@@ -11,7 +11,6 @@ import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.loki2302.dto.AuthenticationResultDTO;
-import com.loki2302.dto.BlogServiceErrorCode;
 import com.loki2302.dto.PostDTO;
 import com.loki2302.dto.ServiceResult;
 import com.loki2302.dto.UserDTO;
@@ -25,19 +24,7 @@ public class BlogServiceTest {
 
 	@Autowired
 	BlogService blogService;
-	
-	@Test
-	public void cantAuthenticateIfNotRegistered() {
-		ServiceResult<AuthenticationResultDTO> authenticationResult = 
-				blogService.authenticate(
-						"loki2302", 
-						"qwerty");
-		assertFalse(authenticationResult.ok);
-		assertEquals(
-				BlogServiceErrorCode.BadUserNameOrPassword, 
-				authenticationResult.blogServiceErrorCode);
-	}
-	
+		
 	@Test
 	public void bloggingScenario() {
 		UserDTO user = createUser("loki2302", "qwerty");
