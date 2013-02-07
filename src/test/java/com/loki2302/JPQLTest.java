@@ -4,38 +4,11 @@ import static org.junit.Assert.*;
 
 import java.util.List;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.transaction.TransactionConfiguration;
-import org.springframework.transaction.annotation.Transactional;
 
-import com.loki2302.entities.Post;
-import com.loki2302.entities.User;
-import com.loki2302.repositories.PostRepository;
-import com.loki2302.repositories.UserRepository;
-
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:applicationContext.xml", "classpath:repository-context.xml"})
-@Transactional
-@TransactionConfiguration(defaultRollback = true)
-public class JPQLTest {
-	
-	@PersistenceContext
-	EntityManager entityManager;
-	
-	@Autowired
-	UserRepository userRepository;
-	
-	@Autowired
-	PostRepository postRepository;
-	
+public class JPQLTest extends AbstractSpringDataJPATest {	
 	@Test
 	public void canGetUserNamesAndPostCount() {
 		createUserWithPosts("loki2302", 7);
@@ -86,21 +59,6 @@ public class JPQLTest {
 		public UserNameAndPostCount(String userName, long postCount) {
 			this.userName = userName;
 			this.postCount = postCount;
-		}
-	}
-	
-	private void createUserWithPosts(String userName, int numberOfPosts) {
-		User user = new User();
-		user.setUserName(userName);
-		user.setPassword("qwerty");
-		user = userRepository.save(user);
-		
-		for(int i = 0; i < numberOfPosts; ++i) {
-			Post post = new Post();
-			post.setText(String.format("Post #%d of %s", i, userName));
-			post.setText("content here");
-			post.setAuthor(user);
-			post = postRepository.save(post);
 		}
 	}
 }
