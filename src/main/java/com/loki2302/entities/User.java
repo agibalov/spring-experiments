@@ -20,7 +20,7 @@ public class User {
 	private String userName;
 	private String password;
 	
-	@OneToMany
+	@OneToMany(mappedBy = "author")
 	private List<Post> posts;
 	
 	@OneToMany

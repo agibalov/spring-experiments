@@ -10,11 +10,11 @@ import javax.persistence.Tuple;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Root;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +43,6 @@ public class CriteriaApiTest {
 	@Autowired
 	PostRepository postRepository;
 	
-	@Ignore
 	@Test
 	public void canGetUserNamesAndPostCount() {
 		createUserWithPosts("loki2302", 7);
@@ -53,14 +52,20 @@ public class CriteriaApiTest {
 		CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
 		CriteriaQuery<Tuple> criteriaQuery = criteriaBuilder.createTupleQuery();
 		Root<User> root = criteriaQuery.from(User.class);
-		Join<User, Post> postsExpression = root.join("posts");
-		criteriaQuery.multiselect(root.get("userName"), criteriaBuilder.count(postsExpression));		
+		Join<User, Post> postsExpression = root.join("posts", JoinType.LEFT);
+		Expression<Long> postCountExpression = criteriaBuilder.count(postsExpression);
+		criteriaQuery.multiselect(root.get("userName"), postCountExpression);
+		criteriaQuery.groupBy(root.get("userName"));
+		criteriaQuery.orderBy(criteriaBuilder.asc(postCountExpression));
 		
 		TypedQuery<Tuple> typedQuery = entityManager.createQuery(criteriaQuery);
 		List<Tuple> tupleList = typedQuery.getResultList();
-		for(Tuple tuple : tupleList) {
-			System.out.printf("%s\n", tuple.get(0));
-		}
+		assertEquals("qwerty", tupleList.get(0).get(0));
+		assertEquals(3L, tupleList.get(0).get(1));		
+		assertEquals("loki2302", tupleList.get(1).get(0));
+		assertEquals(7L, tupleList.get(1).get(1));		
+		assertEquals("lena", tupleList.get(2).get(0));
+		assertEquals(12L, tupleList.get(2).get(1));
 	}
 	
 	@Test
