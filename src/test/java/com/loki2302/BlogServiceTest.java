@@ -26,25 +26,68 @@ public class BlogServiceTest {
 	BlogService blogService;
 		
 	@Test
-	public void bloggingScenario() {
+	public void canCreatePost() {
 		UserDTO user = createUser("loki2302", "qwerty");
-		assertEquals("loki2302", user.UserName);
-		assertEquals(0, user.NumberOfPosts);
-		
-		AuthenticationResultDTO authenticationResult = authenticate("loki2302", "qwerty");
-		assertNotNull(authenticationResult.SessionToken);
-		assertEquals(0, authenticationResult.User.NumberOfPosts);
+		AuthenticationResultDTO authenticationResult = authenticate(
+				"loki2302", "qwerty");
 		
 		String sessionToken = authenticationResult.SessionToken;
 		
-		PostDTO post = createPost(sessionToken, "hi there");
-		assertEquals("hi there", post.Text);
-		assertEquals("loki2302", post.UserName);
-		assertEquals(user.UserId, post.UserId);
+		ServiceResult<PostDTO> createPostResult = blogService.createPost(
+				sessionToken, 
+				"text goes here");
+		assertTrue(createPostResult.ok);
+		assertNotNull(createPostResult.payload);
+		assertTrue(createPostResult.payload.PostId > 0);
+		assertEquals("text goes here", createPostResult.payload.Text);
+		assertEquals("loki2302", createPostResult.payload.UserName);
+		assertEquals(user.UserId, createPostResult.payload.UserId);
+	}
+	
+	@Test
+	public void canUpdatePost() {
+		UserDTO user = createUser("loki2302", "qwerty");
+		AuthenticationResultDTO authenticationResult = authenticate(
+				"loki2302", "qwerty");
 		
-		authenticationResult = authenticate("loki2302", "qwerty");
-		assertNotNull(authenticationResult.SessionToken);
-		assertEquals(1, authenticationResult.User.NumberOfPosts);
+		String sessionToken = authenticationResult.SessionToken;
+		
+		PostDTO post = createPost(sessionToken, "text goes here");
+		ServiceResult<PostDTO> updatePostResult = blogService.updatePost(
+				sessionToken, 
+				post.PostId, 
+				"new text goes here");
+		assertTrue(updatePostResult.ok);
+		assertNotNull(updatePostResult.payload);
+		assertEquals(post.PostId, updatePostResult.payload.PostId);
+		assertEquals(post.UserId, updatePostResult.payload.UserId);
+		assertEquals(post.UserName, updatePostResult.payload.UserName);
+		assertEquals("new text goes here", updatePostResult.payload.Text);
+	}
+	
+	@Test
+	public void cantUpdatePostThatDoesNotExist() {
+		// TODO
+	}
+	
+	@Test
+	public void cantUpdatePostThatDoesNotBelongToTheUser() {
+		// TODO
+	}
+	
+	@Test
+	public void canDeletePost() {
+		// TODO
+	}
+	
+	@Test
+	public void cantDeletePostThatDoesNotExist() {
+		// TODO
+	}
+	
+	@Test
+	public void cantDeletePostThatDoesnBelongToTheUser() {
+		// TODO
 	}
 	
 	private UserDTO createUser(
@@ -84,6 +127,38 @@ public class BlogServiceTest {
 		assertTrue(result.ok);
 		
 		return result.payload;		
+	}
+	
+	private PostDTO getPost(
+			String sessionToken, 
+			long postId) {
+		
+		ServiceResult<PostDTO> result = blogService.getPost(
+				sessionToken, 
+				postId);
+		
+		assertTrue(result.ok);
+		
+		return result.payload;
+	}
+	
+	private PostDTO updatePost(
+			String sessionToken, 
+			long postId, 
+			String text) {
+		
+		return null;
+	}
+	
+	private void deletePost(
+			String sessionToken, 
+			long postId) {
+		
+		ServiceResult<Object> result = blogService.deletePost(
+				sessionToken,
+				postId);
+		
+		assertTrue(result.ok);
 	}
 	
 }

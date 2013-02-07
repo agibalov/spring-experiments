@@ -79,4 +79,9 @@ public class AuthenticationTest {
 				authenticationResult.blogServiceErrorCode);
 	}
 	
+	@Test
+	public void cantAuthenticateWithWrongPassword() {
+		// TODO
+	}
+	
 }
