@@ -1,4 +1,4 @@
-package com.loki2302.service;
+package com.loki2302.service.implementation;
 
 import java.util.UUID;
 
@@ -12,11 +12,8 @@ import com.loki2302.repositories.UserRepository;
 
 @Service
 public class AuthenticationManager {
-	@Autowired
-	UserRepository userRepository;
-	
-	@Autowired
-	SessionRepository sessionRepository;
+	@Autowired UserRepository userRepository;	
+	@Autowired SessionRepository sessionRepository;
 	
 	public Session authenticate(String userName, String password) {
 		User user = userRepository.findUserByName(userName);

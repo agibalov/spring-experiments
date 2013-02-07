@@ -1,109 +1,132 @@
 package com.loki2302.service;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.Join;
-import javax.persistence.criteria.JoinType;
-import javax.persistence.criteria.Root;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.loki2302.dto.AuthenticationResultDTO;
+import com.loki2302.dto.BlogServiceErrorCode;
 import com.loki2302.dto.PostDTO;
+import com.loki2302.dto.ServiceResult;
 import com.loki2302.dto.UserDTO;
-import com.loki2302.entities.Post;
-import com.loki2302.entities.Session;
-import com.loki2302.entities.User;
-import com.loki2302.repositories.PostRepository;
-import com.loki2302.repositories.UserRepository;
+import com.loki2302.service.implementation.BlogServiceException;
+import com.loki2302.service.implementation.UserDetailsRetriever;
+import com.loki2302.service.transactionscripts.AuthenticateTransactionScript;
+import com.loki2302.service.transactionscripts.CreatePostTransactionScript;
+import com.loki2302.service.transactionscripts.CreateUserTransactionScript;
+import com.loki2302.service.transactionscripts.DeletePostTransactionScript;
+import com.loki2302.service.transactionscripts.GetPostTransactionScript;
+import com.loki2302.service.transactionscripts.UpdatePostTransactionScript;
 
 @Service
-public class BlogService {
+public class BlogService {		
+	@Autowired CreateUserTransactionScript createUserTransactionScript;	
+	@Autowired AuthenticateTransactionScript authenticateTransactionScript;	
+	@Autowired UserDetailsRetriever userDetailsRetriever;
+	@Autowired CreatePostTransactionScript createPostTransactionScript;	
+	@Autowired GetPostTransactionScript getPostTransactionScript;	
+	@Autowired DeletePostTransactionScript deletePostTransactionScript;	
+	@Autowired UpdatePostTransactionScript updatePostTransactionScript;
 	
-	@PersistenceContext
-	EntityManager entityManager;
-	
-	@Autowired
-	UserRepository userRepository;
-	
-	@Autowired
-	PostRepository postRepository;	
-	
-	@Autowired
-	AuthenticationManager authenticationManager;
-	
-	@Autowired
-	PostMapper postMapper;
-	
-	public UserDTO createUser(String userName, String password) {
-		User user = new User();
-		user.setUserName(userName);
-		user.setPassword(password);
-		user = userRepository.save(user);
+	public ServiceResult<UserDTO> createUser(
+			final String userName, 
+			final String password) {
 		
-		UserAndPostCount result = getUserDetails(user.getId());		
-		UserDTO userDto = new UserDTO();
-		userDto.UserId = result.User.getId();
-		userDto.UserName = result.User.getUserName();		
-		userDto.NumberOfPosts = result.PostCount;
-		
-		return userDto;
+		return ExecuteWithExceptionHandling(new ServiceAction<UserDTO>() {
+			@Override 
+			public UserDTO execute() throws BlogServiceException {
+				return createUserTransactionScript.createUser(
+						userName, 
+						password);
+			}			
+		});
 	}
 	
-	private UserAndPostCount getUserDetails(long userId) {
-		CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-		CriteriaQuery<UserAndPostCount> criteriaQuery = 
-				criteriaBuilder.createQuery(UserAndPostCount.class);
-		Root<User> root = criteriaQuery.from(User.class);
-		Join<User, Post> postsExpression = root.join("posts", JoinType.LEFT);
-		Expression<Long> postCountExpression = criteriaBuilder.count(postsExpression);
-		criteriaQuery.multiselect(root, postCountExpression);
-		criteriaQuery.groupBy(root);
-		criteriaQuery.where(criteriaBuilder.equal(root.get("id"), userId));		
-		TypedQuery<UserAndPostCount> typedQuery = entityManager.createQuery(criteriaQuery);
-		UserAndPostCount result = typedQuery.getSingleResult();
-		return result;
+	public ServiceResult<AuthenticationResultDTO> authenticate(
+			final String userName, 
+			final String password) {
+		
+		return ExecuteWithExceptionHandling(new ServiceAction<AuthenticationResultDTO>() {
+			@Override 
+			public AuthenticationResultDTO execute() throws BlogServiceException {
+				return authenticateTransactionScript.authenticate(
+						userName, 
+						password);
+			}			
+		});
 	}
 	
-	public AuthenticationResultDTO authenticate(String userName, String password) {
-		Session session = authenticationManager.authenticate(userName, password);
+	public ServiceResult<PostDTO> createPost(
+			final String sessionToken, 
+			final String text) {
 		
-		UserAndPostCount result = getUserDetails(session.getUser().getId());		
+		return ExecuteWithExceptionHandling(new ServiceAction<PostDTO>() {
+			@Override
+			public PostDTO execute() throws BlogServiceException {
+				return createPostTransactionScript.createPost(
+						sessionToken, 
+						text);
+			}			
+		});		
+	}
+	
+	public ServiceResult<PostDTO> getPost(
+			final String sessionToken, 
+			final long postId) {
+		
+		return ExecuteWithExceptionHandling(new ServiceAction<PostDTO>() {
+			@Override 
+			public PostDTO execute() throws BlogServiceException {
+				return getPostTransactionScript.getPost(
+						sessionToken, 
+						postId);
+			}			
+		});		
+	}
+	
+	public ServiceResult<Object> deletePost(
+			final String sessionToken, 
+			final long postId) {
+		
+		return ExecuteWithExceptionHandling(new ServiceAction<Object>() {
+			@Override 
+			public Object execute() throws BlogServiceException {
+				deletePostTransactionScript.deletePost(
+						sessionToken, 
+						postId);
 				
-		AuthenticationResultDTO authenticationResultDto = new AuthenticationResultDTO();
-		authenticationResultDto.SessionToken = session.getSessionToken();
-		
-		UserDTO userDto = new UserDTO();
-		userDto.UserId = result.User.getId();
-		userDto.UserName = result.User.getUserName();		
-		userDto.NumberOfPosts = result.PostCount;
-		authenticationResultDto.User = userDto;
-		
-		return authenticationResultDto;
+				return null;
+			}			
+		});
 	}
 	
-	public PostDTO createPost(String sessionToken, String text) {
-		User user = authenticationManager.getUser(sessionToken);		
-		Post post = new Post();
-		post.setAuthor(user);
-		post.setText(text);
-		post = postRepository.save(post);
-		return postMapper.build(post);
+	public ServiceResult<PostDTO> updatePost(
+			final String sessionToken, 
+			final long postId, 
+			final String text) {
+		
+		return ExecuteWithExceptionHandling(new ServiceAction<PostDTO>() {			
+			@Override 
+			public PostDTO execute() throws BlogServiceException {				
+				return updatePostTransactionScript.updatePost(
+						sessionToken, 
+						postId, 
+						text);
+			}			
+		});
 	}
 	
-	public PostDTO getPost(String sessionToken, long postId) {
-		User user = authenticationManager.getUser(sessionToken);
-		Post post = postRepository.findOne(postId);
-		if(!post.getAuthor().equals(user)) {
-			throw new RuntimeException("no permissions to access the post");
+	private static <T> ServiceResult<T> ExecuteWithExceptionHandling(ServiceAction<T> function) {
+		try {
+			T result = function.execute();			
+			return ServiceResult.ok(result);
+		} catch(BlogServiceException e) {
+			return ServiceResult.error(e.getBlogServiceErrorCode());
+		} catch(RuntimeException e) {
+			return ServiceResult.error(BlogServiceErrorCode.InternalError);
 		}
-		
-		return postMapper.build(post);		
 	}
 	
+	public static interface ServiceAction<T> {
+		T execute() throws BlogServiceException;
+	}
 }

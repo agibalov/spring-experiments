@@ -1,4 +1,4 @@
-package com.loki2302.service;
+package com.loki2302.service.implementation;
 
 import org.springframework.stereotype.Service;
 
