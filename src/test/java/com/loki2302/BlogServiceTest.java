@@ -15,7 +15,6 @@ import com.loki2302.dto.PostDTO;
 import com.loki2302.dto.UserDTO;
 import com.loki2302.service.BlogService;
 
-
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:applicationContext.xml", "classpath:repository-context.xml"})
 @Transactional

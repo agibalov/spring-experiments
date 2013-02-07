@@ -15,6 +15,7 @@
 			<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
 				<property name="generateDdl" value="true" />
 				<property name="database" value="HSQL" />
+				<property name="showSql" value="true" />
 			</bean>
 		</property>
 		<property name="persistenceUnitName" value="jpa.sample" />
