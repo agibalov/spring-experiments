@@ -32,6 +32,7 @@ public class BlogServiceTest {
 		
 		AuthenticationResultDTO authenticationResult = blogService.authenticate("loki2302", "qwerty");
 		assertNotNull(authenticationResult.SessionToken);
+		assertEquals(0, authenticationResult.User.NumberOfPosts);
 		
 		String sessionToken = authenticationResult.SessionToken;
 		
@@ -39,6 +40,10 @@ public class BlogServiceTest {
 		assertEquals("hi there", post.Text);
 		assertEquals("loki2302", post.UserName);
 		assertEquals(user.UserId, post.UserId);
+		
+		authenticationResult = blogService.authenticate("loki2302", "qwerty");
+		assertNotNull(authenticationResult.SessionToken);
+		assertEquals(1, authenticationResult.User.NumberOfPosts);
 	}
 	
 }
