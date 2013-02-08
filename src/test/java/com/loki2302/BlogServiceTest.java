@@ -11,6 +11,7 @@ import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.loki2302.dto.AuthenticationResultDTO;
+import com.loki2302.dto.BlogServiceErrorCode;
 import com.loki2302.dto.PostDTO;
 import com.loki2302.dto.ServiceResult;
 import com.loki2302.dto.UserDTO;
@@ -47,6 +48,30 @@ public class BlogServiceTest {
 	}
 	
 	@Test
+	public void cantCreatePostIfTextIsTooLong() {
+		UserDTO user = createUser("loki2302", "qwerty");
+		AuthenticationResultDTO authenticationResult = authenticate(
+				"loki2302", "qwerty");
+		
+		String sessionToken = authenticationResult.SessionToken;
+		
+		StringBuilder stringBuilder = new StringBuilder();
+		for(int i = 0; i < 1025; ++i) {
+			stringBuilder.append('a');
+		}
+		
+		ServiceResult<PostDTO> createPostResult = blogService.createPost(
+				sessionToken, 
+				stringBuilder.toString());
+		assertFalse(createPostResult.ok);
+		assertNull(createPostResult.payload);		
+		assertEquals(
+				BlogServiceErrorCode.ValidationError, 
+				createPostResult.blogServiceErrorCode);
+		assertTrue(createPostResult.fieldErrors.containsKey("text"));
+	}
+	
+	@Test
 	public void canUpdatePost() {
 		UserDTO user = createUser("loki2302", "qwerty");
 		AuthenticationResultDTO authenticationResult = authenticate(
@@ -75,12 +100,7 @@ public class BlogServiceTest {
 	@Test
 	public void cantUpdatePostThatDoesNotBelongToTheUser() {
 		// TODO
-	}
-	
-	@Test
-	public void cantCreatePostIfTextIsTooLong() {
-		// TODO
-	}
+	}	
 	
 	@Test
 	public void cantUpdatePostIfTextIsTooLong() {
