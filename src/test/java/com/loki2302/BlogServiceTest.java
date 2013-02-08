@@ -78,6 +78,16 @@ public class BlogServiceTest {
 	}
 	
 	@Test
+	public void cantCreatePostIfTextIsTooLong() {
+		// TODO
+	}
+	
+	@Test
+	public void cantUpdatePostIfTextIsTooLong() {
+		// TODO
+	}
+	
+	@Test
 	public void canDeletePost() {
 		// TODO
 	}
