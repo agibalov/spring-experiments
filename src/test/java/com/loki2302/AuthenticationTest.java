@@ -17,13 +17,39 @@ import com.loki2302.dto.UserDTO;
 import com.loki2302.service.BlogService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:applicationContext.xml", "classpath:repository-context.xml"})
+@ContextConfiguration(locations = {
+		"classpath:applicationContext.xml", 
+		"classpath:repository-context.xml"})
 @Transactional
 @TransactionConfiguration(defaultRollback = true)
 public class AuthenticationTest {
 
 	@Autowired
 	BlogService blogService;	
+	
+	@Test
+	public void cantCreateUserWithBadUserName() {
+		ServiceResult<UserDTO> createUserResult = blogService.createUser(
+				"",
+				"qwerty");
+		assertFalse(createUserResult.ok);
+		assertEquals(
+				BlogServiceErrorCode.ValidationError, 
+				createUserResult.blogServiceErrorCode);
+		assertTrue(createUserResult.fieldErrors.containsKey("userName"));
+	}
+	
+	@Test
+	public void cantCreateUserWithBadPassword() {
+		ServiceResult<UserDTO> createUserResult = blogService.createUser(
+				"loki2302",
+				"");
+		assertFalse(createUserResult.ok);
+		assertEquals(
+				BlogServiceErrorCode.ValidationError, 
+				createUserResult.blogServiceErrorCode);
+		assertTrue(createUserResult.fieldErrors.containsKey("password"));
+	}
 	
 	@Test
 	public void canRegister() {

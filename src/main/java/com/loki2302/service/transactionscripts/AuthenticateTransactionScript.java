@@ -11,15 +11,23 @@ import com.loki2302.service.implementation.AuthenticationManager;
 import com.loki2302.service.implementation.BlogServiceException;
 import com.loki2302.service.implementation.UserAndPostCount;
 import com.loki2302.service.implementation.UserDetailsRetriever;
+import com.loki2302.service.validation.ThrowingValidator;
+import com.loki2302.service.validation.subjects.UserNameAndPassword;
 
 @Service
 public class AuthenticateTransactionScript {
+	@Autowired ThrowingValidator throwingValidator;
 	@Autowired AuthenticationManager authenticationManager;	
 	@Autowired UserDetailsRetriever userDetailsRetriever;
 	
 	public AuthenticationResultDTO authenticate(
 			String userName, 
 			String password) throws BlogServiceException {
+		
+		UserNameAndPassword userNameAndPassword = new UserNameAndPassword();
+		userNameAndPassword.userName = userName;
+		userNameAndPassword.password = password;
+		throwingValidator.Validate(userNameAndPassword);
 		
 		Session session = authenticationManager.authenticate(
 				userName, 

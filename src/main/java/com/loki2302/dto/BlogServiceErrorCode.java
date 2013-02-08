@@ -5,5 +5,6 @@ public enum BlogServiceErrorCode {
 	NoSuchPost,
 	NoPermissionsToAccessPost,
 	BadUserNameOrPassword,
-	UserAlreadyRegistered
+	UserAlreadyRegistered,
+	ValidationError
 }
