@@ -11,9 +11,12 @@ import com.loki2302.repositories.PostRepository;
 import com.loki2302.service.implementation.AuthenticationManager;
 import com.loki2302.service.implementation.BlogServiceException;
 import com.loki2302.service.implementation.PostMapper;
+import com.loki2302.service.validation.ThrowingValidator;
+import com.loki2302.service.validation.subjects.PostSubject;
 
 @Service
 public class UpdatePostTransactionScript {
+	@Autowired ThrowingValidator throwingValidator;
 	@Autowired AuthenticationManager authenticationManager;	
 	@Autowired PostRepository postRepository;	
 	@Autowired PostMapper postMapper;
@@ -22,6 +25,10 @@ public class UpdatePostTransactionScript {
 			String sessionToken, 
 			long postId, 
 			String text) throws BlogServiceException {
+		
+		PostSubject postSubject = new PostSubject();
+		postSubject.text = text;
+		throwingValidator.Validate(postSubject);
 		
 		User user = authenticationManager.getUser(sessionToken);
 		Post post = postRepository.findOne(postId);

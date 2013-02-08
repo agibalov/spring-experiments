@@ -18,7 +18,10 @@ public class GetPostTransactionScript {
 	@Autowired PostRepository postRepository;	
 	@Autowired PostMapper postMapper;
 	
-	public PostDTO getPost(String sessionToken, long postId) throws BlogServiceException {
+	public PostDTO getPost(
+			String sessionToken, 
+			long postId) throws BlogServiceException {
+		
 		User user = authenticationManager.getUser(sessionToken);
 		Post post = postRepository.findOne(postId);
 		if(post == null) {

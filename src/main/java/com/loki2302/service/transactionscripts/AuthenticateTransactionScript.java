@@ -12,7 +12,7 @@ import com.loki2302.service.implementation.BlogServiceException;
 import com.loki2302.service.implementation.UserAndPostCount;
 import com.loki2302.service.implementation.UserDetailsRetriever;
 import com.loki2302.service.validation.ThrowingValidator;
-import com.loki2302.service.validation.subjects.UserNameAndPassword;
+import com.loki2302.service.validation.subjects.UserNameAndPasswordSubject;
 
 @Service
 public class AuthenticateTransactionScript {
@@ -24,10 +24,11 @@ public class AuthenticateTransactionScript {
 			String userName, 
 			String password) throws BlogServiceException {
 		
-		UserNameAndPassword userNameAndPassword = new UserNameAndPassword();
-		userNameAndPassword.userName = userName;
-		userNameAndPassword.password = password;
-		throwingValidator.Validate(userNameAndPassword);
+		UserNameAndPasswordSubject userNameAndPasswordSubject = 
+				new UserNameAndPasswordSubject();
+		userNameAndPasswordSubject.userName = userName;
+		userNameAndPasswordSubject.password = password;
+		throwingValidator.Validate(userNameAndPasswordSubject);
 		
 		Session session = authenticationManager.authenticate(
 				userName, 

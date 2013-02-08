@@ -15,7 +15,10 @@ public class DeletePostTransactionScript {
 	@Autowired AuthenticationManager authenticationManager;	
 	@Autowired PostRepository postRepository;
 	
-	public void deletePost(String sessionToken, long postId) throws BlogServiceException {
+	public void deletePost(
+			String sessionToken, 
+			long postId) throws BlogServiceException {
+		
 		User user = authenticationManager.getUser(sessionToken);
 		Post post = postRepository.findOne(postId);
 		if(post == null) {
