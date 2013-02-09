@@ -18,7 +18,16 @@ import com.loki2302.repositories.UserRepository;
 public class AuthenticationManager {
 	@Autowired UserRepository userRepository;	
 	@Autowired SessionRepository sessionRepository;
+	int sessionPeriod;
 	
+	public void setSessionPeriod(int sessionPeriod) {
+		this.sessionPeriod = sessionPeriod;
+	}
+	
+	public int getSessionPeriod() {
+		return sessionPeriod;
+	}
+		
 	public Session authenticate(
 			String userName, 
 			String password) throws BlogServiceException {
@@ -50,7 +59,7 @@ public class AuthenticationManager {
 		DateTime lastActivity = new DateTime(session.getLastActivity());
 		DateTime currentTime = new DateTime(new Date());
 		Seconds sessionSeconds = Seconds.secondsBetween(lastActivity, currentTime);		
-		if(sessionSeconds.getSeconds() >= 3) {
+		if(sessionSeconds.getSeconds() >= sessionPeriod) {
 			sessionRepository.delete(session);			
 			throw new BlogServiceException(BlogServiceErrorCode.SessionExpired); 
 		}
