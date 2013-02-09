@@ -1,5 +1,7 @@
 package com.loki2302.entities;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -19,6 +21,8 @@ public class Session {
 	@ManyToOne
 	private User user;
 	
+	private Date lastActivity;
+	
 	public Long getId() {
 		return id;
 	}
@@ -37,5 +41,13 @@ public class Session {
 	
 	public void setUser(User user) {
 		this.user = user;
+	}
+	
+	public Date getLastActivity() {
+		return lastActivity;
+	}
+	
+	public void setLastActivity(Date lastActivity) {
+		this.lastActivity = lastActivity;
 	}
 }

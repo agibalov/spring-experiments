@@ -6,5 +6,7 @@ public enum BlogServiceErrorCode {
 	NoPermissionsToAccessPost,
 	BadUserNameOrPassword,
 	UserAlreadyRegistered,
-	ValidationError
+	ValidationError,
+	NoSuchSession,
+	SessionExpired
 }

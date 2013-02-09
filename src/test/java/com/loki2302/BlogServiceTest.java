@@ -27,6 +27,35 @@ public class BlogServiceTest {
 
 	@Autowired
 	BlogService blogService;
+	
+	@Test
+	public void sessionExpiresAfter3Seconds() throws InterruptedException {
+		UserDTO user = createUser("loki2302", "qwerty");
+		AuthenticationResultDTO authenticationResult = authenticate(
+				"loki2302", "qwerty");
+		
+		String sessionToken = authenticationResult.SessionToken;
+		createPost(sessionToken, "test1");
+		Thread.sleep(3500);		
+		
+		ServiceResult<PostDTO> createPostResult = blogService.createPost(
+				sessionToken, 
+				"test2");
+		assertFalse(createPostResult.ok);
+		assertNull(createPostResult.payload);		
+		assertEquals(
+				BlogServiceErrorCode.SessionExpired, 
+				createPostResult.blogServiceErrorCode);
+		
+		createPostResult = blogService.createPost(
+				sessionToken, 
+				"test3");
+		assertFalse(createPostResult.ok);
+		assertNull(createPostResult.payload);		
+		assertEquals(
+				BlogServiceErrorCode.NoSuchSession, 
+				createPostResult.blogServiceErrorCode);
+	}
 		
 	@Test
 	public void canCreatePost() {

@@ -1,7 +1,10 @@
 package com.loki2302.service.implementation;
 
+import java.util.Date;
 import java.util.UUID;
 
+import org.joda.time.DateTime;
+import org.joda.time.Seconds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,16 +35,28 @@ public class AuthenticationManager {
 		Session session = new Session();
 		session.setUser(user);
 		session.setSessionToken(UUID.randomUUID().toString());
+		session.setLastActivity(new Date());
 		session = sessionRepository.save(session);
 		
 		return session;			
 	}
 	
-	public User getUser(String sessionToken) {
+	public User getUser(String sessionToken) throws BlogServiceException {
 		Session session = sessionRepository.findBySessionToken(sessionToken);
 		if(session == null) {
-			throw new RuntimeException("No such session");
+			throw new BlogServiceException(BlogServiceErrorCode.NoSuchSession);
 		}
+		
+		DateTime lastActivity = new DateTime(session.getLastActivity());
+		DateTime currentTime = new DateTime(new Date());
+		Seconds sessionSeconds = Seconds.secondsBetween(lastActivity, currentTime);		
+		if(sessionSeconds.getSeconds() >= 3) {
+			sessionRepository.delete(session);			
+			throw new BlogServiceException(BlogServiceErrorCode.SessionExpired); 
+		}
+		
+		session.setLastActivity(currentTime.toDate());
+		session = sessionRepository.save(session);
 		
 		User user = session.getUser();
 		return user;
