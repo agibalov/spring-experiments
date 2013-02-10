@@ -33,6 +33,9 @@ public class ThrowingValidator {
 				fieldErrors = new ArrayList<String>();
 				fields.put(fieldName, fieldErrors);
 			}
+			
+			String message = violation.getMessage();
+			fieldErrors.add(message);
 		}
 			
 		throw new BlogServiceValidationException(fields);			
