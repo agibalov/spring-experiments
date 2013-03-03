@@ -22,7 +22,11 @@ public class HelloServiceImpl implements HelloService {
 		response.numberA = numberA;
 		response.numberB = numberB;
 		response.result = numberA + numberB;
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+		}
 		
 		return response;
-	}
+	} 
 }
