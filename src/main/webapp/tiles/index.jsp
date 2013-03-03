@@ -1,3 +1,6 @@
+<%@ page isELIgnored="false" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
 <!DOCTYPE html>
 <html ng-app="app">
     <head>
@@ -5,13 +8,13 @@
 
         <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet">
         <link href="http://netdna.bootstrapcdn.com/font-awesome/3.0.2/css/font-awesome.css" rel="stylesheet"> 
-        <link href="/static/angular-ui.min.css" rel="stylesheet" type="text/css" />     
+        <link href="<c:url value="/static/angular-ui.min.css" />" rel="stylesheet" type="text/css" />		
 		
 		<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
         <script src="http://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.0/jquery-ui.min.js"></script>
-        <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
+        <script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
         <script src="http://cdnjs.cloudflare.com/ajax/libs/angular.js/1.1.1/angular.min.js"></script>
-        <script src="/static/angular-ui.min.js"></script>
+        <script src="<c:url value="/static/angular-ui.min.js" />"></script>
         <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.3/underscore-min.js"></script>		
 	</head>
 	<body ng-controller="AppController">
@@ -84,7 +87,7 @@
                     };
                 });				
 			});			
-			app.constant("serviceUrl", "http://localhost:8080/api/HelloService/");
+			app.constant("serviceUrl", "<c:url value="/api/HelloService/" />");
 			
 			angular.module("app").controller("BackendMonitorModalController", function ($scope, backendMonitor) {
                 $scope.backendState = backendMonitor.getState();
