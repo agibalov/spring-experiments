@@ -18,15 +18,7 @@ import com.loki2302.repositories.UserRepository;
 public class AuthenticationManager {
 	@Autowired UserRepository userRepository;	
 	@Autowired SessionRepository sessionRepository;
-	int sessionPeriod;
-	
-	public void setSessionPeriod(int sessionPeriod) {
-		this.sessionPeriod = sessionPeriod;
-	}
-	
-	public int getSessionPeriod() {
-		return sessionPeriod;
-	}
+	int sessionPeriod = 3; // TODO: make configurable
 		
 	public Session authenticate(
 			String userName, 

@@ -15,7 +15,7 @@ import com.loki2302.repositories.PostRepository;
 import com.loki2302.repositories.UserRepository;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:applicationContext.xml"})
+@ContextConfiguration(classes = MyConfiguration.class)
 @Transactional
 @TransactionConfiguration(defaultRollback = true)
 public abstract class AbstractSpringDataJPATest {

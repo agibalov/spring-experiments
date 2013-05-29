@@ -18,7 +18,7 @@ import com.loki2302.dto.UserDTO;
 import com.loki2302.service.BlogService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:applicationContext.xml"})
+@ContextConfiguration(classes = MyConfiguration.class)
 @Transactional
 @TransactionConfiguration(defaultRollback = true)
 public class BlogServiceTest {
