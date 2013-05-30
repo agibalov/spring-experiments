@@ -1,38 +1,77 @@
 package me.loki2302;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.*;
 
-/**
- * Unit test for simple App.
- */
-public class AppTest 
-    extends TestCase
-{
-    /**
-     * Create the test case
-     *
-     * @param testName name of the test case
-     */
-    public AppTest( String testName )
-    {
-        super( testName );
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.neo4j.support.Neo4jTemplate;
+import org.springframework.data.neo4j.support.node.Neo4jHelper;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.transaction.BeforeTransaction;
+import org.springframework.transaction.annotation.Transactional;
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = AppConfiguration.class)
+@Transactional
+public class AppTest {
+    @Autowired
+    private Neo4jTemplate neo4jTemplate;
+    
+    @Autowired
+    private PeopleRepository peopleRepository;
+    
+    @Rollback(false)
+    @BeforeTransaction
+    public void cleanUpDatabase() {
+        Neo4jHelper.cleanDb(neo4jTemplate);
     }
-
-    /**
-     * @return the suite of tests being tested
-     */
-    public static Test suite()
-    {
-        return new TestSuite( AppTest.class );
+    
+    @Test
+    public void thereAreNoPeopleByDefault() {
+        assertNobodyThere();
     }
-
-    /**
-     * Rigourous Test :-)
-     */
-    public void testApp()
-    {
-        assertTrue( true );
+    
+    @Test
+    public void canSaveSinglePerson() {
+        assertNobodyThere();
+        
+        Person person = new Person();
+        person.setName("loki2302");
+        person = peopleRepository.save(person);
+        
+        assertPeopleThere(1);
+        
+        assertNotNull(person.getId());
+        assertEquals("loki2302", person.getName());
+    }    
+    
+    @Test
+    public void canSaveAndRetrieveSinglePerson() {
+        assertNobodyThere();
+        
+        Person person = new Person();
+        person.setName("loki2302");
+        person = peopleRepository.save(person);
+        
+        assertPeopleThere(1);
+        
+        Long personId = person.getId();
+        
+        Person person1 = peopleRepository.findOne(personId);
+        assertEquals(personId, person1.getId());
+        assertEquals("loki2302", person1.getName());
+    }
+    
+    private void assertNobodyThere() {
+        long peopleCount = peopleRepository.count();
+        assertEquals(0, peopleCount);
+    }
+    
+    private void assertPeopleThere(long expectedPeopleCount) {
+        long peopleCount = peopleRepository.count();
+        assertEquals(expectedPeopleCount, peopleCount);
     }
 }
