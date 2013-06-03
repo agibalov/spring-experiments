@@ -1,4 +1,4 @@
-package me.loki2302;
+package me.loki2302.plain;
 
 import static org.junit.Assert.*;
 
@@ -14,7 +14,7 @@ import org.springframework.test.context.transaction.BeforeTransaction;
 import org.springframework.transaction.annotation.Transactional;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = AppConfiguration.class)
+@ContextConfiguration(classes = TestConfiguration.class)
 @Transactional
 public class AppTest {
     @Autowired

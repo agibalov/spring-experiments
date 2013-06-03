@@ -1,4 +1,4 @@
-package me.loki2302;
+package me.loki2302.app;
 
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;

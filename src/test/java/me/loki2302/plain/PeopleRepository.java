@@ -1,4 +1,4 @@
-package me.loki2302;
+package me.loki2302.plain;
 
 
 import org.springframework.data.neo4j.repository.GraphRepository;

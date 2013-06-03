@@ -1,4 +1,4 @@
-package me.loki2302;
+package me.loki2302.plain;
 
 import org.springframework.data.neo4j.annotation.GraphId;
 import org.springframework.data.neo4j.annotation.NodeEntity;
