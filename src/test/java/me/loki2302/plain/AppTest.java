@@ -21,7 +21,7 @@ public class AppTest {
     private Neo4jTemplate neo4jTemplate;
     
     @Autowired
-    private PeopleRepository peopleRepository;
+    private PersonRepository personRepository;
     
     @Rollback(false)
     @BeforeTransaction
@@ -40,7 +40,7 @@ public class AppTest {
         
         Person person = new Person();
         person.setName("loki2302");
-        person = peopleRepository.save(person);
+        person = personRepository.save(person);
         
         assertPeopleThere(1);
         
@@ -54,24 +54,24 @@ public class AppTest {
         
         Person person = new Person();
         person.setName("loki2302");
-        person = peopleRepository.save(person);
+        person = personRepository.save(person);
         
         assertPeopleThere(1);
         
         Long personId = person.getId();
         
-        Person person1 = peopleRepository.findOne(personId);
+        Person person1 = personRepository.findOne(personId);
         assertEquals(personId, person1.getId());
         assertEquals("loki2302", person1.getName());
     }
     
     private void assertNobodyThere() {
-        long peopleCount = peopleRepository.count();
+        long peopleCount = personRepository.count();
         assertEquals(0, peopleCount);
     }
     
     private void assertPeopleThere(long expectedPeopleCount) {
-        long peopleCount = peopleRepository.count();
+        long peopleCount = personRepository.count();
         assertEquals(expectedPeopleCount, peopleCount);
     }
 }
