@@ -119,30 +119,36 @@ public class CypherTest {
     	assertPersonLikesNobody(likingPersonId);
     	assertPersonLikedByNobody(likingPersonId);
     	assertPersonHasOnePersonToLike(likingPersonId, personIdToLike);
+    	assertPersonHasOnePersonToBeLikedBy(likingPersonId, personIdToLike);
     	
     	assertPersonLikesNobody(personIdToLike);
     	assertPersonLikedByNobody(personIdToLike);    	
     	assertPersonHasOnePersonToLike(personIdToLike, likingPersonId);
+    	assertPersonHasOnePersonToBeLikedBy(personIdToLike, likingPersonId);
     	
     	personService.likePerson(likingPersonId, personIdToLike);    	
     	
     	assertPersonLikesOnePerson(likingPersonId, personIdToLike);
     	assertPersonLikedByNobody(likingPersonId);
     	assertPersonHasNoPersonsToLike(likingPersonId);
+    	assertPersonHasOnePersonToBeLikedBy(likingPersonId, personIdToLike);
     	
     	assertPersonLikesNobody(personIdToLike);
     	assertPersonLikedByOnePerson(personIdToLike, likingPersonId);
     	assertPersonHasOnePersonToLike(personIdToLike, likingPersonId);
+    	assertPersonHasNoPersonsToBeLikedBy(personIdToLike);
     	
     	personService.unlikePerson(likingPersonId, personIdToLike);
     	
     	assertPersonLikesNobody(likingPersonId);
     	assertPersonLikedByNobody(likingPersonId);
     	assertPersonHasOnePersonToLike(likingPersonId, personIdToLike);
+    	assertPersonHasOnePersonToBeLikedBy(likingPersonId, personIdToLike);
     	
     	assertPersonLikesNobody(personIdToLike);
     	assertPersonLikedByNobody(personIdToLike);
     	assertPersonHasOnePersonToLike(personIdToLike, likingPersonId);
+    	assertPersonHasOnePersonToBeLikedBy(personIdToLike, likingPersonId);
     }
     
     @Test(expected = RuntimeException.class)
@@ -170,7 +176,7 @@ public class CypherTest {
     private void assertPersonHasNoPersonsToLike(long likingPersonId) {    	
     	List<PersonDTO> likingPersons = personService.getPersonsToLike(likingPersonId);
     	assertEquals(0, likingPersons.size());
-    }
+    }    
     
     private void assertPersonHasOnePersonToLike(long likingPersonId, long personIdToLike) {
     	List<PersonDTO> personsToLike = personService.getPersonsToLike(likingPersonId);
@@ -200,4 +206,17 @@ public class CypherTest {
     	PersonDTO personLikedBy = personService.getPersonById(likingPersonId);
     	assertSamePerson(personLikedBy, theOnlyLikingPerson);
     } 
+    
+    private void assertPersonHasNoPersonsToBeLikedBy(long likedPersonId) {
+    	List<PersonDTO> personsToBeLikedBy = personService.getPersonsToBeLikedBy(likedPersonId);
+    	assertEquals(0, personsToBeLikedBy.size());
+    }
+    
+    private void assertPersonHasOnePersonToBeLikedBy(long likedPersonId, long likingPersonId) {
+    	List<PersonDTO> personsToBeLikedBy = personService.getPersonsToBeLikedBy(likedPersonId);
+    	assertEquals(1, personsToBeLikedBy.size());
+    	PersonDTO theOnlyPersonToBeLikedBy = personsToBeLikedBy.get(0);
+    	PersonDTO likingPerson = personService.getPersonById(likingPersonId);
+    	assertSamePerson(likingPerson, theOnlyPersonToBeLikedBy);
+    }
 }
