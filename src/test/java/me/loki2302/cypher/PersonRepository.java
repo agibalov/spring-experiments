@@ -10,4 +10,10 @@ public interface PersonRepository extends GraphRepository<Person>, RelationshipO
 	
 	@Query("start likedPerson=node({0}) match likingPerson-[:LIKES]->likedPerson return likingPerson")
 	Iterable<Person> getLikingPersons(Person likedPerson);
+	
+	@Query(
+			"start likingPerson=node({0}), personToLike=node:__types__(className='me.loki2302.cypher.Person') " +
+			"where not (likingPerson-[:LIKES]->personToLike) and likingPerson <> personToLike " +
+			"return personToLike")	
+	Iterable<Person> getPersonsToLike(Person likingPerson);
 }

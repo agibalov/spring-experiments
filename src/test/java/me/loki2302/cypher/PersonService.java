@@ -112,6 +112,16 @@ public class PersonService {
 		return personDtosFromPersons(likingPersons);
 	}   	
 	
+	public List<PersonDTO> getPersonsToLike(long likingPersonId) {
+		Person likingPerson = personRepository.findOne(likingPersonId);
+		if(likingPerson == null) {
+			throw new RuntimeException("no such liking person");
+		}
+		
+		Iterable<Person> likedPersons = personRepository.getPersonsToLike(likingPerson);
+		return personDtosFromPersons(likedPersons);
+	}
+	
 	private static PersonDTO personDtoFromPerson(Person person) {
 		PersonDTO personDto = new PersonDTO();
 		personDto.id = person.getId();
