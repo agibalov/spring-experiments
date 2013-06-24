@@ -1,0 +1,9 @@
+{
+	"persons": [
+		{"id": 1, "name": "loki2302"},
+		{"id": 2, "name": "millasa"}
+	],
+	"likes": [
+		{"from": 1, "to": 2}
+	]
+}
