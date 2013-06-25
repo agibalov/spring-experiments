@@ -69,6 +69,16 @@ public abstract class AbstractPersonServiceTest {
     	assertSamePerson(personToLike, theOnlyLikedPerson);
     }
     
+    protected void assertPersonLikesPersons(long likingPersonId, long... likedPersonIds) {
+    	List<PersonDTO> likedPersons = personService.getLikedPersons(likingPersonId);
+    	assertEquals(likedPersonIds.length, likedPersons.size());
+    	
+    	for(long expectedLikedPersonId : likedPersonIds) {
+    		PersonDTO expectedLikedPerson = personService.getPersonById(expectedLikedPersonId);
+    		assertTrue(likedPersons.contains(expectedLikedPerson));
+    	}
+    }
+    
     protected void assertPersonLikedByNobody(long likedPersonId) {
     	List<PersonDTO> likingPersons = personService.getLikingPersons(likedPersonId);
     	assertEquals(0, likingPersons.size());
