@@ -1,4 +1,4 @@
-package me.loki2302.transactions.explicit;
+package me.loki2302.transactions.implicit;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
@@ -12,6 +12,6 @@ import org.springframework.data.neo4j.config.Neo4jConfiguration;
 public class TestNeo4jConfiguration extends Neo4jConfiguration {
     @Bean(name = "graphDatabaseService")
     public GraphDatabaseService provideGraphDatabaseService() {
-        return new EmbeddedGraphDatabase("target/mydb3");
+        return new EmbeddedGraphDatabase("target/mydb4");
     }
 }

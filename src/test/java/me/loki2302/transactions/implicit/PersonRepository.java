@@ -1,4 +1,4 @@
-package me.loki2302.transactions.explicit;
+package me.loki2302.transactions.implicit;
 
 import org.springframework.data.neo4j.repository.GraphRepository;
 

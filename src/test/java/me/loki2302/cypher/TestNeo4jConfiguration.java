@@ -12,6 +12,6 @@ import org.springframework.data.neo4j.config.Neo4jConfiguration;
 public class TestNeo4jConfiguration extends Neo4jConfiguration {
     @Bean(name = "graphDatabaseService")
     public GraphDatabaseService provideGraphDatabaseService() {
-        return new EmbeddedGraphDatabase("target/mydb");
+        return new EmbeddedGraphDatabase("target/mydb1");
     }
 }
