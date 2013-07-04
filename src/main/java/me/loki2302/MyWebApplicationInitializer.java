@@ -1,5 +1,8 @@
 package me.loki2302;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
@@ -24,11 +27,20 @@ public class MyWebApplicationInitializer implements WebApplicationInitializer {
         
         System.out.println("****************************************************");
         System.out.printf("settings: %s\n", settings);
-        System.out.println("****************************************************");
+        System.out.println("****************************************************");        
+        
+        List<Class<?>> configurations = new ArrayList<Class<?>>();
+        configurations.add(MyConfiguration.class);
+        
+        if(settings.getUseStubNotificationService()) {
+            configurations.add(DummyNotificationServiceConfiguration.class);
+        } else {
+            configurations.add(RealNotificationServiceConfiguration.class);
+        }
         
         AnnotationConfigWebApplicationContext context = new AnnotationConfigWebApplicationContext();
-        context.register(MyConfiguration.class);
-               
+        context.register(configurations.toArray(new Class<?>[configurations.size()]));
+                       
         ServletRegistration.Dynamic dispatcher = servletContext.addServlet(
                 "dispatcher", 
                 new DispatcherServlet(context));

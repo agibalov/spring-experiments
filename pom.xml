@@ -58,6 +58,13 @@
 				<version>2.3</version>
 				<configuration>
 					<failOnMissingWebXml>false</failOnMissingWebXml>
+					<webResources>
+						<resource>
+							<directory>src/main</directory>
+							<filtering>true</filtering>
+							<targetPath>WEB-INF</targetPath>							
+						</resource>
+					</webResources>
 				</configuration>
 			</plugin>
 		</plugins>

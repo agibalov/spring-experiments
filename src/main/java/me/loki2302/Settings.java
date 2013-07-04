@@ -3,14 +3,23 @@ package me.loki2302;
 import com.google.gson.Gson;
 
 public class Settings {
-    private String environmentName;
+    private boolean useStubNotificationService;
+    private String notifyAs;
     
-    public void setEnvironmentName(String environmentName) {
-        this.environmentName = environmentName;
+    public void setUseStubNotificationService(boolean useStubNotificationService) {
+        this.useStubNotificationService = useStubNotificationService;
     }
     
-    public String getEnvironmentName() {
-        return environmentName;
+    public boolean getUseStubNotificationService() {
+        return useStubNotificationService;
+    }
+    
+    public void setNotifyAs(String notifyAs) {
+        this.notifyAs = notifyAs;
+    }
+    
+    public String getNotifyAs() {
+        return notifyAs;
     }
     
     @Override
