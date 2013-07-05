@@ -1,5 +1,7 @@
 package me.loki2302;
 
+import static org.junit.Assert.*;
+import me.loki2302.notifications.DummyNotificationService;
 import me.loki2302.notifications.NotificationService;
 
 import org.junit.Test;
@@ -16,6 +18,7 @@ public class DummyNotificationServiceTest {
     
     @Test
     public void test() {
-        notificationService.notifyUser();        
+        notificationService.notifyUser();
+        assertEquals(DummyNotificationService.class, notificationService.getClass());
     }
 }

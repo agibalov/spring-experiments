@@ -1,6 +1,8 @@
 package me.loki2302;
 
+import static org.junit.Assert.assertEquals;
 import me.loki2302.notifications.NotificationService;
+import me.loki2302.notifications.RealNotificationService;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,5 +19,6 @@ public class RealNotificationServiceTest {
     @Test
     public void test() {
         notificationService.notifyUser();        
+        assertEquals(RealNotificationService.class, notificationService.getClass());
     }
 }
