@@ -1,5 +1,6 @@
 package me.loki2302;
 
+
 import com.google.gson.Gson;
 
 public class Settings {

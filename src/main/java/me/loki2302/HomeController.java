@@ -2,6 +2,8 @@ package me.loki2302;
 
 import java.util.Date;
 
+import me.loki2302.notifications.NotificationService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

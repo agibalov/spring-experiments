@@ -7,6 +7,9 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
 
+import me.loki2302.notifications.DummyNotificationServiceConfiguration;
+import me.loki2302.notifications.RealNotificationServiceConfiguration;
+
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
