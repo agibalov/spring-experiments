@@ -3,15 +3,15 @@ package me.loki2302;
 import com.google.gson.Gson;
 
 public class Settings {
-    private boolean useStubNotificationService;
+    private boolean useDummyNotificationService;
     private String notifyAs;
     
-    public void setUseStubNotificationService(boolean useStubNotificationService) {
-        this.useStubNotificationService = useStubNotificationService;
+    public void setUseDummyNotificationService(boolean useDummyNotificationService) {
+        this.useDummyNotificationService = useDummyNotificationService;
     }
     
-    public boolean getUseStubNotificationService() {
-        return useStubNotificationService;
+    public boolean getUseDummyNotificationService() {
+        return useDummyNotificationService;
     }
     
     public void setNotifyAs(String notifyAs) {

@@ -4,7 +4,7 @@
        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
 	<bean id="settings" class="me.loki2302.Settings">
-		<property name="useStubNotificationService" value="false" />
-		<property name="notifyAs" value="theNotifier" />		
+		<property name="useDummyNotificationService" value="${config.use.dummy.notification.service}" />
+		<property name="notifyAs" value="${config.notify.as}" />		
 	</bean>
 </beans>

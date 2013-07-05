@@ -15,7 +15,6 @@ public class HomeController {
     
     @RequestMapping(value = "/", method = RequestMethod.GET)    
     public String index(Model model) {
-        System.out.println("lol");
         model.addAttribute("currentTime", new Date());
         model.addAttribute("notificationService", notificationService.toString());
         return "index";

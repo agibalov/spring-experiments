@@ -11,7 +11,7 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 @Configuration
 @EnableWebMvc
 @ComponentScan(basePackageClasses = MyConfiguration.class)
-@ImportResource("/WEB-INF/resources/settings.xml")
+@ImportResource("/settings.xml")
 public class MyConfiguration {    
     @Bean
     public InternalResourceViewResolver provideInternalResourceViewResolver() {

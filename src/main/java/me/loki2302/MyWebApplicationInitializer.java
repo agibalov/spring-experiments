@@ -32,7 +32,7 @@ public class MyWebApplicationInitializer implements WebApplicationInitializer {
         List<Class<?>> configurations = new ArrayList<Class<?>>();
         configurations.add(MyConfiguration.class);
         
-        if(settings.getUseStubNotificationService()) {
+        if(settings.getUseDummyNotificationService()) {
             configurations.add(DummyNotificationServiceConfiguration.class);
         } else {
             configurations.add(RealNotificationServiceConfiguration.class);
