@@ -14,4 +14,9 @@ public class HomeController {
         model.addAttribute("currentTime", new Date());
         return "index";
     }
+    
+    @RequestMapping(value = "/markdown", method = RequestMethod.GET)    
+    public String markdown() {        
+        return "markdown";
+    }
 }

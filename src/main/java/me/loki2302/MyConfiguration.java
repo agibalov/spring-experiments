@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import de.neuland.jade4j.JadeConfiguration;
+import de.neuland.jade4j.filter.MarkdownFilter;
 import de.neuland.jade4j.spring.template.SpringTemplateLoader;
 import de.neuland.jade4j.spring.view.JadeViewResolver;
 
@@ -27,6 +28,7 @@ public class MyConfiguration {
         JadeConfiguration configuration = new JadeConfiguration();
         configuration.setCaching(false);
         configuration.setTemplateLoader(templateLoader());
+        configuration.setFilter("markdown", new MarkdownFilter());
         return configuration;
     }
 
