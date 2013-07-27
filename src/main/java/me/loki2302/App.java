@@ -13,6 +13,11 @@ import org.springframework.web.WebApplicationInitializer;
 
 public class App {
     public static void main(String[] args) throws Exception {
+        Server server = start();
+        server.join();
+    }
+    
+    public static Server start() throws Exception {
         WebAppContext webAppContext = new WebAppContext();
         webAppContext.setContextPath("/");
         webAppContext.setBaseResource(Resource.newClassPathResource("META-INF/webapp"));        
@@ -32,6 +37,6 @@ public class App {
         server.setHandler(webAppContext);
         
         server.start();
-        server.join();
+        return server;
     }
 }

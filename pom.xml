@@ -17,6 +17,13 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.jsoup</groupId>
+			<artifactId>jsoup</artifactId>
+			<version>1.7.2</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-server</artifactId>
 			<version>9.0.4.v20130625</version>
@@ -45,7 +52,7 @@
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-jsp</artifactId>
 			<version>9.0.4.v20130625</version>
-		</dependency>		
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -58,7 +65,7 @@
 					<source>1.6</source>
 					<target>1.6</target>
 				</configuration>
-			</plugin>			
+			</plugin>
 		</plugins>
 		<resources>
 			<resource>
