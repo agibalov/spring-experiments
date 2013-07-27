@@ -1,4 +1,4 @@
-package me.loki2302;
+package me.loki2302.webapp;
 
 import java.util.Date;
 
@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public class HomeController {    
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public String index(Model model) {
-        System.out.println("xxxx");
         model.addAttribute("time", new Date());
         return "index";
     }

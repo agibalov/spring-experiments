@@ -1,5 +1,7 @@
 package me.loki2302;
 
+import me.loki2302.webapp.MyWebApplicationInitializer;
+
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.MultiMap;
 import org.eclipse.jetty.util.resource.Resource;

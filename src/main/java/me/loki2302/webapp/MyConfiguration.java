@@ -1,4 +1,4 @@
-package me.loki2302;
+package me.loki2302.webapp;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -15,14 +15,16 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 public class MyConfiguration extends WebMvcConfigurerAdapter {    
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/WEB-INF/*")
-            .addResourceLocations("classpath:/META-INF/webapp/WEB-INF/*");
+        registry.addResourceHandler("/WEB-INF/views/*")
+            .addResourceLocations("classpath:/META-INF/webapp/WEB-INF/views/*");
+        registry.addResourceHandler("/assets/*")
+            .addResourceLocations("classpath:/META-INF/webapp/WEB-INF/assets/*");
     }
 
     @Bean
     public ViewResolver viewResolver() {
         InternalResourceViewResolver viewResolver = new InternalResourceViewResolver();
-        viewResolver.setPrefix("WEB-INF/");
+        viewResolver.setPrefix("WEB-INF/views/");
         viewResolver.setSuffix(".jsp");
         return viewResolver;
     }   

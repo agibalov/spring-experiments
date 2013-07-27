@@ -1,4 +1,4 @@
-package me.loki2302;
+package me.loki2302.webapp;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -33,6 +33,5 @@ public class MyWebApplicationInitializer implements WebApplicationInitializer {
                 new JspServlet());
         dispatcher.setLoadOnStartup(1);
         dispatcher.addMapping("*.jsp");
-        System.out.println(dispatcher);
     }
 }
