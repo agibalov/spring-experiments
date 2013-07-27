@@ -12,7 +12,7 @@ import org.eclipse.jetty.annotations.ClassInheritanceHandler;
 import org.springframework.web.WebApplicationInitializer;
 
 public class App {
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {        
         Server server = start();
         server.join();
     }
@@ -31,7 +31,7 @@ public class App {
                         _classInheritanceHandler = new ClassInheritanceHandler(map);
                     }
                 }
-        });
+        });       
         
         Server server = new Server(8080);
         server.setHandler(webAppContext);

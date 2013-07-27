@@ -10,7 +10,7 @@ import org.junit.Test;
 
 public class AppTest {
     @Test
-    public void dummyTest() throws Exception {
+    public void dummyTest() throws Exception {                
         Server server = App.start();
         try {
             Document document = Jsoup.connect("http://localhost:8080/").get();
