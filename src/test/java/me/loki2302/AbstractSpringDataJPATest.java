@@ -3,9 +3,9 @@ package me.loki2302;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
-import me.loki2302.MyConfiguration;
+import me.loki2302.DataConfiguration;
 import me.loki2302.entities.Post;
-import me.loki2302.entities.XUser;
+import me.loki2302.entities.User;
 import me.loki2302.repositories.PostRepository;
 import me.loki2302.repositories.UserRepository;
 
@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = MyConfiguration.class)
+@ContextConfiguration(classes = DataConfiguration.class)
 @Transactional
 @TransactionConfiguration(defaultRollback = true)
 public abstract class AbstractSpringDataJPATest {
@@ -43,7 +43,7 @@ public abstract class AbstractSpringDataJPATest {
 	}
 	
 	protected void createUserWithPosts(String userName, int numberOfPosts) {
-		XUser user = new XUser();
+		User user = new User();
 		user.setUserName(userName);
 		user.setPassword("qwerty");
 		user = userRepository.save(user);

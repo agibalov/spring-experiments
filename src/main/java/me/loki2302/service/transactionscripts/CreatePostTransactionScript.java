@@ -2,7 +2,7 @@ package me.loki2302.service.transactionscripts;
 
 import me.loki2302.dto.PostDTO;
 import me.loki2302.entities.Post;
-import me.loki2302.entities.XUser;
+import me.loki2302.entities.User;
 import me.loki2302.repositories.PostRepository;
 import me.loki2302.service.implementation.AuthenticationManager;
 import me.loki2302.service.implementation.BlogServiceException;
@@ -29,7 +29,7 @@ public class CreatePostTransactionScript {
 		postSubject.text = text;
 		throwingValidator.Validate(postSubject);
 		
-		XUser user = authenticationManager.getUser(sessionToken);		
+		User user = authenticationManager.getUser(sessionToken);		
 		Post post = new Post();
 		post.setAuthor(user);
 		post.setText(text);

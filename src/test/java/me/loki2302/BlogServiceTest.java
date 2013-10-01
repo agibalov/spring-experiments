@@ -2,7 +2,7 @@ package me.loki2302;
 
 import static org.junit.Assert.*;
 
-import me.loki2302.MyConfiguration;
+import me.loki2302.DataConfiguration;
 import me.loki2302.dto.AuthenticationResultDTO;
 import me.loki2302.dto.BlogServiceErrorCode;
 import me.loki2302.dto.PostDTO;
@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = MyConfiguration.class)
+@ContextConfiguration(classes = DataConfiguration.class)
 @Transactional
 @TransactionConfiguration(defaultRollback = true)
 public class BlogServiceTest {
@@ -30,7 +30,7 @@ public class BlogServiceTest {
 	
 	@Test
 	public void sessionExpiresAfter3Seconds() throws InterruptedException {
-		UserDTO user = createUser("loki2302", "qwerty");
+		createUser("loki2302", "qwerty");
 		AuthenticationResultDTO authenticationResult = authenticate(
 				"loki2302", "qwerty");
 		
@@ -102,7 +102,7 @@ public class BlogServiceTest {
 	
 	@Test
 	public void canUpdatePost() {
-		UserDTO user = createUser("loki2302", "qwerty");
+		createUser("loki2302", "qwerty");
 		AuthenticationResultDTO authenticationResult = authenticate(
 				"loki2302", "qwerty");
 		

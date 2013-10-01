@@ -3,7 +3,7 @@ package me.loki2302.service.transactionscripts;
 import me.loki2302.dto.AuthenticationResultDTO;
 import me.loki2302.dto.UserDTO;
 import me.loki2302.entities.Session;
-import me.loki2302.entities.XUser;
+import me.loki2302.entities.User;
 import me.loki2302.service.implementation.AuthenticationManager;
 import me.loki2302.service.implementation.BlogServiceException;
 import me.loki2302.service.implementation.UserAndPostCount;
@@ -35,7 +35,7 @@ public class AuthenticateTransactionScript {
 				userName, 
 				password);
 		
-		XUser user = session.getUser();
+		User user = session.getUser();
 		
 		UserAndPostCount result = userDetailsRetriever.getUserDetails(
 				user.getId());		

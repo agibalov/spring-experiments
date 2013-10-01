@@ -2,7 +2,7 @@ package me.loki2302.service.transactionscripts;
 
 import me.loki2302.dto.BlogServiceErrorCode;
 import me.loki2302.dto.UserDTO;
-import me.loki2302.entities.XUser;
+import me.loki2302.entities.User;
 import me.loki2302.repositories.UserRepository;
 import me.loki2302.service.implementation.BlogServiceException;
 import me.loki2302.service.implementation.UserAndPostCount;
@@ -30,12 +30,12 @@ public class CreateUserTransactionScript {
 		userNameAndPasswordSubject.password = password;
 		throwingValidator.Validate(userNameAndPasswordSubject);
 		
-		XUser user = userRepository.findUserByName(userName);
+		User user = userRepository.findUserByName(userName);
 		if(user != null) {
 			throw new BlogServiceException(BlogServiceErrorCode.UserAlreadyRegistered);
 		}
 		
-		user = new XUser();
+		user = new User();
 		user.setUserName(userName);
 		user.setPassword(password);
 		user = userRepository.save(user);

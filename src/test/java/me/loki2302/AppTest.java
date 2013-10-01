@@ -3,9 +3,9 @@ import static org.junit.Assert.*;
 
 import java.util.List;
 
-import me.loki2302.MyConfiguration;
+import me.loki2302.DataConfiguration;
 import me.loki2302.entities.Post;
-import me.loki2302.entities.XUser;
+import me.loki2302.entities.User;
 import me.loki2302.repositories.PostRepository;
 import me.loki2302.repositories.UserRepository;
 
@@ -19,19 +19,17 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
-
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = MyConfiguration.class)
+@ContextConfiguration(classes = DataConfiguration.class)
 @Transactional
 @TransactionConfiguration(defaultRollback = true)
-public class AppTest {
-	
+public class AppTest {	
 	@Autowired
 	UserRepository userRepository;
 	
 	@Autowired
 	PostRepository postRepository;
-				
+	
 	@Test
 	public void thereAreNoUsersByDefault() {
 		long count = userRepository.count();
@@ -40,7 +38,7 @@ public class AppTest {
 	
 	@Test
 	public void canCreateUser() {
-		XUser user = new XUser();
+		User user = new User();
 		user.setUserName("loki2302");
 		user.setPassword("qwerty");
 		
@@ -52,7 +50,7 @@ public class AppTest {
 		assertEquals("loki2302", user.getUserName());
 		assertEquals("qwerty", user.getPassword());
 		
-		XUser retrievedUser = userRepository.findOne(user.getId());
+		User retrievedUser = userRepository.findOne(user.getId());
 		assertEquals("loki2302", retrievedUser.getUserName());
 		assertEquals("qwerty", retrievedUser.getPassword());
 		
@@ -70,13 +68,13 @@ public class AppTest {
 	
 	@Test
 	public void cantRetrieveUserForBadId() {
-		XUser user = userRepository.findOne(123L);
+		User user = userRepository.findOne(123L);
 		assertNull(user);
 	}
 	
 	@Test
 	public void cantRetrieveUserForBadUserName() {
-		XUser user = userRepository.findUserByName("qwerty");
+		User user = userRepository.findUserByName("qwerty");
 		assertNull(user);
 	}
 	
@@ -85,14 +83,14 @@ public class AppTest {
 		int totalUsers = 100;
 		
 		for(int i = 0; i < totalUsers; ++i) {
-			XUser user = new XUser();
+			User user = new User();
 			user.setUserName(String.format("user#%d", i + 1));
 			userRepository.save(user);
 		}
 		assertEquals(100, userRepository.count());
 		
 		int pageNumber = 0;
-		Page<XUser> page = null;
+		Page<User> page = null;
 		do {
 			PageRequest pageRequest = new PageRequest(pageNumber, 3);
 			page = userRepository.findAll(pageRequest);
@@ -108,7 +106,7 @@ public class AppTest {
 	
 	@Test
 	public void canCreateUserAndPost() {
-		XUser user = new XUser();
+		User user = new User();
 		user.setUserName("loki2302");
 		user.setPassword("qwerty");
 		user = userRepository.save(user);

@@ -11,7 +11,7 @@ import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Root;
 
 import me.loki2302.entities.Post;
-import me.loki2302.entities.XUser;
+import me.loki2302.entities.User;
 
 import org.springframework.stereotype.Service;
 
@@ -24,8 +24,8 @@ public class UserDetailsRetriever {
 		CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
 		CriteriaQuery<UserAndPostCount> criteriaQuery = 
 				criteriaBuilder.createQuery(UserAndPostCount.class);
-		Root<XUser> root = criteriaQuery.from(XUser.class);
-		Join<XUser, Post> postsExpression = root.join("posts", JoinType.LEFT);
+		Root<User> root = criteriaQuery.from(User.class);
+		Join<User, Post> postsExpression = root.join("posts", JoinType.LEFT);
 		Expression<Long> postCountExpression = criteriaBuilder.count(postsExpression);
 		criteriaQuery.multiselect(root, postCountExpression);
 		criteriaQuery.groupBy(root);

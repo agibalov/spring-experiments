@@ -15,7 +15,7 @@ public class Post {
 	private String text;
 	
 	@ManyToOne
-	private XUser author;
+	private User author;
 	
 	public Long getId() {
 		return id;
@@ -29,11 +29,11 @@ public class Post {
 		this.text = text;
 	}
 	
-	public XUser getAuthor() {
+	public User getAuthor() {
 		return author;
 	}
 	
-	public void setAuthor(XUser author) {
+	public void setAuthor(User author) {
 		this.author = author;
 	}
 

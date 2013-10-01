@@ -14,7 +14,7 @@ import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Root;
 
 import me.loki2302.entities.Post;
-import me.loki2302.entities.XUser;
+import me.loki2302.entities.User;
 
 import org.junit.Test;
 
@@ -27,8 +27,8 @@ public class CriteriaApiTest extends AbstractSpringDataJPATest {
 		
 		CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
 		CriteriaQuery<Tuple> criteriaQuery = criteriaBuilder.createTupleQuery();
-		Root<XUser> root = criteriaQuery.from(XUser.class);
-		Join<XUser, Post> postsExpression = root.join("posts", JoinType.LEFT);
+		Root<User> root = criteriaQuery.from(User.class);
+		Join<User, Post> postsExpression = root.join("posts", JoinType.LEFT);
 		Expression<Long> postCountExpression = criteriaBuilder.count(postsExpression);
 		criteriaQuery.multiselect(root.get("userName"), postCountExpression);
 		criteriaQuery.groupBy(root.get("userName"));
@@ -53,8 +53,8 @@ public class CriteriaApiTest extends AbstractSpringDataJPATest {
 		CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
 		CriteriaQuery<UserNameAndPostCount> criteriaQuery = 
 				criteriaBuilder.createQuery(UserNameAndPostCount.class);
-		Root<XUser> root = criteriaQuery.from(XUser.class);
-		Join<XUser, Post> postsExpression = root.join("posts", JoinType.LEFT);
+		Root<User> root = criteriaQuery.from(User.class);
+		Join<User, Post> postsExpression = root.join("posts", JoinType.LEFT);
 		Expression<Long> postCountExpression = criteriaBuilder.count(postsExpression);
 		criteriaQuery.multiselect(root.get("userName"), postCountExpression);
 		criteriaQuery.groupBy(root.get("userName"));
@@ -78,7 +78,7 @@ public class CriteriaApiTest extends AbstractSpringDataJPATest {
 		
 		CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
 		CriteriaQuery<Tuple> criteriaQuery = criteriaBuilder.createTupleQuery();
-		Root<XUser> root = criteriaQuery.from(XUser.class);
+		Root<User> root = criteriaQuery.from(User.class);
 		criteriaQuery.multiselect(root.get("userName"));
 		criteriaQuery.orderBy(criteriaBuilder.asc(root.get("userName")));
 		
@@ -96,12 +96,12 @@ public class CriteriaApiTest extends AbstractSpringDataJPATest {
 		createUserWithPosts("lena", 12);
 		
 		CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-		CriteriaQuery<XUser> criteriaQuery = criteriaBuilder.createQuery(XUser.class);
-		Root<XUser> root = criteriaQuery.from(XUser.class);
+		CriteriaQuery<User> criteriaQuery = criteriaBuilder.createQuery(User.class);
+		Root<User> root = criteriaQuery.from(User.class);
 		criteriaQuery.orderBy(criteriaBuilder.asc(root.get("userName")));
 		
-		TypedQuery<XUser> typedQuery = entityManager.createQuery(criteriaQuery);
-		List<XUser> userList = typedQuery.getResultList();
+		TypedQuery<User> typedQuery = entityManager.createQuery(criteriaQuery);
+		List<User> userList = typedQuery.getResultList();
 		assertEquals("lena", userList.get(0).getUserName());
 		assertEquals("loki2302", userList.get(1).getUserName());
 		assertEquals("qwerty", userList.get(2).getUserName());		

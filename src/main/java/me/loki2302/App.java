@@ -1,6 +1,6 @@
 package me.loki2302;
 
-import me.loki2302.entities.XUser;
+import me.loki2302.entities.User;
 import me.loki2302.repositories.UserRepository;
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -10,10 +10,10 @@ public class App {
     public static void main(String[] args) {
         AnnotationConfigApplicationContext context = null;
         try {
-            context = new AnnotationConfigApplicationContext(MyConfiguration.class);
+            context = new AnnotationConfigApplicationContext(DataConfiguration.class);
             UserRepository userRepository = context.getBean(UserRepository.class);
             
-            XUser u = new XUser();
+            User u = new User();
             u.setUserName("loki2302");
             u.setPassword("qwerty123");
             u = userRepository.save(u);

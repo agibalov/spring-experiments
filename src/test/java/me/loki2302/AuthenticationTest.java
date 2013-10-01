@@ -2,7 +2,7 @@ package me.loki2302;
 
 import static org.junit.Assert.*;
 
-import me.loki2302.MyConfiguration;
+import me.loki2302.DataConfiguration;
 import me.loki2302.dto.AuthenticationResultDTO;
 import me.loki2302.dto.BlogServiceErrorCode;
 import me.loki2302.dto.ServiceResult;
@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = MyConfiguration.class)
+@ContextConfiguration(classes = DataConfiguration.class)
 @Transactional
 @TransactionConfiguration(defaultRollback = true)
 public class AuthenticationTest {

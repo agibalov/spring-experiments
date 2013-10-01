@@ -19,7 +19,7 @@ public class Session {
 	private String sessionToken;
 	
 	@ManyToOne
-	private XUser user;
+	private User user;
 	
 	private Date lastActivity;
 	
@@ -35,11 +35,11 @@ public class Session {
 		this.sessionToken = sessionToken;
 	}
 	
-	public XUser getUser() {
+	public User getUser() {
 		return user;
 	}
 	
-	public void setUser(XUser user) {
+	public void setUser(User user) {
 		this.user = user;
 	}
 	

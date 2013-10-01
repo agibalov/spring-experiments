@@ -1,15 +1,13 @@
 package me.loki2302.repositories;
 
-import me.loki2302.entities.XUser;
+import me.loki2302.entities.User;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 
-
-public interface UserRepository extends JpaRepository<XUser, Long> {
-	
-	@Query("select u from XUser u where u.userName = :name")
-	XUser findUserByName(@Param("name") String userName);
-
+public interface UserRepository extends JpaRepository<User, Long>, QueryDslPredicateExecutor<User> {	
+	@Query("select u from User u where u.userName = :name")
+	User findUserByName(@Param("name") String userName);
 }

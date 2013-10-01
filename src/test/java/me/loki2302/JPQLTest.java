@@ -16,7 +16,7 @@ public class JPQLTest extends AbstractSpringDataJPATest {
 		createUserWithPosts("lena", 12);
 		
 		TypedQuery<Object[]> query = entityManager.createQuery(
-	            "select u.userName, count(p.id) from XUser u " + 
+	            "select u.userName, count(p.id) from User u " + 
 	            "left join u.posts p group by u.userName", Object[].class);
 	    List<Object[]> resultList = query.getResultList();
 	    
@@ -38,7 +38,7 @@ public class JPQLTest extends AbstractSpringDataJPATest {
 		
 		TypedQuery<UserNameAndPostCount> query = entityManager.createQuery(
 				"select new me.loki2302.JPQLTest$UserNameAndPostCount(u.userName, count(p.id)) " +
-	            "from XUser u " + 
+	            "from User u " + 
 	            "left join u.posts p group by u.userName", UserNameAndPostCount.class);
 	    List<UserNameAndPostCount> resultList = query.getResultList();
 	    

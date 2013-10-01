@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import me.loki2302.dto.BlogServiceErrorCode;
 import me.loki2302.entities.Session;
-import me.loki2302.entities.XUser;
+import me.loki2302.entities.User;
 import me.loki2302.repositories.SessionRepository;
 import me.loki2302.repositories.UserRepository;
 
@@ -25,7 +25,7 @@ public class AuthenticationManager {
 			String userName, 
 			String password) throws BlogServiceException {
 		
-		XUser user = userRepository.findUserByName(userName);
+		User user = userRepository.findUserByName(userName);
 		if(user == null) {
 			throw new BlogServiceException(BlogServiceErrorCode.BadUserNameOrPassword);
 		}
@@ -43,7 +43,7 @@ public class AuthenticationManager {
 		return session;			
 	}
 	
-	public XUser getUser(String sessionToken) throws BlogServiceException {
+	public User getUser(String sessionToken) throws BlogServiceException {
 		Session session = sessionRepository.findBySessionToken(sessionToken);
 		if(session == null) {
 			throw new BlogServiceException(BlogServiceErrorCode.NoSuchSession);
@@ -60,7 +60,7 @@ public class AuthenticationManager {
 		session.setLastActivity(currentTime.toDate());
 		session = sessionRepository.save(session);
 		
-		XUser user = session.getUser();
+		User user = session.getUser();
 		return user;
 	}
 }

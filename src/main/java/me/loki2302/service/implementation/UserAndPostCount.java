@@ -1,12 +1,12 @@
 package me.loki2302.service.implementation;
 
-import me.loki2302.entities.XUser;
+import me.loki2302.entities.User;
 
 public class UserAndPostCount {
-	public XUser User;
+	public User User;
 	public long PostCount;
 	
-	public UserAndPostCount(XUser user, long postCount) {
+	public UserAndPostCount(User user, long postCount) {
 		this.User = user;
 		this.PostCount = postCount;
 	}
