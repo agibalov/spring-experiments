@@ -1,0 +1,11 @@
+@args Collection<Person> people;
+@extends(layout.html, area: "person")
+
+@section("title") {People}
+@section("content") {  
+	<ul>
+	@for(Person person : people) {
+		<li><a href="/person/@person.id">@person.firstName @person.lastName</a></li>
+	}
+	</ul>
+}
