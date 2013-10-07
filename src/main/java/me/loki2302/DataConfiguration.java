@@ -27,12 +27,7 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 @EnableJpaRepositories(basePackageClasses = UserRepository.class)
 @EnableTransactionManagement
 @ComponentScan(basePackageClasses = App.class)
-public class DataConfiguration {    
-    @Bean(name = "validator")
-    public LocalValidatorFactoryBean provideValidator() {
-        return new LocalValidatorFactoryBean();
-    }
-    
+public class DataConfiguration {
     @Bean
     public DataSource dataSource() {
         return new EmbeddedDatabaseBuilder()

@@ -23,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 @ContextConfiguration(classes = DataConfiguration.class)
 @Transactional
 @TransactionConfiguration(defaultRollback = true)
-public class AppTest {	
+public class SpringRepositoryTest {	
 	@Autowired
 	UserRepository userRepository;
 	

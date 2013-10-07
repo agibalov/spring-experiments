@@ -5,7 +5,6 @@ import me.loki2302.repositories.UserRepository;
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-
 public class App {
     public static void main(String[] args) {
         AnnotationConfigApplicationContext context = null;
