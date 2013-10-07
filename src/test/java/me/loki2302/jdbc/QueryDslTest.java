@@ -1,13 +1,9 @@
 package me.loki2302.jdbc;
 
-import static com.mysema.query.types.PathMetadataFactory.*;
-import static org.junit.Assert.*;
-
-import com.mysema.query.types.PathMetadata;
-import com.mysema.query.types.Path;
+import static com.mysema.query.types.PathMetadataFactory.forVariable;
+import static org.junit.Assert.assertEquals;
 
 import java.util.List;
-import java.util.UUID;
 
 import javax.sql.DataSource;
 
@@ -19,15 +15,17 @@ import org.springframework.data.jdbc.query.QueryDslJdbcTemplate;
 import org.springframework.data.jdbc.query.SqlInsertCallback;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.googlecode.flyway.core.Flyway;
 import com.mysema.query.sql.PrimaryKey;
 import com.mysema.query.sql.RelationalPathBase;
 import com.mysema.query.sql.SQLQuery;
 import com.mysema.query.sql.dml.SQLInsertClause;
+import com.mysema.query.types.Path;
+import com.mysema.query.types.PathMetadata;
 import com.mysema.query.types.path.NumberPath;
 import com.mysema.query.types.path.StringPath;
 
@@ -52,18 +50,18 @@ public class QueryDslTest {
         
         final QUser qUser = QUser.user;
         
-        qdslTemplate.insert(qUser,  new SqlInsertCallback() {
+        qdslTemplate.insert(qUser, new SqlInsertCallback() {
             @Override
             public long doInSqlInsertClause(SQLInsertClause insert) {
                 return insert
-                        .columns(qUser.rowUuid, qUser.name)
-                        .values(UUID.randomUUID().toString(), "lokiloki")
+                        .columns(qUser.name)
+                        .values("lokiloki")
                         .execute();
             }            
         });
         
         SQLQuery query = qdslTemplate.newSqlQuery().from(qUser);
-        List<User> users = qdslTemplate.query(query, BeanPropertyRowMapper.newInstance(User.class), qUser.id, qUser.rowUuid, qUser.name);
+        List<User> users = qdslTemplate.query(query, BeanPropertyRowMapper.newInstance(User.class), qUser.id, qUser.name);
         System.out.println(users.size());
         assertEquals(1, users.size());
         for(User u : users) {
@@ -74,7 +72,6 @@ public class QueryDslTest {
     
     public static class User {
         private Long id;
-        private String rowUuid;
         private String name;
         
         public Long getId() {
@@ -84,15 +81,7 @@ public class QueryDslTest {
         public void setId(Long id) {
             this.id = id;
         }
-        
-        public String getRowUuid() {
-            return rowUuid;
-        }
-        
-        public void setRowUuid(String rowUuid) {
-            this.rowUuid = rowUuid;
-        }
-        
+                
         public String getName() {
             return name;
         }
@@ -107,7 +96,6 @@ public class QueryDslTest {
         
         public static final QUser user = new QUser("User");
         public final NumberPath<Long> id = createNumber("Id", Long.class);
-        public final StringPath rowUuid = createString("RowUuid");
         public final StringPath name = createString("Name");
         
         public final PrimaryKey<QUser> pk = createPrimaryKey(id);
