@@ -8,7 +8,7 @@ import javax.persistence.TypedQuery;
 
 import org.junit.Test;
 
-public class JPQLTest extends AbstractSpringDataJPATest {	
+public abstract class JPQLTest extends AbstractSpringDataJPATest {	
 	@Test
 	public void canGetUserNamesAndPostCount() {
 		createUserWithPosts("loki2302", 7);

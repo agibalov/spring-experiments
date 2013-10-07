@@ -18,7 +18,7 @@ import me.loki2302.entities.User;
 
 import org.junit.Test;
 
-public class CriteriaApiTest extends AbstractSpringDataJPATest {	
+public abstract class CriteriaApiTest extends AbstractSpringDataJPATest {	
 	@Test
 	public void canGetUserNamesAndPostCount() {
 		createUserWithPosts("loki2302", 7);

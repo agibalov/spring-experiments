@@ -11,7 +11,7 @@ import org.junit.Test;
 import com.google.common.collect.Lists;
 import com.mysema.query.jpa.impl.JPAQuery;
 
-public class QueryDslTest extends AbstractSpringDataJPATest {
+public abstract class QueryDslTest extends AbstractSpringDataJPATest {
     @Test
     public void canFindAllInRepositoryByPredicate() {
         User loki = userRepository.save(user("loki"));

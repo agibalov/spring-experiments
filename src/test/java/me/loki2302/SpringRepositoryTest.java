@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
-public class SpringRepositoryTest extends AbstractSpringDataJPATest {		
+public abstract class SpringRepositoryTest extends AbstractSpringDataJPATest {		
 	@Test
 	public void thereAreNoUsersByDefault() {
 		long count = userRepository.count();
