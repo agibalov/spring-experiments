@@ -23,10 +23,7 @@ public class User {
 	
 	@OneToMany(mappedBy = "author")
 	private List<Post> posts;
-	
-	@OneToMany(mappedBy = "user")
-	private List<Session> sessions;
-	
+		
 	public Long getId() {
 		return id;
 	}

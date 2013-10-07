@@ -22,7 +22,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
-
 @Configuration
 @EnableJpaRepositories(basePackageClasses = UserRepository.class)
 @EnableTransactionManagement
