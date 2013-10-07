@@ -10,7 +10,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 
-
 public interface PostRepository extends JpaRepository<Post, Long>, QueryDslPredicateExecutor<Post> {
 	List<Post> findAllByAuthor(User author);
 	

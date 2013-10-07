@@ -9,7 +9,7 @@ public class App {
     public static void main(String[] args) {
         AnnotationConfigApplicationContext context = null;
         try {
-            context = new AnnotationConfigApplicationContext(DataConfiguration.class);
+            context = new AnnotationConfigApplicationContext(HsqldbConfiguration.class);
             UserRepository userRepository = context.getBean(UserRepository.class);
             
             User u = new User();

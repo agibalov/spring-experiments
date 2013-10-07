@@ -3,7 +3,7 @@ package me.loki2302;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
-import me.loki2302.DataConfiguration;
+import me.loki2302.HsqldbConfiguration;
 import me.loki2302.entities.Post;
 import me.loki2302.entities.User;
 import me.loki2302.repositories.PostRepository;
@@ -16,13 +16,11 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
-
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = DataConfiguration.class)
+@ContextConfiguration(classes = HsqldbConfiguration.class)
 @Transactional
 @TransactionConfiguration(defaultRollback = true)
 public abstract class AbstractSpringDataJPATest {
-	
 	@PersistenceContext
 	EntityManager entityManager;
 	

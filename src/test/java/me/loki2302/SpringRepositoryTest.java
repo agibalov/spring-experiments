@@ -3,33 +3,13 @@ import static org.junit.Assert.*;
 
 import java.util.List;
 
-import me.loki2302.DataConfiguration;
 import me.loki2302.entities.Post;
 import me.loki2302.entities.User;
-import me.loki2302.repositories.PostRepository;
-import me.loki2302.repositories.UserRepository;
-
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.transaction.TransactionConfiguration;
-import org.springframework.transaction.annotation.Transactional;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = DataConfiguration.class)
-@Transactional
-@TransactionConfiguration(defaultRollback = true)
-public class SpringRepositoryTest {	
-	@Autowired
-	UserRepository userRepository;
-	
-	@Autowired
-	PostRepository postRepository;
-	
+public class SpringRepositoryTest extends AbstractSpringDataJPATest {		
 	@Test
 	public void thereAreNoUsersByDefault() {
 		long count = userRepository.count();
