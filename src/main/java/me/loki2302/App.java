@@ -1,7 +1,8 @@
 package me.loki2302;
 
-import me.loki2302.entities.User;
-import me.loki2302.repositories.UserRepository;
+import me.loki2302.jpa.HsqldbConfiguration;
+import me.loki2302.jpa.entities.User;
+import me.loki2302.jpa.repositories.UserRepository;
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
