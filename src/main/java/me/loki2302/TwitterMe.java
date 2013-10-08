@@ -17,8 +17,7 @@ public class TwitterMe {
     @JsonProperty("profile_image_url") public String ProfileImageUrl;
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return JsonUtils.asJson(this);
     }
 }
