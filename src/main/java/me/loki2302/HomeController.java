@@ -1,13 +1,9 @@
 package me.loki2302;
 
 import java.io.IOException;
-import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.ObjectWriter;
 import org.scribe.model.OAuthRequest;
 import org.scribe.model.Response;
 import org.scribe.model.Token;
@@ -172,61 +168,5 @@ public class HomeController {
         model.addAttribute("result", result);
         
         return "index";        
-    }
-    
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class FacebookMe {
-        @JsonProperty("id") public String Id;
-        @JsonProperty("name") public String Name;
-        @JsonProperty("first_name") public String FirstName;
-        @JsonProperty("last_name") public String LastName;
-        @JsonProperty("link") public String Link;
-        @JsonProperty("username") public String UserName;
-        @JsonProperty("gender") public String Gender;
-        @JsonProperty("email") public String Email;
-        @JsonProperty("timezone") public String Timezone;
-        @JsonProperty("locale") public String Locale;
-        @JsonProperty("verified") public boolean Verified;
-        @JsonProperty("updated_time") public String UpdatedTime;
-                
-        @Override
-        public String toString() {
-            return JsonUtils.asJson(this);
-        }
-    }
-    
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class TwitterMe {
-        @JsonProperty("id") public String Id;
-        @JsonProperty("name") public String Name;
-        @JsonProperty("screen_name") public String ScreenName;
-        @JsonProperty("url") public String Url;
-        @JsonProperty("followers_count") public int FollowersCount;
-        @JsonProperty("friends_count") public int FriendsCount;
-        @JsonProperty("time_zone") public String TimeZone;
-        @JsonProperty("verified") public boolean Verified;
-        @JsonProperty("profile_image_url") public String ProfileImageUrl;
-
-        @Override
-        public String toString()
-        {
-            return JsonUtils.asJson(this);
-        }
-    }    
-    
-    public static class JsonUtils {
-        private final static ObjectWriter objectWriter = new ObjectMapper().writerWithDefaultPrettyPrinter();
-        
-        public static String asJson(Object o) {
-            try {
-                return objectWriter.writeValueAsString(o);
-            } catch (JsonGenerationException e) {
-                return "FAIL";
-            } catch (JsonMappingException e) {
-                return "FAIL";
-            } catch (IOException e) {
-                return "FAIL";
-            }
-        }
     }
 }
