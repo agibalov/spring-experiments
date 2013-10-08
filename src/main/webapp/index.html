@@ -3,6 +3,11 @@
 @extends(layout.html)
 
 @section("content") {
-	<h3>Hello</h3>
-	<pre>@result.UserDetailsJson</pre>
+	@if(result != null) {
+		<h3>@result.Provider</h3>
+		<p>@result.Message</p>
+		@if(result.UserDetailsJson != null) {
+			<pre>@result.UserDetailsJson</pre>
+		}
+	}
 }
