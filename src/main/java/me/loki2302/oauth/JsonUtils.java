@@ -1,4 +1,4 @@
-package me.loki2302;
+package me.loki2302.oauth;
 
 import java.io.IOException;
 

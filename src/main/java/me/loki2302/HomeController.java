@@ -7,8 +7,9 @@ import me.loki2302.oauth.FacebookAuthenticationService;
 import me.loki2302.oauth.FacebookUserInfo;
 import me.loki2302.oauth.GoogleAuthenticationService;
 import me.loki2302.oauth.GoogleUserInfo;
-import me.loki2302.oauth.TwitterAuthenticationService;
-import me.loki2302.oauth.TwitterAuthenticationService.OAuthToken;
+import me.loki2302.oauth.TwitterAuthenticationService2;
+import me.loki2302.oauth.TwitterAuthenticationService2.OAuthToken2;
+import me.loki2302.oauth.TwitterUserInfo;
 
 import org.apache.http.client.ClientProtocolException;
 import org.springframework.stereotype.Controller;
@@ -33,7 +34,7 @@ public class HomeController {
             "email", 
             "http://localhost:8080/facebookCallback");
     
-    private final TwitterAuthenticationService twitterAuthenticationService = new TwitterAuthenticationService(
+    private final TwitterAuthenticationService2 twitterAuthenticationService = new TwitterAuthenticationService2(
             "JRBEmQEBhV1B5gJOvzA3ag",
             "VlB7e9wA0WIRmVOVzGpLQqgzUjAyklezXdWCXTSM21Y",
             "http://localhost:8080/twitterCallback");
@@ -63,15 +64,11 @@ public class HomeController {
             } else {
                 System.out.printf("error: %s\n", error);
             }
-        } else {        
-            System.out.printf("code: %s\n", code);
-            
+        } else {            
             String accessToken = googleAuthenticationService.getAccessToken(code);
-            System.out.printf("access_token: %s\n", accessToken);
+            GoogleUserInfo googleUserInfo = googleAuthenticationService.getUserInfo(accessToken);
             
             model.addAttribute("token", accessToken);
-                        
-            GoogleUserInfo googleUserInfo = googleAuthenticationService.getUserInfo(accessToken);            
             model.addAttribute("userData", googleUserInfo.toString());
         }
         
@@ -98,15 +95,11 @@ public class HomeController {
             } else {
                 System.out.printf("error: %s\n", error);
             }
-        } else {        
-            System.out.printf("code: %s\n", code);
-            
+        } else {
             String accessToken = facebookAuthenticationService.getAccessToken(code);
-            System.out.printf("access_token: %s\n", accessToken);
+            FacebookUserInfo facebookUserInfo = facebookAuthenticationService.getUserInfo(accessToken);
             
             model.addAttribute("token", accessToken);
-                        
-            FacebookUserInfo facebookUserInfo = facebookAuthenticationService.getUserInfo(accessToken);            
             model.addAttribute("userData", facebookUserInfo.toString());
         }
         
@@ -130,19 +123,14 @@ public class HomeController {
         
         if(denied != null && !denied.equals("")) {
             System.out.println("user cancelled");
-        } else {        
-            System.out.printf("oauth_token: %s\n", oauthToken);
-            System.out.printf("oauth_verifier: %s\n", oauthVerifier);
+        } else {            
+            OAuthToken2 accessToken = twitterAuthenticationService.getAccessToken(oauthToken, oauthVerifier);            
+            TwitterUserInfo twitterUserInfo = twitterAuthenticationService.getUserInfo(accessToken);
             
-            OAuthToken accessToken = twitterAuthenticationService.getAccessToken(oauthToken, oauthVerifier);
-            System.out.printf(
-                    "Twitter access token: %s %s\n", 
-                    accessToken.accessToken, 
-                    accessToken.accessTokenSecret);
-            
-            model.addAttribute("token", String.format("'%s' '%s'", 
+            model.addAttribute("token", String.format("'%s'/'%s'", 
                     accessToken.accessToken, 
                     accessToken.accessTokenSecret));
+            model.addAttribute("userData", twitterUserInfo.toString());
         }
         
         return "index";

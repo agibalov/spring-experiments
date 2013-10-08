@@ -1,7 +1,6 @@
 package me.loki2302.oauth;
 
 
-import me.loki2302.JsonUtils;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonProperty;
