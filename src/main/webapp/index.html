@@ -1,4 +1,4 @@
-@args String token
+@args String token, String provider, String userData
 
 <!doctype html>
 <html>
@@ -14,7 +14,14 @@
 		<a class="btn btn-success btn-lg" href="/facebook">Facebook</a>
 		<a class="btn btn-success btn-lg" href="/twitter">Twitter</a>
 		
-		<p>@token</p>
+		@if(provider != null && !provider.equals("")) {
+			<h2>@provider</h2>
+			<p>@token</p>
+			
+			@if(userData != null && !userData.equals("")) {
+				<pre>@userData</pre>
+			}
+		}
 		
 		<hr>
 		&copy; 2013 <a href="http://loki2302.me" target="_blank">loki2302</a>

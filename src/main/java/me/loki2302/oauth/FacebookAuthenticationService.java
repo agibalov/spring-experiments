@@ -1,12 +1,23 @@
 package me.loki2302.oauth;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.List;
 
+
+import org.apache.commons.io.IOUtils;
 import org.apache.http.Consts;
+import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
 
 public class FacebookAuthenticationService {    
     private final static String FacebookAccessCodeServiceEndpointUri = "https://www.facebook.com/dialog/oauth";
@@ -62,5 +73,47 @@ public class FacebookAuthenticationService {
         }
         
         throw new RuntimeException("didn't expect to get this far");
+    }
+    
+    public FacebookUserInfo getUserInfo(String accessToken) {
+        String meUrl;
+        try {
+            meUrl = new URIBuilder("https://graph.facebook.com/me")
+                .addParameter("access_token", accessToken)
+                .build()
+                .toString();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+    
+        HttpGet getMeRequest = new HttpGet(meUrl);            
+        HttpClient client = HttpClientBuilder.create().build();
+        HttpResponse response;
+        try {
+            response = client.execute(getMeRequest);
+        } catch (ClientProtocolException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        String responseString;
+        try {
+            responseString = IOUtils.toString(response.getEntity().getContent());
+        } catch (IllegalStateException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            return objectMapper.readValue(responseString, FacebookUserInfo.class);
+        } catch (JsonParseException e) {
+            throw new RuntimeException(e);
+        } catch (JsonMappingException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

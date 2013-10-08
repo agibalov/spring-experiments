@@ -1,7 +1,14 @@
 package me.loki2302.oauth;
 
 import java.io.IOException;
+
+
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.JsonMappingException;
@@ -68,6 +75,40 @@ public class GoogleAuthenticationService {
         }
         
         return googleAccessTokenResponse.accessToken;
+    }
+    
+    public GoogleUserInfo getUserInfo(String accessToken) {    
+        HttpGet getMeRequest = new HttpGet("https://www.googleapis.com/userinfo/v2/me");
+        getMeRequest.addHeader("Authorization", String.format("Bearer %s", accessToken));
+        HttpClient client = HttpClientBuilder.create().build();
+        HttpResponse response;
+        try {
+            response = client.execute(getMeRequest);
+        } catch (ClientProtocolException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        
+        String responseString;
+        try {
+            responseString = IOUtils.toString(response.getEntity().getContent());
+        } catch (IllegalStateException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            return objectMapper.readValue(responseString, GoogleUserInfo.class);
+        } catch (JsonParseException e) {
+            throw new RuntimeException(e);
+        } catch (JsonMappingException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
     
     private static class GoogleAccessTokenResponse {        

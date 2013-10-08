@@ -1,10 +1,16 @@
 package me.loki2302;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+
 import me.loki2302.oauth.FacebookAuthenticationService;
+import me.loki2302.oauth.FacebookUserInfo;
 import me.loki2302.oauth.GoogleAuthenticationService;
+import me.loki2302.oauth.GoogleUserInfo;
 import me.loki2302.oauth.TwitterAuthenticationService;
 import me.loki2302.oauth.TwitterAuthenticationService.OAuthToken;
 
+import org.apache.http.client.ClientProtocolException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,7 +53,9 @@ public class HomeController {
     public String googleCallback(
             @RequestParam(value = "code", required = false) String code, 
             @RequestParam(value = "error", required = false) String error,
-            Model model) {
+            Model model) throws ClientProtocolException, URISyntaxException, IOException {
+        
+        model.addAttribute("provider", "Google");
         
         if(error != null) {
             if(error.equals("access_denied")) {
@@ -62,6 +70,9 @@ public class HomeController {
             System.out.printf("access_token: %s\n", accessToken);
             
             model.addAttribute("token", accessToken);
+                        
+            GoogleUserInfo googleUserInfo = googleAuthenticationService.getUserInfo(accessToken);            
+            model.addAttribute("userData", googleUserInfo.toString());
         }
         
         return "index";
@@ -79,6 +90,8 @@ public class HomeController {
             @RequestParam(value = "error", required = false) String error,
             Model model) {
         
+        model.addAttribute("provider", "Facebook");
+        
         if(error != null) {
             if(error.equals("access_denied")) {
                 System.out.println("user cancelled");
@@ -92,6 +105,9 @@ public class HomeController {
             System.out.printf("access_token: %s\n", accessToken);
             
             model.addAttribute("token", accessToken);
+                        
+            FacebookUserInfo facebookUserInfo = facebookAuthenticationService.getUserInfo(accessToken);            
+            model.addAttribute("userData", facebookUserInfo.toString());
         }
         
         return "index";
@@ -109,6 +125,8 @@ public class HomeController {
             @RequestParam(value = "oauth_verifier", required = false) String oauthVerifier,
             @RequestParam(value = "denied", required = false) String denied,
             Model model) {
+        
+        model.addAttribute("provider", "Twitter");
         
         if(denied != null && !denied.equals("")) {
             System.out.println("user cancelled");
