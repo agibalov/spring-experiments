@@ -3,13 +3,13 @@ package me.loki2302;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-import me.loki2302.oauth.FacebookAuthenticationService;
-import me.loki2302.oauth.FacebookUserInfo;
-import me.loki2302.oauth.GoogleAuthenticationService;
-import me.loki2302.oauth.GoogleUserInfo;
-import me.loki2302.oauth.TwitterAuthenticationService2;
-import me.loki2302.oauth.TwitterAuthenticationService2.OAuthToken2;
-import me.loki2302.oauth.TwitterUserInfo;
+import me.loki2302.socialauth.FacebookAuthenticationService;
+import me.loki2302.socialauth.FacebookUserInfo;
+import me.loki2302.socialauth.GoogleAuthenticationService;
+import me.loki2302.socialauth.GoogleUserInfo;
+import me.loki2302.socialauth.TwitterAuthenticationService;
+import me.loki2302.socialauth.TwitterAuthenticationService.OAuthToken;
+import me.loki2302.socialauth.TwitterUserInfo;
 
 import org.apache.http.client.ClientProtocolException;
 import org.springframework.stereotype.Controller;
@@ -34,7 +34,7 @@ public class HomeController {
             "email", 
             "http://localhost:8080/facebookCallback");
     
-    private final TwitterAuthenticationService2 twitterAuthenticationService = new TwitterAuthenticationService2(
+    private final TwitterAuthenticationService twitterAuthenticationService = new TwitterAuthenticationService(
             "JRBEmQEBhV1B5gJOvzA3ag",
             "VlB7e9wA0WIRmVOVzGpLQqgzUjAyklezXdWCXTSM21Y",
             "http://localhost:8080/twitterCallback");
@@ -124,7 +124,7 @@ public class HomeController {
         if(denied != null && !denied.equals("")) {
             System.out.println("user cancelled");
         } else {            
-            OAuthToken2 accessToken = twitterAuthenticationService.getAccessToken(oauthToken, oauthVerifier);            
+            OAuthToken accessToken = twitterAuthenticationService.getAccessToken(oauthToken, oauthVerifier);            
             TwitterUserInfo twitterUserInfo = twitterAuthenticationService.getUserInfo(accessToken);
             
             model.addAttribute("token", String.format("'%s'/'%s'", 
