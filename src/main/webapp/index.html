@@ -1,0 +1,33 @@
+@args List<FileRow> files
+
+<!doctype html>
+<html>
+<head>
+	<title>Spring MVC file upload</title>
+	<link rel="stylesheet" type="text/css" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" />
+	<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+	<script type="text/javascript" src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>	
+</head>
+<body>
+	<div class="container">
+		<h1>File upload</h1>
+		
+		<form method="post" enctype="multipart/form-data" action="/upload">
+			<div class="form-group">
+				<label for="file">File to upload</label>
+				<input type="file" name="file" placeholder="File here">
+			</div>
+			<button type="submit" class="btn btn-default">Upload</button>
+		</form>
+		<p>There are @files.size() files</p>
+		<ul>
+		@for(FileRow fileRow : files) {
+			<li><a href="/download/@fileRow.Id">@fileRow.Name</a></li>
+		}
+		</ul>
+		
+		<hr>
+		&copy; 2013 <a href="http://loki2302.me" target="_blank">loki2302</a>
+	</div>
+</body>
+</html>
