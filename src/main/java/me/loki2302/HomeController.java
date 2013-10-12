@@ -1,6 +1,7 @@
 package me.loki2302;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.sql.SQLException;
 import java.util.List;
@@ -30,10 +31,11 @@ public class HomeController {
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     public String upload(MultipartFile file) throws IOException {
         String fileName = file.getOriginalFilename();
-        long fileSize = file.getSize();        
+        InputStream fileInputStream = file.getInputStream();
+        int fileSize = (int)file.getSize();
         System.out.printf("got file: %s, %d\n", fileName, fileSize);
         
-        int fileId = fileDao.insertFileFromStream(fileName, fileSize, file.getInputStream());
+        int fileId = fileDao.insertFileFromStream(fileName, fileInputStream, fileSize);
         System.out.printf("Inserted file %s with id %d\n", fileName, fileId);
                 
         return "redirect:/";
