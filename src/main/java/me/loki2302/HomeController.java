@@ -33,25 +33,30 @@ public class HomeController {
         long fileSize = file.getSize();        
         System.out.printf("got file: %s, %d\n", fileName, fileSize);
         
-        fileDao.insertFile(fileName, fileSize, file.getBytes());
+        //fileDao.insertFile(fileName, fileSize, file.getBytes());
+        fileDao.insertFileFromStream(fileName, fileSize, file.getInputStream());
                 
         return "redirect:/";
     }
     
     @RequestMapping(value = "/download/{id}", method = RequestMethod.GET, produces = "application/octet-stream")
     public void download(@PathVariable int id, HttpServletResponse response) throws SQLException, IOException {
-        FileRow fileRow = fileDao.getFileData(id);
-        if(fileRow == null) {
-            throw new RuntimeException("no such file");
+        try {
+            FileRow fileRow = fileDao.getFileData(id);
+            if(fileRow == null) {
+                throw new RuntimeException("no such file");
+            }
+                               
+            response.setContentLength((int)fileRow.Size);
+            
+            String fileName = fileRow.Name;            
+            response.setHeader("Content-Disposition", String.format("attachment; filename=\"%s\"", fileName));
+            
+            OutputStream responseOutputStream = response.getOutputStream();            
+            fileDao.writeFileDataToOutputStream(id, responseOutputStream);            
+            responseOutputStream.flush();
+        } catch(Exception e) {
+            e.printStackTrace();            
         }
-                
-        response.setContentLength((int)fileRow.Size);
-        
-        String fileName = fileRow.Name;
-        response.setHeader("Content-Disposition", String.format("attachment; filename=\"%s\"", fileName));
-        
-        OutputStream responseOutputStream = response.getOutputStream();
-        fileDao.writeFileDataToOutputStream(id, responseOutputStream);
-        responseOutputStream.flush();
     }
 }

@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.support.DataAccessUtils;
@@ -33,6 +34,25 @@ public class FileDao {
                     .addValue("name", fileName)
                     .addValue("size", fileSize)
                     .addValue("data", data),
+                keyHolder);
+        
+        return (Integer)keyHolder.getKey();
+    }
+    
+    public int insertFileFromStream(
+            final String fileName, 
+            final long fileSize, 
+            final InputStream dataStream) throws DataAccessException, IOException {
+                
+        KeyHolder keyHolder = new GeneratedKeyHolder();       
+        
+        jdbcTemplate.update(
+                "insert into File(Name, Size, Data) " + 
+                "values(:name, :size, :data)",
+                new MapSqlParameterSource()
+                    .addValue("name", fileName)
+                    .addValue("size", fileSize)
+                    .addValue("data", IOUtils.toByteArray(dataStream)), // how do i normally do it?
                 keyHolder);
         
         return (Integer)keyHolder.getKey();
