@@ -33,8 +33,8 @@ public class HomeController {
         long fileSize = file.getSize();        
         System.out.printf("got file: %s, %d\n", fileName, fileSize);
         
-        //fileDao.insertFile(fileName, fileSize, file.getBytes());
-        fileDao.insertFileFromStream(fileName, fileSize, file.getInputStream());
+        int fileId = fileDao.insertFileFromStream(fileName, fileSize, file.getInputStream());
+        System.out.printf("Inserted file %s with id %d\n", fileName, fileId);
                 
         return "redirect:/";
     }

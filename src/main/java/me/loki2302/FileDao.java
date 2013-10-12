@@ -3,14 +3,18 @@ package me.loki2302;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 
-import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.support.DataAccessUtils;
+import org.springframework.jdbc.core.PreparedStatementCallback;
+import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -43,19 +47,35 @@ public class FileDao {
             final String fileName, 
             final long fileSize, 
             final InputStream dataStream) throws DataAccessException, IOException {
+                        
+        PreparedStatementCreator preparedStatementCreator = new PreparedStatementCreator() {
+            @Override
+            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                return con.prepareStatement(
+                        "insert into File(Name, Size, Data) " + 
+                        "values(?, ?, ?)",
+                        Statement.RETURN_GENERATED_KEYS);
+            }            
+        };
+        
+        PreparedStatementCallback<Integer> preparedStatementCallback = new PreparedStatementCallback<Integer>() {
+            @Override
+            public Integer doInPreparedStatement(PreparedStatement ps) throws SQLException, DataAccessException {
+                ps.setString(1, fileName);
+                ps.setLong(2, fileSize);
+                ps.setBinaryStream(3, dataStream);
+                ps.executeUpdate();
                 
-        KeyHolder keyHolder = new GeneratedKeyHolder();       
+                ResultSet resultSet = ps.getGeneratedKeys();
+                resultSet.next();
+                
+                return resultSet.getInt(1);
+            }                    
+        };
         
-        jdbcTemplate.update(
-                "insert into File(Name, Size, Data) " + 
-                "values(:name, :size, :data)",
-                new MapSqlParameterSource()
-                    .addValue("name", fileName)
-                    .addValue("size", fileSize)
-                    .addValue("data", IOUtils.toByteArray(dataStream)), // how do i normally do it?
-                keyHolder);
-        
-        return (Integer)keyHolder.getKey();
+        return jdbcTemplate.getJdbcOperations().execute(
+                preparedStatementCreator,
+                preparedStatementCallback);
     }
     
     public List<FileRow> getFiles() {
