@@ -3,7 +3,6 @@ package me.loki2302;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.sql.SQLException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
@@ -41,24 +40,25 @@ public class HomeController {
         return "redirect:/";
     }
     
-    @RequestMapping(value = "/download/{id}", method = RequestMethod.GET, produces = "application/octet-stream")
-    public void download(@PathVariable int id, HttpServletResponse response) throws SQLException, IOException {
-        try {
-            FileRow fileRow = fileDao.getFileData(id);
-            if(fileRow == null) {
-                throw new RuntimeException("no such file");
-            }
-                               
-            response.setContentLength((int)fileRow.Size);
-            
-            String fileName = fileRow.Name;            
-            response.setHeader("Content-Disposition", String.format("attachment; filename=\"%s\"", fileName));
-            
-            OutputStream responseOutputStream = response.getOutputStream();            
-            fileDao.writeFileDataToOutputStream(id, responseOutputStream);            
-            responseOutputStream.flush();
-        } catch(Exception e) {
-            e.printStackTrace();            
+    @RequestMapping(
+            value = "/download/{id}", 
+            method = RequestMethod.GET, 
+            produces = "application/octet-stream")
+    public void download(
+            @PathVariable int id, 
+            HttpServletResponse response) throws IOException {
+        FileRow fileRow = fileDao.getFileData(id);
+        if(fileRow == null) {
+            throw new RuntimeException("no such file");
         }
+                               
+        response.setContentLength((int)fileRow.Size);
+            
+        String fileName = fileRow.Name;            
+        response.setHeader("Content-Disposition", String.format("attachment; filename=\"%s\"", fileName));
+            
+        OutputStream responseOutputStream = response.getOutputStream();            
+        fileDao.writeFileDataToOutputStream(id, responseOutputStream);            
+        responseOutputStream.flush();
     }
 }
