@@ -1,22 +1,18 @@
 package me.loki2302;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.OutputStream;
 import java.sql.SQLException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 @Controller
@@ -32,30 +28,30 @@ public class HomeController {
     }
     
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
-    public String upload(CustomFile customFile) throws IOException {
-        MultipartFile file = customFile.getFile(); 
+    public String upload(MultipartFile file) throws IOException {
         String fileName = file.getOriginalFilename();
         long fileSize = file.getSize();        
         System.out.printf("got file: %s, %d\n", fileName, fileSize);
         
-        fileDao.insertFile(fileName, file.getBytes());
+        fileDao.insertFile(fileName, fileSize, file.getBytes());
                 
         return "redirect:/";
     }
     
     @RequestMapping(value = "/download/{id}", method = RequestMethod.GET, produces = "application/octet-stream")
-    @ResponseBody
-    public Resource download(@PathVariable int id, HttpServletResponse response) throws SQLException {
-        final FileDataRow fileDataRow = fileDao.getFileData(id);
+    public void download(@PathVariable int id, HttpServletResponse response) throws SQLException, IOException {
+        FileRow fileRow = fileDao.getFileData(id);
+        if(fileRow == null) {
+            throw new RuntimeException("no such file");
+        }
+                
+        response.setContentLength((int)fileRow.Size);
         
-        response.setHeader("Content-Disposition", String.format("attachment; filename=\"%s\"", fileDataRow.Name));
+        String fileName = fileRow.Name;
+        response.setHeader("Content-Disposition", String.format("attachment; filename=\"%s\"", fileName));
         
-        InputStream inputStream = new ByteArrayInputStream(fileDataRow.Data);
-        return new InputStreamResource(inputStream) {
-            @Override
-            public long contentLength() throws IOException {
-                return fileDataRow.Data.length;
-            }            
-        };        
+        OutputStream responseOutputStream = response.getOutputStream();
+        fileDao.writeFileDataToOutputStream(id, responseOutputStream);
+        responseOutputStream.flush();
     }
 }

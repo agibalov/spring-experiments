@@ -37,8 +37,7 @@ public class MvcConfiguration {
     @Bean
     public MultipartResolver multipartResolver() {
         CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver();
-        multipartResolver.setMaxUploadSize(1024 * 1024);
-        multipartResolver.setResolveLazily(true);
+        //multipartResolver.setMaxUploadSize(1024 * 1024);        
         return multipartResolver;
     }
 }
