@@ -11,5 +11,5 @@ public class JdbcTemplateUserDaoTest extends UserDaoTest {
     @Override
     protected UserDao userDao() {
         return jdbcTemplateUserDao;
-    }        
+    }
 }

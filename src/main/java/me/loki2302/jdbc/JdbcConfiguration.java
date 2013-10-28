@@ -5,6 +5,7 @@ import javax.sql.DataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jdbc.query.QueryDslJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
@@ -30,5 +31,10 @@ public class JdbcConfiguration {
     @Bean
     public NamedParameterJdbcTemplate jdbcTemplate(DataSource dataSource) {
         return new NamedParameterJdbcTemplate(dataSource);
+    }
+    
+    @Bean
+    public QueryDslJdbcTemplate queryDslJdbcTemplate(DataSource dataSource) {
+        return new QueryDslJdbcTemplate(dataSource);
     }
 }
