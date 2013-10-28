@@ -7,7 +7,6 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import me.loki2302.jdbc.UserDAO.Page;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -24,12 +23,11 @@ import com.googlecode.flyway.core.Flyway;
 @ContextConfiguration(classes = JdbcConfiguration.class)
 @Transactional
 @TransactionConfiguration(defaultRollback = true)
-public class UserDAOTest {
+public abstract class UserDaoTest {
     @Autowired
     private DataSource dataSource;
     
-    @Autowired
-    private UserDAO userDao;
+    protected abstract UserDao userDao();
     
     @Before
     public void setUpDatabase() {
@@ -40,37 +38,37 @@ public class UserDAOTest {
     
     @Test
     public void thereAreNoUsersInEmptyDatabase() {
-        assertEquals(0, userDao.getUserCount());
+        assertEquals(0, userDao().getUserCount());
         
-        List<UserRow> allUsers = userDao.getAllUsers();
+        List<UserRow> allUsers = userDao().getAllUsers();
         assertTrue(allUsers.isEmpty());
     }
     
     @Test
     public void canCreateUser() {        
-        UserRow user = userDao.createUser("loki2302");
-        assertEquals(1, userDao.getUserCount());        
+        UserRow user = userDao().createUser("loki2302");
+        assertEquals(1, userDao().getUserCount());        
         assertNotEquals(0, user.UserId);
         assertEquals("loki2302", user.Name);
     }
     
     @Test
     public void createUserThrowsWhenUserNameAlreadyUsed() {
-        userDao.createUser("loki2302");
-        assertEquals(1, userDao.getUserCount());
+        userDao().createUser("loki2302");
+        assertEquals(1, userDao().getUserCount());
         try {
-            userDao.createUser("loki2302");
+            userDao().createUser("loki2302");
             fail();
         } catch(UserAlreadyExistsException e) {
-            assertEquals(1, userDao.getUserCount());
+            assertEquals(1, userDao().getUserCount());
         }
     }
     
     @Test
     public void canGetUserByUserId() {
-        UserRow originalUser = userDao.createUser("loki2302");
+        UserRow originalUser = userDao().createUser("loki2302");
         int userId = originalUser.UserId;
-        UserRow retrievedUser = userDao.findUser(userId);
+        UserRow retrievedUser = userDao().findUser(userId);
         assertEquals(originalUser.UserId, retrievedUser.UserId);
         assertEquals(originalUser.Name, retrievedUser.Name);
     }
@@ -78,14 +76,14 @@ public class UserDAOTest {
     @Test
     public void canGetMultipleUsersByUserIds() {
         UserRow createdUsers[] = new UserRow[] {
-                userDao.createUser("user1"),
-                userDao.createUser("user2"),
-                userDao.createUser("user3"),
-                userDao.createUser("user4"),
-                userDao.createUser("user5")
+                userDao().createUser("user1"),
+                userDao().createUser("user2"),
+                userDao().createUser("user3"),
+                userDao().createUser("user4"),
+                userDao().createUser("user5")
         };
         
-        List<UserRow> retrievedUsers = userDao.findUsers(
+        List<UserRow> retrievedUsers = userDao().findUsers(
                 Arrays.asList(
                     createdUsers[0].UserId, 
                     createdUsers[2].UserId, 
@@ -101,14 +99,14 @@ public class UserDAOTest {
     
     @Test
     public void whenThereIsNoUserWithGivenUserIdServiceReturnsNull() {
-        assertNull(userDao.findUser(123));
+        assertNull(userDao().findUser(123));
     }
     
     @Test
     public void canGetAllUsers() {
-        UserRow user1 = userDao.createUser("loki2302");
-        UserRow user2 = userDao.createUser("loki2302_2");
-        List<UserRow> allUsers = userDao.getAllUsers();
+        UserRow user1 = userDao().createUser("loki2302");
+        UserRow user2 = userDao().createUser("loki2302_2");
+        List<UserRow> allUsers = userDao().getAllUsers();
         assertEquals(2, allUsers.size());
         assertEquals(user1.UserId, allUsers.get(0).UserId);
         assertEquals(user1.Name, allUsers.get(0).Name);
@@ -119,14 +117,14 @@ public class UserDAOTest {
     @Test
     public void canGetAllUsersWithPagination() {
         UserRow createdUsers[] = new UserRow[] {
-                userDao.createUser("user1"),
-                userDao.createUser("user2"),
-                userDao.createUser("user3"),
-                userDao.createUser("user4"),
-                userDao.createUser("user5")
+                userDao().createUser("user1"),
+                userDao().createUser("user2"),
+                userDao().createUser("user3"),
+                userDao().createUser("user4"),
+                userDao().createUser("user5")
         };
         
-        Page<UserRow> page1 = userDao.getAllUsers(2, 0);        
+        Page<UserRow> page1 = userDao().getAllUsers(2, 0);        
         assertEquals(5, page1.TotalItems);
         assertEquals(3, page1.TotalPages);
         assertEquals(0, page1.CurrentPage);
@@ -134,7 +132,7 @@ public class UserDAOTest {
         assertEquals(createdUsers[0].UserId, page1.Items.get(0).UserId);
         assertEquals(createdUsers[1].UserId, page1.Items.get(1).UserId);
         
-        Page<UserRow> page2 = userDao.getAllUsers(2, 1);        
+        Page<UserRow> page2 = userDao().getAllUsers(2, 1);        
         assertEquals(5, page2.TotalItems);
         assertEquals(3, page2.TotalPages);
         assertEquals(1, page2.CurrentPage);
@@ -142,7 +140,7 @@ public class UserDAOTest {
         assertEquals(createdUsers[2].UserId, page2.Items.get(0).UserId);
         assertEquals(createdUsers[3].UserId, page2.Items.get(1).UserId);
         
-        Page<UserRow> page3 = userDao.getAllUsers(2, 2);        
+        Page<UserRow> page3 = userDao().getAllUsers(2, 2);        
         assertEquals(5, page3.TotalItems);
         assertEquals(3, page3.TotalPages);
         assertEquals(2, page3.CurrentPage);

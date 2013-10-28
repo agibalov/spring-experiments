@@ -12,7 +12,7 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
-@ComponentScan(basePackageClasses = UserDAO.class)
+@ComponentScan(basePackageClasses = JdbcConfiguration.class)
 public class JdbcConfiguration {
     @Bean
     public DataSource dataSource() {

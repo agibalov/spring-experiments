@@ -1,12 +1,15 @@
-package me.loki2302.jdbc;
+package me.loki2302.jdbc.template;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
+
+import me.loki2302.jdbc.Page;
+import me.loki2302.jdbc.UserAlreadyExistsException;
+import me.loki2302.jdbc.UserDao;
+import me.loki2302.jdbc.UserRow;
+import me.loki2302.jdbc.UserRowMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.support.DataAccessUtils;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -14,11 +17,15 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class UserDAO {
+public class JdbcTemplateUserDao implements UserDao {
     @Autowired
     private NamedParameterJdbcTemplate template;
     
-    public UserRow createUser(final String userName) {       
+    @Autowired
+    private UserRowMapper userRowMapper;
+    
+    @Override
+    public UserRow createUser(String userName) {       
         int userCount = template.queryForObject(
                 "select count(*) from Users where Name = :userName", 
                 new MapSqlParameterSource().addValue("userName", userName),
@@ -39,33 +46,37 @@ public class UserDAO {
         UserRow user = template.queryForObject(
                 "select Id, Name from Users where Id = :userId",
                 new MapSqlParameterSource().addValue("userId", userId),
-                new UserRowMapper());
+                userRowMapper);
                 
         return user;
     }
     
-    public UserRow findUser(final int userId) {                
+    @Override
+    public UserRow findUser(int userId) {                
         return DataAccessUtils.singleResult(template.query(
                 "select Id, Name from Users where Id = :userId",
                 new MapSqlParameterSource()
                 .addValue("userId", userId),
-                new UserRowMapper()));
+                userRowMapper));
     }
        
-    public List<UserRow> findUsers(final List<Integer> userIds) {               
+    @Override
+    public List<UserRow> findUsers(List<Integer> userIds) {               
         return template.query(
                 "select Id, Name from Users where Id in (:userIds)",
                 new MapSqlParameterSource().addValue("userIds", userIds),
-                new UserRowMapper());
+                userRowMapper);
     }
         
+    @Override
     public List<UserRow> getAllUsers() {
         return template.query(
                 "select Id, Name from Users", 
-                new UserRowMapper());
+                userRowMapper);
     }
     
-    public Page<UserRow> getAllUsers(final int itemsPerPage, final int page) {
+    @Override
+    public Page<UserRow> getAllUsers(int itemsPerPage, int page) {
         int totalUsers = getUserCount();
         
         Page<UserRow> pageResult = new Page<UserRow>();
@@ -77,31 +88,15 @@ public class UserDAO {
                 new MapSqlParameterSource()
                     .addValue("skip", page * itemsPerPage)
                     .addValue("take", itemsPerPage),
-                new UserRowMapper());
+                userRowMapper);
         return pageResult;
     }
     
+    @Override
     public int getUserCount() {
         return template.queryForObject(
                 "select count(*) from Users",
                 new MapSqlParameterSource(),
                 Integer.class);
-    }
-
-    private static class UserRowMapper implements RowMapper<UserRow> {
-        @Override
-        public UserRow mapRow(ResultSet rs, int rowNum) throws SQLException {
-            UserRow userRow = new UserRow();
-            userRow.UserId = rs.getInt("Id");
-            userRow.Name = rs.getString("Name");
-            return userRow;
-        }
-    }
-    
-    public class Page<T> {
-        public int TotalItems;
-        public int TotalPages;
-        public int CurrentPage;
-        public List<T> Items;
     }
 }
