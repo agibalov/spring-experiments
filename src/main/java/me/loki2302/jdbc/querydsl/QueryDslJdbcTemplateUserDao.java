@@ -16,10 +16,14 @@ import org.springframework.stereotype.Repository;
 
 import com.mysema.query.sql.SQLQuery;
 import com.mysema.query.sql.dml.SQLInsertClause;
+import com.mysema.query.types.Expression;
 
 @Repository
 public class QueryDslJdbcTemplateUserDao implements UserDao {
-    private final static QUserRow qUserRow = QUserRow.userRow;
+    private final static QUserRow qUserRow = QUserRow.userRow;    
+    private final static Expression<?>[] userRowProjection = new Expression<?>[] { 
+        qUserRow.id, 
+        qUserRow.name };
     
     @Autowired
     private QueryDslJdbcTemplate queryDslJdbcTemplate;
@@ -33,6 +37,7 @@ public class QueryDslJdbcTemplateUserDao implements UserDao {
                 queryDslJdbcTemplate.newSqlQuery()
                     .from(qUserRow)
                     .where(qUserRow.name.eq(userName))); 
+        
         if(userCount > 0) {
             throw new UserAlreadyExistsException();
         }
@@ -56,11 +61,11 @@ public class QueryDslJdbcTemplateUserDao implements UserDao {
                 .newSqlQuery()
                 .from(qUserRow)
                 .where(qUserRow.id.eq(userId));
+        
         return queryDslJdbcTemplate.queryForObject(
                 query, 
                 userRowMapper, 
-                qUserRow.id, 
-                qUserRow.name);
+                userRowProjection);
     }
 
     @Override
@@ -69,23 +74,23 @@ public class QueryDslJdbcTemplateUserDao implements UserDao {
                 .newSqlQuery()
                 .from(qUserRow)
                 .where(qUserRow.id.in(userIds));
+        
         return queryDslJdbcTemplate.query(
                 query, 
                 userRowMapper, 
-                qUserRow.id, 
-                qUserRow.name);
+                userRowProjection);
     }
 
     @Override
     public List<UserRow> getAllUsers() {        
         SQLQuery query = queryDslJdbcTemplate
                 .newSqlQuery()
-                .from(qUserRow);        
+                .from(qUserRow);
+        
         return queryDslJdbcTemplate.query(
                 query, 
                 userRowMapper, 
-                qUserRow.id, 
-                qUserRow.name);
+                userRowProjection);
     }
 
     @Override
@@ -106,14 +111,17 @@ public class QueryDslJdbcTemplateUserDao implements UserDao {
         pageResult.Items = queryDslJdbcTemplate.query(
                 query, 
                 userRowMapper, 
-                qUserRow.id, 
-                qUserRow.name);
+                userRowProjection);
         
         return pageResult;
     }
 
     @Override
-    public int getUserCount() {        
-        return (int)queryDslJdbcTemplate.count(queryDslJdbcTemplate.newSqlQuery().from(qUserRow));
+    public int getUserCount() {
+        SQLQuery query = queryDslJdbcTemplate
+                .newSqlQuery()
+                .from(qUserRow);
+        
+        return (int)queryDslJdbcTemplate.count(query);
     }
 }
