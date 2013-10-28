@@ -1,6 +1,5 @@
 package me.loki2302.jdbc.querydsl;
 
-
 import java.sql.SQLException;
 import java.util.List;
 

@@ -13,11 +13,10 @@ public class QUserRow extends RelationalPathBase<QUserRow> {
     private static final long serialVersionUID = 1209561150476404798L;
     
     public static final QUserRow userRow = new QUserRow("UserRow");
-    public final NumberPath<Integer> id = createNumber("Id", Integer.class);
+    public final NumberPath<Integer> id = createNumber("ID", Integer.class); // IMPORTANT: "ID", not "Id" or "id".
     public final StringPath name = createString("Name");
     
-    // doesn't work when this is uncommented
-    // public final PrimaryKey<QUserRow> pk = createPrimaryKey(id);
+    public final PrimaryKey<QUserRow> pk = createPrimaryKey(id);
     
     public QUserRow(String variable) {
         super(QUserRow.class, forVariable(variable), "PUBLIC", "Users");
