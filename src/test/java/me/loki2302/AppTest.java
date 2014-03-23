@@ -22,16 +22,27 @@ public class AppTest {
     private EmbeddedWebApplicationContext server;
 
     @Test
-    public void dummy() {
+    public void canLaunchEntireAppAndMakeARequest() {
+        String message = makeGetForString("/");
+        assertEquals("hello", message);
+    }
+
+    @Test
+    public void appPropertiesAreProperlyInjectedIntoController() {
+        String message = makeGetForString("/property");
+        assertEquals("hello from app.properties", message);
+    }
+
+    private String makeGetForString(String path) {
         String uri = UriComponentsBuilder.newInstance()
                 .scheme("http")
                 .host("localhost")
                 .port(server.getEmbeddedServletContainer().getPort())
-                .path("/")
+                .path(path)
                 .build().toUriString();
 
         RestTemplate restTemplate = new RestTemplate();
-        String message = restTemplate.getForObject(uri, String.class);
-        assertEquals("hello", message);
+        String responseBody = restTemplate.getForObject(uri, String.class);
+        return responseBody;
     }
 }
