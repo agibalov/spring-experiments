@@ -22,7 +22,7 @@
 		<p>There are @files.size() files</p>
 		<ul>
 		@for(FileRow fileRow : files) {
-			<li><a href="/download/@fileRow.Id">@fileRow.Name</a></li>
+			<li>@fileRow.Name [<a href="/download/@fileRow.Id">download</a>, <a href="/download-mc/@fileRow.Id">download mc</a>]</li>
 		}
 		</ul>
 		

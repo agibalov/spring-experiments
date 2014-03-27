@@ -1,19 +1,20 @@
 package me.loki2302;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.List;
-
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.List;
 
 @Controller
 public class HomeController {
@@ -43,7 +44,7 @@ public class HomeController {
     @RequestMapping(
             value = "/download/{id}", 
             method = RequestMethod.GET, 
-            produces = "application/octet-stream")
+            produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public void download(
             @PathVariable int id, 
             HttpServletResponse response) throws IOException {
@@ -60,5 +61,23 @@ public class HomeController {
         OutputStream responseOutputStream = response.getOutputStream();            
         fileDao.writeFileDataToOutputStream(id, responseOutputStream);            
         responseOutputStream.flush();
+    }
+
+    @RequestMapping(
+            value = "/download-mc/{id}",
+            method = RequestMethod.GET)
+    @ResponseBody
+    public DownloadableFile downloadWithMessageConverter(@PathVariable final int id) {
+        FileRow fileRow = fileDao.getFileData(id);
+        if(fileRow == null) {
+            throw new RuntimeException("no such file");
+        }
+
+        return new DownloadableFile(fileRow.Name, fileRow.Size, new DownloadableFileContentProvider() {
+            @Override
+            public void writeContent(OutputStream outputStream) {
+                fileDao.writeFileDataToOutputStream(id, outputStream);
+            }
+        });
     }
 }
