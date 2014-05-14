@@ -6,7 +6,12 @@
     <body>
         <div th:fragment="content">
             <h2>Page 2</h2>
-            <p>Page 2 content here</p>
+            <ul th:remove="all-but-first">
+                <li th:each="person : ${people}"
+                    th:text="|id=${person.id}, name=${person.name}|">Dummy text here</li>
+                <li>Dummy 1</li>
+                <li>Dummy 2</li>
+            </ul>
         </div>
     </body>
 </html>
