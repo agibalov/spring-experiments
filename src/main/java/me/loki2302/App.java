@@ -26,5 +26,10 @@ public class App {
             model.addAttribute("currentTime", new Date());
             return "index";
         }
+
+        @RequestMapping("/page2")
+        public String page2(Model model) {
+            return "page2";
+        }
     }
 }
