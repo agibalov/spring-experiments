@@ -6,8 +6,8 @@
     <body>
         <h1>HEADER</h1>
         <ul>
-            <li><a href="/">Index</a></li>
-            <li><a href="/page2">Page 2</a></li>
+            <li><a href="http://www.google.com" th:href="@{/}">Index</a></li>
+            <li><a href="http://www.github.com" th:href="@{/page2}">Page 2</a></li>
         </ul>
         <div th:include="this :: content"></div>
         <h1>FOOTER</h1>
