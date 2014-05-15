@@ -12,6 +12,13 @@
                 <li>Dummy 1</li>
                 <li>Dummy 2</li>
             </ul>
+            <ul th:remove="all-but-first">
+                <li th:each="person,it : ${people}"
+                    th:text="|id=${person.id}, name=${person.name}|"
+                    th:style="${it.odd} ? 'color: red': 'color: green'">Dummy text here</li>
+                <li>Dummy 1</li>
+                <li>Dummy 2</li>
+            </ul>
         </div>
     </body>
 </html>
