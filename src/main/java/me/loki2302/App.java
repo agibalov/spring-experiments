@@ -44,10 +44,10 @@ public class App {
             return new RythmView(template);
         }
 
-        private static String loadTemplateFromResource(String name) throws IOException {
+        private static String loadTemplateFromResource(String templateResourceName) throws IOException {
             InputStream inputStream = null;
             try {
-                inputStream = RythmView.class.getResourceAsStream("/index.html");
+                inputStream = RythmView.class.getResourceAsStream(templateResourceName);
                 return IOUtils.toString(inputStream);
             } finally {
                 IOUtils.closeQuietly(inputStream);
