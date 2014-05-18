@@ -1,7 +1,6 @@
 package me.loki2302;
 
-import org.apache.commons.io.IOUtils;
-import org.rythmengine.Rythm;
+import org.rythmengine.RythmEngine;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -15,11 +14,12 @@ import org.springframework.web.servlet.ViewResolver;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+
+import static org.rythmengine.conf.RythmConfigurationKey.HOME_TEMPLATE;
 
 public class App {
     public static void main(String[] args) {
@@ -32,34 +32,53 @@ public class App {
     public static class Config {
         @Bean
         public ViewResolver viewResolver() {
-            return new RythmViewResolver();
+            Map<String, Object> config = new HashMap<String, Object>();
+            config.put(HOME_TEMPLATE.getKey(), "templates");
+            RythmEngine rythmEngine = new RythmEngine(config);
+
+            RythmViewResolver rythmViewResolver = new RythmViewResolver(rythmEngine);
+            rythmViewResolver.setPrefix("");
+            rythmViewResolver.setSuffix(".html");
+
+            return rythmViewResolver;
         }
     }
 
     public static class RythmViewResolver implements ViewResolver {
-        @Override
-        public View resolveViewName(String viewName, Locale locale) throws Exception {
-            String templateResourceName = String.format("/%s.html", viewName);
-            String template = loadTemplateFromResource(templateResourceName);
-            return new RythmView(template);
+        private final RythmEngine rythmEngine;
+        private String prefix = "";
+        private String suffix = "";
+
+        public RythmViewResolver(RythmEngine rythmEngine) {
+            this.rythmEngine = rythmEngine;
         }
 
-        private static String loadTemplateFromResource(String templateResourceName) throws IOException {
-            InputStream inputStream = null;
-            try {
-                inputStream = RythmView.class.getResourceAsStream(templateResourceName);
-                return IOUtils.toString(inputStream);
-            } finally {
-                IOUtils.closeQuietly(inputStream);
-            }
+        public void setPrefix(String prefix) {
+            this.prefix = prefix;
+        }
+
+        public void setSuffix(String suffix) {
+            this.suffix = suffix;
+        }
+
+        @Override
+        public View resolveViewName(String viewName, Locale locale) throws Exception {
+            String templateName = makeTemplateName(viewName);
+            return new RythmView(rythmEngine, templateName);
+        }
+
+        private String makeTemplateName(String viewName) {
+            return prefix + viewName + suffix;
         }
     }
 
     public static class RythmView implements View {
-        private final String template;
+        private final RythmEngine rythmEngine;
+        private final String templateName;
 
-        public RythmView(String template) {
-            this.template = template;
+        public RythmView(RythmEngine rythmEngine, String templateName) {
+            this.rythmEngine = rythmEngine;
+            this.templateName = templateName;
         }
 
         @Override
@@ -73,7 +92,7 @@ public class App {
                 HttpServletRequest request,
                 HttpServletResponse response) throws Exception {
 
-            String result = Rythm.render(template, model);
+            String result = rythmEngine.render(templateName, model);
 
             response.getWriter().append(result);
         }
