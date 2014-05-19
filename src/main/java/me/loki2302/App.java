@@ -1,0 +1,105 @@
+package me.loki2302;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.social.connect.Connection;
+import org.springframework.social.google.connect.GoogleConnectionFactory;
+import org.springframework.social.oauth2.AccessGrant;
+import org.springframework.social.oauth2.OAuth2Operations;
+import org.springframework.social.oauth2.OAuth2Parameters;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.context.request.NativeWebRequest;
+import org.springframework.web.servlet.View;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.servlet.view.RedirectView;
+
+import java.util.Date;
+
+public class App {
+    public static void main(String[] args) {
+        SpringApplication.run(Config.class, args);
+    }
+
+    @EnableAutoConfiguration
+    @ComponentScan
+    public static class Config {
+        @Bean
+        public GoogleConnectionFactory googleConnectionFactory() {
+            GoogleConnectionFactory googleConnectionFactory = new GoogleConnectionFactory(
+                    "330741531920.apps.googleusercontent.com",
+                    "R21tppN-oV9bAqg-Sgp5tTNg");
+
+            googleConnectionFactory.setScope(
+                    "https://www.googleapis.com/auth/userinfo.profile " +
+                    "https://www.googleapis.com/auth/userinfo.email");
+
+            return googleConnectionFactory;
+        }
+    }
+
+    @Controller
+    public static class HomeController {
+        private final static Logger log = LoggerFactory.getLogger(HomeController.class);
+
+        @Autowired
+        private GoogleConnectionFactory googleConnectionFactory;
+
+        @RequestMapping("/")
+        public String index(Model model) {
+            model.addAttribute("message", new Date());
+            return "index";
+        }
+
+        @RequestMapping("/google")
+        public View google() {
+            String callbackUrl = makeGoogleCallbackUrl();
+
+            log.info("Callback URL is {}", callbackUrl);
+
+            OAuth2Operations oAuth2Operations = googleConnectionFactory.getOAuthOperations();
+            OAuth2Parameters oAuth2Parameters = new OAuth2Parameters();
+            oAuth2Parameters.setRedirectUri(callbackUrl);
+            oAuth2Parameters.setScope(googleConnectionFactory.getScope());
+            String authorizeUrl = oAuth2Operations.buildAuthorizeUrl(oAuth2Parameters);
+
+            log.info("Authorize URL is {}", authorizeUrl);
+
+            return new RedirectView(authorizeUrl);
+        }
+
+        @RequestMapping(value = "/googleCallback", method = RequestMethod.GET, params = "code")
+        @ResponseBody
+        public String googleCallback(NativeWebRequest request) {
+            String code = request.getParameter("code");
+            String callbackUrl = makeGoogleCallbackUrl();
+            try {
+                AccessGrant accessGrant = googleConnectionFactory
+                        .getOAuthOperations()
+                        .exchangeForAccess(code, callbackUrl, null);
+                Connection connection = googleConnectionFactory.createConnection(accessGrant);
+                return connection.getDisplayName();
+            } catch (HttpClientErrorException e) {
+                throw e;
+            }
+        }
+
+        private static String makeGoogleCallbackUrl() {
+            String callbackUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+                    .path("/googleCallback")
+                    .buildAndExpand()
+                    .toUriString();
+
+            return callbackUrl;
+        }
+    }
+}
