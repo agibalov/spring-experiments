@@ -4,6 +4,9 @@
         <title>Hello</title>
     </head>
     <body>
-        <p data-th-text="${message}">Dummy text here</p>
+        <ul>
+            <li><a href="http://www.google.com" data-th-href="@{/google}">Sign In with Google</a></li>
+        </ul>
+        <p data-th-text="${name}" data-th-if="${name}">John Smith</p>
     </body>
 </html>

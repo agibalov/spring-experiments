@@ -56,7 +56,6 @@ public class App {
 
         @RequestMapping("/")
         public String index(Model model) {
-            model.addAttribute("message", new Date());
             return "index";
         }
 
@@ -78,8 +77,7 @@ public class App {
         }
 
         @RequestMapping(value = "/googleCallback", method = RequestMethod.GET, params = "code")
-        @ResponseBody
-        public String googleCallback(NativeWebRequest request) {
+        public String googleCallback(Model model, NativeWebRequest request) {
             String code = request.getParameter("code");
             String callbackUrl = makeGoogleCallbackUrl();
             try {
@@ -87,7 +85,8 @@ public class App {
                         .getOAuthOperations()
                         .exchangeForAccess(code, callbackUrl, null);
                 Connection connection = googleConnectionFactory.createConnection(accessGrant);
-                return connection.getDisplayName();
+                model.addAttribute("name", connection.getDisplayName());
+                return "index";
             } catch (HttpClientErrorException e) {
                 throw e;
             }
