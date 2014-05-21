@@ -14,9 +14,7 @@ import org.springframework.social.oauth2.OAuth2Operations;
 import org.springframework.social.oauth2.OAuth2Parameters;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.servlet.View;
@@ -24,6 +22,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class App {
     public static void main(String[] args) {
@@ -86,10 +86,33 @@ public class App {
                         .exchangeForAccess(code, callbackUrl, null);
                 Connection connection = googleConnectionFactory.createConnection(accessGrant);
                 model.addAttribute("name", connection.getDisplayName());
-                return "index";
             } catch (HttpClientErrorException e) {
-                throw e;
+                model.addAttribute("error", e.getMessage());
             }
+
+            return "index";
+        }
+
+        @RequestMapping(value = "/googleCallback", method = RequestMethod.GET, params = "error")
+        public String googleErrorCallback(
+                Model model,
+                @RequestParam("error") String error,
+                @RequestParam(value = "error_description", required = false) String errorDescription,
+                @RequestParam(value = "error_uri", required = false) String errorUri) {
+
+            if(error != null) {
+                model.addAttribute("error", error);
+            }
+
+            if(errorDescription != null) {
+                model.addAttribute("errorDescription", errorDescription);
+            }
+
+            if(errorUri != null) {
+                model.addAttribute("errorUri", errorUri);
+            }
+
+            return "index";
         }
 
         private static String makeGoogleCallbackUrl() {
