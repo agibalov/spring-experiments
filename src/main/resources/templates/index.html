@@ -8,6 +8,8 @@
             <li><a href="http://www.google.com" data-th-href="@{/google}">Sign In with Google</a></li>
         </ul>
         <p data-th-text="${name}" data-th-if="${name}">John Smith</p>
+        <img data-th-src="@{${imageUrl}}" data-th-if="${imageUrl}" src="#" />
+        <a data-th-href="@{${profileUrl}}" data-th-if="${profileUrl}" href="#">Profile</a>
         <p data-th-text="${error}" data-th-if="${error}">Error</p>
         <p data-th-text="${errorDescription}" data-th-if="${errorDescription}">Error</p>
         <p data-th-text="${errorUri}" data-th-if="${errorDescription}">Error</p>

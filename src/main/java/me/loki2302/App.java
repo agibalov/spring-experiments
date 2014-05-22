@@ -84,6 +84,8 @@ public class App {
                         .exchangeForAccess(code, callbackUrl, null);
                 Connection connection = googleConnectionFactory.createConnection(accessGrant);
                 model.addAttribute("name", connection.getDisplayName());
+                model.addAttribute("profileUrl", connection.getProfileUrl());
+                model.addAttribute("imageUrl", connection.getImageUrl());
             } catch (HttpClientErrorException e) {
                 model.addAttribute("error", e.getMessage());
             }
