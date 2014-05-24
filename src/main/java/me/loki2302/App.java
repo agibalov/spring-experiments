@@ -23,13 +23,14 @@ import java.util.Arrays;
 import java.util.List;
 
 public class App {
-    // TODO: @PreAuthorize
-    // TODO: @PostAuthorize
-    // TODO: @PreFilter
-    // TODO: @PostFilter
-    // TODO: SpEL - trivial expression
-    // TODO: SpEL - use context beans
+    // +TODO: @PreAuthorize
+    // +TODO: @PostAuthorize
+    // +TODO: @PreFilter
+    // +TODO: @PostFilter
+    // +TODO: SpEL - trivial expression
+    // +TODO: SpEL - use context beans
     // TODO: completely custom handling (like, god object that knows what is allowed and what is not)
+    // TODO: convert to JUnit tests
 
     public static void main(String[] args) {
         ApplicationContext context = SpringApplication.run(Config.class, args);
