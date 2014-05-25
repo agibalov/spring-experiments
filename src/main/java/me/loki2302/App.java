@@ -8,6 +8,8 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.social.connect.Connection;
+import org.springframework.social.google.api.impl.GoogleTemplate;
+import org.springframework.social.google.api.userinfo.GoogleUserInfo;
 import org.springframework.social.google.connect.GoogleConnectionFactory;
 import org.springframework.social.oauth2.AccessGrant;
 import org.springframework.social.oauth2.OAuth2Operations;
@@ -86,6 +88,10 @@ public class App {
                 model.addAttribute("name", connection.getDisplayName());
                 model.addAttribute("profileUrl", connection.getProfileUrl());
                 model.addAttribute("imageUrl", connection.getImageUrl());
+
+                GoogleTemplate googleTemplate = new GoogleTemplate(accessGrant.getAccessToken());
+                GoogleUserInfo googleUserInfo = googleTemplate.userOperations().getUserInfo();
+                model.addAttribute("email", googleUserInfo.getEmail());
             } catch (HttpClientErrorException e) {
                 model.addAttribute("error", e.getMessage());
             }
