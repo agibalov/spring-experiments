@@ -21,7 +21,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(SpringJUnit4ClassRunner.class)
 @IntegrationTest
 @SpringApplicationConfiguration(classes = Config.class)
-public class SecurityTests {
+public class CalculatorSecurityTests {
     @Autowired
     private Calculator calculator;
 
