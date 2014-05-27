@@ -8,12 +8,11 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.social.connect.Connection;
+import org.springframework.social.connect.web.ConnectSupport;
 import org.springframework.social.google.api.impl.GoogleTemplate;
 import org.springframework.social.google.api.userinfo.GoogleUserInfo;
 import org.springframework.social.google.connect.GoogleConnectionFactory;
 import org.springframework.social.oauth2.AccessGrant;
-import org.springframework.social.oauth2.OAuth2Operations;
-import org.springframework.social.oauth2.OAuth2Parameters;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -60,16 +59,15 @@ public class App {
         }
 
         @RequestMapping("/google")
-        public View google() {
+        public View google(NativeWebRequest nativeWebRequest) {
             String callbackUrl = makeGoogleCallbackUrl();
-
             log.info("Callback URL is {}", callbackUrl);
 
-            OAuth2Operations oAuth2Operations = googleConnectionFactory.getOAuthOperations();
-            OAuth2Parameters oAuth2Parameters = new OAuth2Parameters();
-            oAuth2Parameters.setRedirectUri(callbackUrl);
-            oAuth2Parameters.setScope(googleConnectionFactory.getScope());
-            String authorizeUrl = oAuth2Operations.buildAuthorizeUrl(oAuth2Parameters);
+            ConnectSupport connectSupport = new ConnectSupport();
+            connectSupport.setCallbackUrl(callbackUrl);
+            String authorizeUrl = connectSupport.buildOAuthUrl(
+                    googleConnectionFactory,
+                    nativeWebRequest);
 
             log.info("Authorize URL is {}", authorizeUrl);
 
