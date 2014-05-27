@@ -9,16 +9,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.web.ConnectSupport;
-import org.springframework.social.google.api.impl.GoogleTemplate;
+import org.springframework.social.google.api.Google;
 import org.springframework.social.google.api.userinfo.GoogleUserInfo;
 import org.springframework.social.google.connect.GoogleConnectionFactory;
-import org.springframework.social.oauth2.AccessGrant;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -76,21 +74,22 @@ public class App {
 
         @RequestMapping(value = "/googleCallback", method = RequestMethod.GET, params = "code")
         public String googleCallback(Model model, NativeWebRequest request) {
-            String code = request.getParameter("code");
             String callbackUrl = makeGoogleCallbackUrl();
-            try {
-                AccessGrant accessGrant = googleConnectionFactory
-                        .getOAuthOperations()
-                        .exchangeForAccess(code, callbackUrl, null);
-                Connection connection = googleConnectionFactory.createConnection(accessGrant);
-                model.addAttribute("name", connection.getDisplayName());
-                model.addAttribute("profileUrl", connection.getProfileUrl());
-                model.addAttribute("imageUrl", connection.getImageUrl());
+            log.info("Callback URL is {}", callbackUrl);
 
-                GoogleTemplate googleTemplate = new GoogleTemplate(accessGrant.getAccessToken());
-                GoogleUserInfo googleUserInfo = googleTemplate.userOperations().getUserInfo();
+            ConnectSupport connectSupport = new ConnectSupport();
+            connectSupport.setCallbackUrl(callbackUrl);
+            try {
+                Connection<?> connection = connectSupport.completeConnection(googleConnectionFactory, request);
+                Connection<Google> googleConnection = (Connection<Google>)connection;
+
+                model.addAttribute("name", googleConnection.getDisplayName());
+                model.addAttribute("profileUrl", googleConnection.getProfileUrl());
+                model.addAttribute("imageUrl", googleConnection.getImageUrl());
+
+                GoogleUserInfo googleUserInfo = googleConnection.getApi().userOperations().getUserInfo();
                 model.addAttribute("email", googleUserInfo.getEmail());
-            } catch (HttpClientErrorException e) {
+            } catch(Exception e) {
                 model.addAttribute("error", e.getMessage());
             }
 
