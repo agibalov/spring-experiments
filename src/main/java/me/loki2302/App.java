@@ -8,12 +8,18 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.social.connect.Connection;
+import org.springframework.social.connect.ConnectionFactory;
+import org.springframework.social.connect.support.OAuth2ConnectionFactory;
 import org.springframework.social.connect.web.ConnectSupport;
+import org.springframework.social.facebook.api.Facebook;
+import org.springframework.social.facebook.api.FacebookProfile;
+import org.springframework.social.facebook.connect.FacebookConnectionFactory;
 import org.springframework.social.google.api.Google;
 import org.springframework.social.google.api.userinfo.GoogleUserInfo;
 import org.springframework.social.google.connect.GoogleConnectionFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -42,6 +48,17 @@ public class App {
 
             return googleConnectionFactory;
         }
+
+        @Bean
+        public FacebookConnectionFactory facebookConnectionFactory() {
+            FacebookConnectionFactory facebookConnectionFactory = new FacebookConnectionFactory(
+                    "470358236410054",
+                    "aabe43ffb4e3f2e2c0c3e8502d6db530");
+
+            facebookConnectionFactory.setScope("email");
+
+            return facebookConnectionFactory;
+        }
     }
 
     @Controller
@@ -51,20 +68,29 @@ public class App {
         @Autowired
         private GoogleConnectionFactory googleConnectionFactory;
 
+        @Autowired
+        private FacebookConnectionFactory facebookConnectionFactory;
+
         @RequestMapping("/")
         public String index(Model model) {
             return "index";
         }
 
-        @RequestMapping("/google")
-        public View google(NativeWebRequest nativeWebRequest) {
-            String callbackUrl = makeGoogleCallbackUrl();
+        @RequestMapping("/{provider}")
+        public View authenticate(
+                @PathVariable String provider,
+                NativeWebRequest nativeWebRequest) {
+
+            String callbackUrl = makeCallbackUrl(provider);
             log.info("Callback URL is {}", callbackUrl);
 
             ConnectSupport connectSupport = new ConnectSupport();
             connectSupport.setCallbackUrl(callbackUrl);
+
+            ConnectionFactory connectionFactory = getConnectionFactoryByProviderName(provider);
+
             String authorizeUrl = connectSupport.buildOAuthUrl(
-                    googleConnectionFactory,
+                    connectionFactory,
                     nativeWebRequest);
 
             log.info("Authorize URL is {}", authorizeUrl);
@@ -72,23 +98,30 @@ public class App {
             return new RedirectView(authorizeUrl);
         }
 
-        @RequestMapping(value = "/googleCallback", method = RequestMethod.GET, params = "code")
-        public String googleCallback(Model model, NativeWebRequest request) {
-            String callbackUrl = makeGoogleCallbackUrl();
+        @RequestMapping(value = "/{provider}/callback", method = RequestMethod.GET, params = "code")
+        public String callbackSuccess(
+                @PathVariable String provider,
+                Model model,
+                NativeWebRequest request) {
+
+            String callbackUrl = makeCallbackUrl(provider);
             log.info("Callback URL is {}", callbackUrl);
 
             ConnectSupport connectSupport = new ConnectSupport();
             connectSupport.setCallbackUrl(callbackUrl);
             try {
-                Connection<?> connection = connectSupport.completeConnection(googleConnectionFactory, request);
-                Connection<Google> googleConnection = (Connection<Google>)connection;
+                ConnectionFactory<?> connectionFactory = getConnectionFactoryByProviderName(provider);
+                Connection<?> connection = connectSupport.completeConnection(
+                        (OAuth2ConnectionFactory<?>)connectionFactory,
+                        request);
 
-                model.addAttribute("name", googleConnection.getDisplayName());
-                model.addAttribute("profileUrl", googleConnection.getProfileUrl());
-                model.addAttribute("imageUrl", googleConnection.getImageUrl());
-
-                GoogleUserInfo googleUserInfo = googleConnection.getApi().userOperations().getUserInfo();
-                model.addAttribute("email", googleUserInfo.getEmail());
+                if(connectionFactory instanceof GoogleConnectionFactory) {
+                    extendModelWithGoogleDetails(model, (Connection<Google>)connection);
+                } else if(connectionFactory instanceof FacebookConnectionFactory) {
+                    extendModelWithFacebookDetails(model, (Connection<Facebook>)connection);
+                } else {
+                    throw new RuntimeException("Unknown connectionFactory " + connectionFactory);
+                }
             } catch(Exception e) {
                 model.addAttribute("error", e.getMessage());
             }
@@ -96,8 +129,33 @@ public class App {
             return "index";
         }
 
-        @RequestMapping(value = "/googleCallback", method = RequestMethod.GET, params = "error")
-        public String googleErrorCallback(
+        private static void extendModelWithGoogleDetails(
+                Model model,
+                Connection<Google> googleConnection) {
+
+            model.addAttribute("name", googleConnection.getDisplayName());
+            model.addAttribute("profileUrl", googleConnection.getProfileUrl());
+            model.addAttribute("imageUrl", googleConnection.getImageUrl());
+
+            GoogleUserInfo googleUserInfo = googleConnection.getApi().userOperations().getUserInfo();
+            model.addAttribute("email", googleUserInfo.getEmail());
+        }
+
+        private static void extendModelWithFacebookDetails(
+                Model model,
+                Connection<Facebook> facebookConnection) {
+
+            model.addAttribute("name", facebookConnection.getDisplayName());
+            model.addAttribute("profileUrl", facebookConnection.getProfileUrl());
+            model.addAttribute("imageUrl", facebookConnection.getImageUrl());
+
+            FacebookProfile facebookProfile = facebookConnection.getApi().userOperations().getUserProfile();
+            model.addAttribute("email", facebookProfile.getEmail());
+        }
+
+        @RequestMapping(value = "/{provider}/callback", method = RequestMethod.GET, params = "error")
+        public String callbackError(
+                @PathVariable String provider,
                 Model model,
                 @RequestParam("error") String error,
                 @RequestParam(value = "error_description", required = false) String errorDescription,
@@ -118,13 +176,25 @@ public class App {
             return "index";
         }
 
-        private static String makeGoogleCallbackUrl() {
+        private static String makeCallbackUrl(String provider) {
             String callbackUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
-                    .path("/googleCallback")
-                    .buildAndExpand()
+                    .path("/{provider}/callback")
+                    .buildAndExpand(provider)
                     .toUriString();
 
             return callbackUrl;
+        }
+
+        private ConnectionFactory<?> getConnectionFactoryByProviderName(String provider) {
+            if(provider.equals("google")) {
+                return googleConnectionFactory;
+            }
+
+            if(provider.equals("facebook")) {
+                return facebookConnectionFactory;
+            }
+
+            throw new RuntimeException("Unknown provider " + provider);
         }
     }
 }
