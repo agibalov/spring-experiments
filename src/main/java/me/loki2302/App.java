@@ -1,7 +1,5 @@
 package me.loki2302;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.ConnectionFactory;
+import org.springframework.social.connect.support.OAuth1ConnectionFactory;
 import org.springframework.social.connect.support.OAuth2ConnectionFactory;
 import org.springframework.social.connect.web.ConnectSupport;
 import org.springframework.social.facebook.api.Facebook;
@@ -19,6 +18,8 @@ import org.springframework.social.facebook.connect.FacebookConnectionFactory;
 import org.springframework.social.google.api.Google;
 import org.springframework.social.google.api.plus.Person;
 import org.springframework.social.google.connect.GoogleConnectionFactory;
+import org.springframework.social.twitter.api.Twitter;
+import org.springframework.social.twitter.connect.TwitterConnectionFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -59,6 +60,15 @@ public class App {
 
             return facebookConnectionFactory;
         }
+
+        @Bean
+        public TwitterConnectionFactory twitterConnectionFactory() {
+            TwitterConnectionFactory twitterConnectionFactory = new TwitterConnectionFactory(
+                    "aWlrQITKSZHwwq28OJyCFw",
+                    "69sxwdNV1g1lEfuS3U5A0ATAljahdTwDwAhlbwDw9t4");
+
+            return twitterConnectionFactory;
+        }
     }
 
     @Controller
@@ -71,12 +81,19 @@ public class App {
         @Autowired
         private FacebookConnectionFactory facebookConnectionFactory;
 
-        @RequestMapping("/")
+        @Autowired
+        private TwitterConnectionFactory twitterConnectionFactory;
+
+        @RequestMapping(
+                value = "/",
+                method = RequestMethod.GET)
         public String index(Model model) {
             return "index";
         }
 
-        @RequestMapping("/{provider}")
+        @RequestMapping(
+                value = "/{provider}",
+                method = RequestMethod.GET)
         public View authenticate(
                 @PathVariable String provider,
                 NativeWebRequest nativeWebRequest) {
@@ -98,7 +115,10 @@ public class App {
             return new RedirectView(authorizeUrl);
         }
 
-        @RequestMapping(value = "/{provider}/callback", method = RequestMethod.GET, params = "code")
+        @RequestMapping(
+                value = "/{provider}/callback",
+                method = RequestMethod.GET,
+                params = "code")
         public String callbackSuccess(
                 @PathVariable String provider,
                 Model model,
@@ -111,13 +131,18 @@ public class App {
             connectSupport.setCallbackUrl(callbackUrl);
             try {
                 ConnectionFactory<?> connectionFactory = getConnectionFactoryByProviderName(provider);
-                Connection<?> connection = connectSupport.completeConnection(
-                        (OAuth2ConnectionFactory<?>)connectionFactory,
-                        request);
 
                 if(connectionFactory instanceof GoogleConnectionFactory) {
+                    Connection<?> connection = connectSupport.completeConnection(
+                            (OAuth2ConnectionFactory<?>)connectionFactory,
+                            request);
+
                     extendModelWithGoogleDetails(model, (Connection<Google>)connection);
                 } else if(connectionFactory instanceof FacebookConnectionFactory) {
+                    Connection<?> connection = connectSupport.completeConnection(
+                            (OAuth2ConnectionFactory<?>)connectionFactory,
+                            request);
+
                     extendModelWithFacebookDetails(model, (Connection<Facebook>)connection);
                 } else {
                     throw new RuntimeException("Unknown connectionFactory " + connectionFactory);
@@ -153,7 +178,19 @@ public class App {
             model.addAttribute("email", facebookProfile.getEmail());
         }
 
-        @RequestMapping(value = "/{provider}/callback", method = RequestMethod.GET, params = "error")
+        private static void extendModelWithTwitterDetails(
+                Model model,
+                Connection<Twitter> twitterConnection) {
+
+            model.addAttribute("name", twitterConnection.getDisplayName());
+            model.addAttribute("profileUrl", twitterConnection.getProfileUrl());
+            model.addAttribute("imageUrl", twitterConnection.getImageUrl());
+        }
+
+        @RequestMapping(
+                value = "/{provider}/callback",
+                method = RequestMethod.GET,
+                params = "error")
         public String callbackError(
                 @PathVariable String provider,
                 Model model,
@@ -176,6 +213,39 @@ public class App {
             return "index";
         }
 
+        @RequestMapping(
+                value = "/{provider}/callback",
+                method = RequestMethod.GET,
+                params = "oauth_token")
+        public String oauth1Callback(
+                @PathVariable String provider,
+                Model model,
+                NativeWebRequest request) {
+
+            String callbackUrl = makeCallbackUrl(provider);
+            log.info("Callback URL is {}", callbackUrl);
+
+            ConnectSupport connectSupport = new ConnectSupport();
+            connectSupport.setCallbackUrl(callbackUrl);
+            try {
+                ConnectionFactory<?> connectionFactory = getConnectionFactoryByProviderName(provider);
+
+                if(connectionFactory instanceof TwitterConnectionFactory) {
+                    Connection<?> connection = connectSupport.completeConnection(
+                            (OAuth1ConnectionFactory<?>)connectionFactory,
+                            request);
+
+                    extendModelWithTwitterDetails(model, (Connection<Twitter>)connection);
+                } else {
+                    throw new RuntimeException("Unknown connectionFactory " + connectionFactory);
+                }
+            } catch(Exception e) {
+                model.addAttribute("error", e.getMessage());
+            }
+
+            return "index";
+        }
+
         private static String makeCallbackUrl(String provider) {
             String callbackUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
                     .path("/{provider}/callback")
@@ -192,6 +262,10 @@ public class App {
 
             if(provider.equals("facebook")) {
                 return facebookConnectionFactory;
+            }
+
+            if(provider.equals("twitter")) {
+                return twitterConnectionFactory;
             }
 
             throw new RuntimeException("Unknown provider " + provider);
