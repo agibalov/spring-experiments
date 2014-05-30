@@ -154,39 +154,6 @@ public class App {
             return "index";
         }
 
-        private static void extendModelWithGoogleDetails(
-                Model model,
-                Connection<Google> googleConnection) {
-
-            model.addAttribute("name", googleConnection.getDisplayName());
-            model.addAttribute("profileUrl", googleConnection.getProfileUrl());
-            model.addAttribute("imageUrl", googleConnection.getImageUrl());
-
-            Person person = googleConnection.getApi().plusOperations().getGoogleProfile();
-            model.addAttribute("email", person.getAccountEmail());
-        }
-
-        private static void extendModelWithFacebookDetails(
-                Model model,
-                Connection<Facebook> facebookConnection) {
-
-            model.addAttribute("name", facebookConnection.getDisplayName());
-            model.addAttribute("profileUrl", facebookConnection.getProfileUrl());
-            model.addAttribute("imageUrl", facebookConnection.getImageUrl());
-
-            FacebookProfile facebookProfile = facebookConnection.getApi().userOperations().getUserProfile();
-            model.addAttribute("email", facebookProfile.getEmail());
-        }
-
-        private static void extendModelWithTwitterDetails(
-                Model model,
-                Connection<Twitter> twitterConnection) {
-
-            model.addAttribute("name", twitterConnection.getDisplayName());
-            model.addAttribute("profileUrl", twitterConnection.getProfileUrl());
-            model.addAttribute("imageUrl", twitterConnection.getImageUrl());
-        }
-
         @RequestMapping(
                 value = "/{provider}/callback",
                 method = RequestMethod.GET,
@@ -244,6 +211,39 @@ public class App {
             }
 
             return "index";
+        }
+
+        private static void extendModelWithGoogleDetails(
+                Model model,
+                Connection<Google> googleConnection) {
+
+            model.addAttribute("name", googleConnection.getDisplayName());
+            model.addAttribute("profileUrl", googleConnection.getProfileUrl());
+            model.addAttribute("imageUrl", googleConnection.getImageUrl());
+
+            Person person = googleConnection.getApi().plusOperations().getGoogleProfile();
+            model.addAttribute("email", person.getAccountEmail());
+        }
+
+        private static void extendModelWithFacebookDetails(
+                Model model,
+                Connection<Facebook> facebookConnection) {
+
+            model.addAttribute("name", facebookConnection.getDisplayName());
+            model.addAttribute("profileUrl", facebookConnection.getProfileUrl());
+            model.addAttribute("imageUrl", facebookConnection.getImageUrl());
+
+            FacebookProfile facebookProfile = facebookConnection.getApi().userOperations().getUserProfile();
+            model.addAttribute("email", facebookProfile.getEmail());
+        }
+
+        private static void extendModelWithTwitterDetails(
+                Model model,
+                Connection<Twitter> twitterConnection) {
+
+            model.addAttribute("name", twitterConnection.getDisplayName());
+            model.addAttribute("profileUrl", twitterConnection.getProfileUrl());
+            model.addAttribute("imageUrl", twitterConnection.getImageUrl());
         }
 
         private static String makeCallbackUrl(String provider) {
