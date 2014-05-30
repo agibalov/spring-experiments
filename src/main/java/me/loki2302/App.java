@@ -1,5 +1,7 @@
 package me.loki2302;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +17,7 @@ import org.springframework.social.facebook.api.Facebook;
 import org.springframework.social.facebook.api.FacebookProfile;
 import org.springframework.social.facebook.connect.FacebookConnectionFactory;
 import org.springframework.social.google.api.Google;
-import org.springframework.social.google.api.userinfo.GoogleUserInfo;
+import org.springframework.social.google.api.plus.Person;
 import org.springframework.social.google.connect.GoogleConnectionFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -42,9 +44,7 @@ public class App {
                     "330741531920.apps.googleusercontent.com",
                     "R21tppN-oV9bAqg-Sgp5tTNg");
 
-            googleConnectionFactory.setScope(
-                    "https://www.googleapis.com/auth/userinfo.profile " +
-                    "https://www.googleapis.com/auth/userinfo.email");
+            googleConnectionFactory.setScope("email");
 
             return googleConnectionFactory;
         }
@@ -137,8 +137,8 @@ public class App {
             model.addAttribute("profileUrl", googleConnection.getProfileUrl());
             model.addAttribute("imageUrl", googleConnection.getImageUrl());
 
-            GoogleUserInfo googleUserInfo = googleConnection.getApi().userOperations().getUserInfo();
-            model.addAttribute("email", googleUserInfo.getEmail());
+            Person person = googleConnection.getApi().plusOperations().getGoogleProfile();
+            model.addAttribute("email", person.getAccountEmail());
         }
 
         private static void extendModelWithFacebookDetails(
