@@ -3,10 +3,12 @@ package me.loki2302;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.ConnectionFactory;
 import org.springframework.social.connect.support.OAuth1ConnectionFactory;
@@ -31,6 +33,8 @@ import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.servlet.view.RedirectView;
 
+import javax.annotation.PostConstruct;
+
 public class App {
     public static void main(String[] args) {
         SpringApplication.run(Config.class, args);
@@ -40,10 +44,13 @@ public class App {
     @ComponentScan
     public static class Config {
         @Bean
-        public GoogleConnectionFactory googleConnectionFactory() {
+        public GoogleConnectionFactory googleConnectionFactory(
+                @Value("${app.social.google.clientId}") String clientId,
+                @Value("${app.social.google.clientSecret}") String clientSecret) {
+
             GoogleConnectionFactory googleConnectionFactory = new GoogleConnectionFactory(
-                    "330741531920.apps.googleusercontent.com",
-                    "R21tppN-oV9bAqg-Sgp5tTNg");
+                    clientId,
+                    clientSecret);
 
             googleConnectionFactory.setScope("email");
 
@@ -51,10 +58,13 @@ public class App {
         }
 
         @Bean
-        public FacebookConnectionFactory facebookConnectionFactory() {
+        public FacebookConnectionFactory facebookConnectionFactory(
+                @Value("${app.social.facebook.appId}") String appId,
+                @Value("${app.social.facebook.appSecret}") String appSecret) {
+
             FacebookConnectionFactory facebookConnectionFactory = new FacebookConnectionFactory(
-                    "470358236410054",
-                    "aabe43ffb4e3f2e2c0c3e8502d6db530");
+                    appId,
+                    appSecret);
 
             facebookConnectionFactory.setScope("email");
 
@@ -62,10 +72,13 @@ public class App {
         }
 
         @Bean
-        public TwitterConnectionFactory twitterConnectionFactory() {
+        public TwitterConnectionFactory twitterConnectionFactory(
+                @Value("${app.social.twitter.consumerKey}") String consumerKey,
+                @Value("${app.social.twitter.consumerSecret}") String consumerSecret) {
+
             TwitterConnectionFactory twitterConnectionFactory = new TwitterConnectionFactory(
-                    "aWlrQITKSZHwwq28OJyCFw",
-                    "69sxwdNV1g1lEfuS3U5A0ATAljahdTwDwAhlbwDw9t4");
+                    consumerKey,
+                    consumerSecret);
 
             return twitterConnectionFactory;
         }
