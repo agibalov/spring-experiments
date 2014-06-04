@@ -138,15 +138,4 @@ public class SpringValidationTest {
             ValidationUtils.rejectIfEmpty(errors, "username", "required");
         }
     }
-
-    private static class NonThrowingResponseErrorHandler implements ResponseErrorHandler {
-        @Override
-        public boolean hasError(ClientHttpResponse response) throws IOException {
-            return false;
-        }
-
-        @Override
-        public void handleError(ClientHttpResponse response) throws IOException {
-        }
-    }
 }
