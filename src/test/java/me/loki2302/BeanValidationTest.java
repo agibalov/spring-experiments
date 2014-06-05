@@ -103,5 +103,4 @@ public class BeanValidationTest {
         @NotEmpty
         public String username;
     }
-
 }
