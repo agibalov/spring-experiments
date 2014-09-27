@@ -9,6 +9,11 @@ import javax.persistence.Id;
 public class Person {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    public long id;
+    public Long id;
     public String name;
+
+    @Override
+    public String toString() {
+        return String.format("Person{id=%s, name=%s}", id, name);
+    }
 }
