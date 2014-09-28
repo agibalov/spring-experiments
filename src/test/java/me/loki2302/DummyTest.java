@@ -142,6 +142,15 @@ public class DummyTest {
     }
 
     @Test
+    public void cantCreatePersonIfThereAreValidationErrors() {
+        try {
+            createPerson(person(""));
+        } catch(HttpClientErrorException e) {
+            assertEquals(HttpStatus.BAD_REQUEST, e.getStatusCode());
+        }
+    }
+
+    @Test
     public void cantGetPersonThatDoesNotExist() {
         try {
             getPerson("http://localhost:8080/people/123");
