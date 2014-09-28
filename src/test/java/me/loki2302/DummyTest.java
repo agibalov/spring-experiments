@@ -1,19 +1,24 @@
 package me.loki2302;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpStatus;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.Resource;
+import org.springframework.hateoas.hal.Jackson2HalModule;
+import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -30,8 +35,11 @@ public class DummyTest {
         restTemplate = new RestTemplate();
         for(HttpMessageConverter<?> converter : restTemplate.getMessageConverters()) {
             if(converter instanceof MappingJackson2HttpMessageConverter) {
-                MappingJackson2HttpMessageConverter c = (MappingJackson2HttpMessageConverter)converter;
-                c.getObjectMapper().disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+                MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter =
+                        (MappingJackson2HttpMessageConverter)converter;
+
+                ObjectMapper objectMapper = mappingJackson2HttpMessageConverter.getObjectMapper();
+                objectMapper.registerModules(new Jackson2HalModule());
             }
         }
     }
@@ -45,23 +53,38 @@ public class DummyTest {
                 "http://localhost:8080/people", person, Object.class);
         String personUri = entity.getHeaders().getLocation().toString();
 
-        Person retrievedPerson = restTemplate.getForObject(personUri, Person.class);
-        assertEquals("loki2302", retrievedPerson.name);
+        ResponseEntity<Resource<Person>> retrievedPersonResource =
+                getPerson(personUri);
+
+        assertEquals(HttpStatus.OK, retrievedPersonResource.getStatusCode());
+        assertEquals("loki2302", retrievedPersonResource.getBody().getContent().name);
+        assertEquals(1, retrievedPersonResource.getBody().getLinks().size());
+        assertEquals("http://localhost:8080/people/1", retrievedPersonResource.getBody().getLink("self").getHref());
 
         Person person2 = new Person();
         person2.name = "Andrey";
         restTemplate.put(personUri, person2);
 
-        retrievedPerson = restTemplate.getForObject(personUri, Person.class);
-        assertEquals("Andrey", retrievedPerson.name);
+        retrievedPersonResource = getPerson(personUri);
+        assertEquals("Andrey", retrievedPersonResource.getBody().getContent().name);
 
         restTemplate.delete(personUri);
 
         try {
-            restTemplate.getForObject(personUri, Person.class);
+            getPerson(personUri);
             fail();
         } catch(HttpClientErrorException e) {
             assertEquals(HttpStatus.NOT_FOUND, e.getStatusCode());
         }
+    }
+
+    private ResponseEntity<Resource<Person>> getPerson(String personUri) {
+        ResponseEntity<Resource<Person>> personResourceResponseEntity = restTemplate.exchange(
+                personUri,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<Resource<Person>>() {});
+
+        return personResourceResponseEntity;
     }
 }
