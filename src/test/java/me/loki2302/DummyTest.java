@@ -7,7 +7,6 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.hal.Jackson2HalModule;
 import org.springframework.http.*;
@@ -17,8 +16,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -46,13 +43,16 @@ public class DummyTest {
 
     @Test
     public void canCreateAndGet() {
+        //
         Person person = new Person();
         person.name = "loki2302";
 
-        HttpEntity<Object> entity = restTemplate.postForEntity(
-                "http://localhost:8080/people", person, Object.class);
-        String personUri = entity.getHeaders().getLocation().toString();
+        ResponseEntity<Object> createdPersonResponseEntity = createPerson(person);
+        String personUri = createdPersonResponseEntity
+                .getHeaders().getLocation().toString();
+        //
 
+        //
         ResponseEntity<Resource<Person>> retrievedPersonResource =
                 getPerson(personUri);
 
@@ -60,15 +60,22 @@ public class DummyTest {
         assertEquals("loki2302", retrievedPersonResource.getBody().getContent().name);
         assertEquals(1, retrievedPersonResource.getBody().getLinks().size());
         assertEquals("http://localhost:8080/people/1", retrievedPersonResource.getBody().getLink("self").getHref());
+        //
 
+        //
         Person person2 = new Person();
         person2.name = "Andrey";
-        restTemplate.put(personUri, person2);
+        updatePerson(personUri, person2);
+        //
 
+        //
         retrievedPersonResource = getPerson(personUri);
         assertEquals("Andrey", retrievedPersonResource.getBody().getContent().name);
+        //
 
+        //
         restTemplate.delete(personUri);
+        //
 
         try {
             getPerson(personUri);
@@ -76,6 +83,23 @@ public class DummyTest {
         } catch(HttpClientErrorException e) {
             assertEquals(HttpStatus.NOT_FOUND, e.getStatusCode());
         }
+    }
+
+    private ResponseEntity<Object> createPerson(Person person) {
+        ResponseEntity<Object> responseEntity = restTemplate.postForEntity(
+                "http://localhost:8080/people",
+                person,
+                Object.class);
+
+        return responseEntity;
+    }
+
+    private ResponseEntity<Object> updatePerson(String personUri, Person person) {
+        return restTemplate.exchange(
+                personUri,
+                HttpMethod.PUT,
+                new HttpEntity<Person>(person),
+                Object.class);
     }
 
     private ResponseEntity<Resource<Person>> getPerson(String personUri) {
