@@ -1,12 +1,15 @@
 package me.loki2302;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.hal.Jackson2HalModule;
 import org.springframework.http.*;
@@ -17,69 +20,150 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import java.util.Arrays;
+
+import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = App.Config.class)
 @WebAppConfiguration
 @IntegrationTest
 public class DummyTest {
+    @Autowired
+    private PersonRepository personRepository;
+
     private RestTemplate restTemplate;
 
     @Before
     public void setUp() {
-        restTemplate = new RestTemplate();
-        for(HttpMessageConverter<?> converter : restTemplate.getMessageConverters()) {
-            if(converter instanceof MappingJackson2HttpMessageConverter) {
-                MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter =
-                        (MappingJackson2HttpMessageConverter)converter;
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        objectMapper.registerModule(new Jackson2HalModule());
 
-                ObjectMapper objectMapper = mappingJackson2HttpMessageConverter.getObjectMapper();
-                objectMapper.registerModules(new Jackson2HalModule());
-            }
-        }
+        MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter();
+        mappingJackson2HttpMessageConverter.setSupportedMediaTypes(MediaType.parseMediaTypes("application/hal+json"));
+        mappingJackson2HttpMessageConverter.setObjectMapper(objectMapper);
+
+        restTemplate = new RestTemplate();
+        restTemplate.setMessageConverters(Arrays.<HttpMessageConverter<?>>asList(mappingJackson2HttpMessageConverter));
+
+        personRepository.deleteAll();
     }
 
     @Test
-    public void canCreateAndGet() {
-        //
-        Person person = new Person();
-        person.name = "loki2302";
+    public void canCreatePerson() {
+        ResponseEntity<Object> responseEntity =
+                createPerson(person("loki2302"));
 
-        ResponseEntity<Object> createdPersonResponseEntity = createPerson(person);
-        String personUri = createdPersonResponseEntity
-                .getHeaders().getLocation().toString();
-        //
+        assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
+        assertNotNull(responseEntity.getHeaders().getLocation());
+        assertFalse(responseEntity.hasBody());
+    }
 
-        //
-        ResponseEntity<Resource<Person>> retrievedPersonResource =
+    @Test
+    public void canGetPerson() {
+        ResponseEntity<Object> responseEntity =
+                createPerson(person("loki2302"));
+
+        String personUri = responseEntity.getHeaders().getLocation().toString();
+
+        ResponseEntity<Resource<Person>> personResponseEntity =
                 getPerson(personUri);
+        assertEquals(HttpStatus.OK, personResponseEntity.getStatusCode());
 
-        assertEquals(HttpStatus.OK, retrievedPersonResource.getStatusCode());
-        assertEquals("loki2302", retrievedPersonResource.getBody().getContent().name);
-        assertEquals(1, retrievedPersonResource.getBody().getLinks().size());
-        assertEquals("http://localhost:8080/people/1", retrievedPersonResource.getBody().getLink("self").getHref());
-        //
+        Resource<Person> personResource = personResponseEntity.getBody();
+        assertEquals(1, personResource.getLinks().size());
+        assertTrue(personResource.getLink("self").getHref().startsWith("http://localhost:8080/people/"));
 
-        //
-        Person person2 = new Person();
-        person2.name = "Andrey";
-        updatePerson(personUri, person2);
-        //
+        Person person = personResource.getContent();
+        assertEquals("loki2302", person.name);
+    }
 
-        //
-        retrievedPersonResource = getPerson(personUri);
-        assertEquals("Andrey", retrievedPersonResource.getBody().getContent().name);
-        //
+    @Test
+    public void canUpdatePerson() {
+        ResponseEntity<Object> responseEntity =
+                createPerson(person("loki2302"));
 
-        //
+        String personUri = responseEntity.getHeaders().getLocation().toString();
+
+        ResponseEntity<Object> updateResponseEntity =
+                updatePerson(personUri, person("Andrey"));
+        assertEquals(HttpStatus.NO_CONTENT, updateResponseEntity.getStatusCode());
+
+        ResponseEntity<Resource<Person>> personResponseEntity =
+                getPerson(personUri);
+        assertEquals("Andrey", personResponseEntity.getBody().getContent().name);
+    }
+
+    @Test
+    public void canDeletePerson() {
+        ResponseEntity<Object> responseEntity =
+                createPerson(person("loki2302"));
+
+        String personUri = responseEntity.getHeaders().getLocation().toString();
+
         restTemplate.delete(personUri);
-        //
 
         try {
             getPerson(personUri);
             fail();
+        } catch(HttpClientErrorException e) {
+            assertEquals(HttpStatus.NOT_FOUND, e.getStatusCode());
+        }
+    }
+
+    @Test
+    public void thereAreNoPeopleByDefault() {
+        ResponseEntity<PagedResources<Person>> peopleResponseEntity = restTemplate.exchange(
+                "http://localhost:8080/people",
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<PagedResources<Person>>() {});
+
+        assertEquals(HttpStatus.OK, peopleResponseEntity.getStatusCode());
+        assertTrue(peopleResponseEntity.getBody().getContent().isEmpty());
+    }
+
+    @Test
+    public void canGetPersonList() {
+        for(int i = 0; i < 10; ++i) {
+            createPerson(person(String.format("loki2302_%d", i)));
+        }
+
+        ResponseEntity<PagedResources<Person>> peopleResponseEntity = restTemplate.exchange(
+                "http://localhost:8080/people/?size=4&page=1",
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<PagedResources<Person>>() {});
+        assertEquals(3, peopleResponseEntity.getBody().getMetadata().getTotalPages());
+        assertEquals(1, peopleResponseEntity.getBody().getMetadata().getNumber());
+        assertEquals(4, peopleResponseEntity.getBody().getMetadata().getSize());
+        assertEquals(10, peopleResponseEntity.getBody().getMetadata().getTotalElements());
+    }
+
+    @Test
+    public void cantGetPersonThatDoesNotExist() {
+        try {
+            getPerson("http://localhost:8080/people/123");
+            fail();
+        } catch(HttpClientErrorException e) {
+            assertEquals(HttpStatus.NOT_FOUND, e.getStatusCode());
+        }
+    }
+
+    @Test
+    public void cantUpdatePersonThatDoesNotExist() {
+        try {
+            updatePerson("http://localhost:8080/people/123", person("Andrey"));
+        } catch(HttpClientErrorException e) {
+            assertEquals(HttpStatus.NOT_FOUND, e.getStatusCode());
+        }
+    }
+
+    @Test
+    public void cantDeletePersonThatDoesNotExist() {
+        try {
+            restTemplate.delete("http://localhost:8080/people/123");
         } catch(HttpClientErrorException e) {
             assertEquals(HttpStatus.NOT_FOUND, e.getStatusCode());
         }
@@ -110,5 +194,11 @@ public class DummyTest {
                 new ParameterizedTypeReference<Resource<Person>>() {});
 
         return personResourceResponseEntity;
+    }
+
+    private static Person person(String name) {
+        Person person = new Person();
+        person.name = name;
+        return person;
     }
 }
