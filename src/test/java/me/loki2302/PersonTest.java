@@ -28,9 +28,12 @@ import static org.junit.Assert.*;
 @SpringApplicationConfiguration(classes = App.Config.class)
 @WebAppConfiguration
 @IntegrationTest
-public class DummyTest {
+public class PersonTest {
     @Autowired
     private PersonRepository personRepository;
+
+    @Autowired
+    private NoteRepository noteRepository;
 
     private RestTemplate restTemplate;
 
@@ -47,6 +50,7 @@ public class DummyTest {
         restTemplate = new RestTemplate();
         restTemplate.setMessageConverters(Arrays.<HttpMessageConverter<?>>asList(mappingJackson2HttpMessageConverter));
 
+        noteRepository.deleteAll();
         personRepository.deleteAll();
     }
 
@@ -72,7 +76,7 @@ public class DummyTest {
         assertEquals(HttpStatus.OK, personResponseEntity.getStatusCode());
 
         Resource<Person> personResource = personResponseEntity.getBody();
-        assertEquals(1, personResource.getLinks().size());
+        assertEquals(2, personResource.getLinks().size());
         assertTrue(personResource.getLink("self").getHref().startsWith("http://localhost:8080/people/"));
 
         Person person = personResource.getContent();
