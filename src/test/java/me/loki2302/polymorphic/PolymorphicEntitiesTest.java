@@ -1,4 +1,4 @@
-package me.loki2302;
+package me.loki2302.polymorphic;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
