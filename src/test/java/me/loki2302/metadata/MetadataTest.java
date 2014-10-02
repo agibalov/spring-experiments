@@ -5,6 +5,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.data.jpa.repository.support.JpaEntityInformation;
+import org.springframework.data.jpa.repository.support.JpaEntityInformationSupport;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.persistence.EntityManager;
@@ -62,5 +64,14 @@ public class MetadataTest {
 
         SingularAttribute<?, Long> explicitIdAttribute = singleEntityType.getId(Long.class);
         assertSame(idAttribute, explicitIdAttribute);
+    }
+
+    @Test
+    public void canUseSpringToGetMetadata() {
+        JpaEntityInformation<Person, ?> jpaEntityInformation =
+                JpaEntityInformationSupport.getMetadata(Person.class, entityManager);
+        SingularAttribute<? super Person, ?> idAttribute = jpaEntityInformation.getIdAttribute();
+        assertEquals(Long.class, idAttribute.getJavaType());
+        assertEquals("id", idAttribute.getName());
     }
 }
