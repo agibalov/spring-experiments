@@ -18,7 +18,7 @@ public class LobsTest {
     private DataRepository dataRepository;
 
     @Test
-    public void dummy() {
+    public void canSaveAndReadLOBs() {
         TheBLOB theBLOB = new TheBLOB();
         theBLOB.message = "hello blob";
 
