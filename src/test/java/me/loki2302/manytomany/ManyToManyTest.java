@@ -35,9 +35,13 @@ public class ManyToManyTest {
 
         assertEquals(3, projectRepository.findAll().size());
         assertEquals(5, personRepository.findAll().size());
-        assertEquals(3, personRepository.findByProjectsIn(Arrays.asList(projectOne)).size());
-        assertEquals(3, personRepository.findByProjectsIn(Arrays.asList(projectTwo)).size());
-        assertEquals(2, personRepository.findByProjectsIn(Arrays.asList(projectThree)).size());
+
+
+        assertEquals(3, personRepository.findByProjects(Arrays.asList(projectOne), 1).size());
+        assertEquals(3, personRepository.findByProjects(Arrays.asList(projectTwo), 1).size());
+        assertEquals(2, personRepository.findByProjects(Arrays.asList(projectThree), 1).size());
+        assertEquals(2, personRepository.findByProjects(Arrays.asList(projectOne, projectTwo), 2).size());
+        assertEquals(1, personRepository.findByProjects(Arrays.asList(projectOne, projectTwo, projectThree), 3).size());
 
         personOne = personRepository.findOne(personOne.id);
         assertEquals(1, personOne.projects.size());
