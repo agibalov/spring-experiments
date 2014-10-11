@@ -13,7 +13,8 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 public class Config implements WebSocketConfigurer {
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(dummyHandler(), "/hello");
+        registry.addHandler(dummyHandler(), "/raw");
+        registry.addHandler(dummyHandler(), "/sockjs").withSockJS();
     }
 
     @Bean
