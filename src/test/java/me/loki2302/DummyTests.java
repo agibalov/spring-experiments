@@ -20,10 +20,8 @@ import org.springframework.web.socket.sockjs.client.RestTemplateXhrTransport;
 import org.springframework.web.socket.sockjs.client.SockJsClient;
 import org.springframework.web.socket.sockjs.client.Transport;
 
-import java.net.MalformedURLException;
 import java.util.Arrays;
 import java.util.concurrent.Exchanger;
-import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.assertEquals;
 
@@ -33,7 +31,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(SpringJUnit4ClassRunner.class)
 public class DummyTests {
     @Test
-    public void canUseRawWebSockets() throws InterruptedException, ExecutionException, MalformedURLException {
+    public void canUseRawWebSockets() throws InterruptedException {
         Exchanger<String> messageExchanger = new Exchanger<String>();
 
         WebSocketConnectionManager webSocketConnectionManager = new WebSocketConnectionManager(
@@ -47,7 +45,7 @@ public class DummyTests {
     }
 
     @Test
-    public void canUseSockJs() throws InterruptedException, ExecutionException, MalformedURLException {
+    public void canUseSockJs() throws InterruptedException {
         Exchanger<String> messageExchanger = new Exchanger<String>();
 
         SockJsClient sockJsClient = new SockJsClient(Arrays.<Transport>asList(
