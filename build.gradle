@@ -11,6 +11,10 @@ repositories {
     maven {
         url 'http://repo.spring.io/milestone'
     }
+
+    maven {
+        url 'https://repository.jboss.org/nexus/content/repositories/releases/'
+    }
 }
 
 dependencies {

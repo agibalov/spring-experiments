@@ -1,5 +1,9 @@
 package me.loki2302;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import me.loki2302.stomp.StompMessageHandler;
+import me.loki2302.stomp.WebSocketStompClient;
+import me.loki2302.stomp.WebSocketStompSession;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -7,6 +11,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.converter.MappingJackson2MessageConverter;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.web.client.RestTemplate;
@@ -20,14 +27,18 @@ import org.springframework.web.socket.sockjs.client.RestTemplateXhrTransport;
 import org.springframework.web.socket.sockjs.client.SockJsClient;
 import org.springframework.web.socket.sockjs.client.Transport;
 
+import java.io.IOException;
+import java.net.URI;
+import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Exchanger;
 
 import static org.junit.Assert.assertEquals;
 
 @IntegrationTest
 @WebAppConfiguration
-@SpringApplicationConfiguration(classes = Config.class)
+@SpringApplicationConfiguration(classes = AppConfig.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 public class DummyTests {
     @Test
@@ -61,6 +72,19 @@ public class DummyTests {
         assertEquals("hello loki2302!", message);
     }
 
+    @Test
+    public void canUseStomp() throws InterruptedException {
+        WebSocketStompClient webSocketStompClient = new WebSocketStompClient(
+                URI.create("ws://localhost:8080/hello"),
+                null,
+                new StandardWebSocketClient());
+        webSocketStompClient.setMessageConverter(new MappingJackson2MessageConverter());
+
+        CountDownLatch countDownLatch = new CountDownLatch(1);
+        webSocketStompClient.connect(new CountDownLatchStompMessageHandler(countDownLatch));
+        countDownLatch.await();
+    }
+
     public static class DummyClientWebSocketHandler extends TextWebSocketHandler {
         private final static Logger logger = LoggerFactory.getLogger(DummyClientWebSocketHandler.class);
 
@@ -73,14 +97,12 @@ public class DummyTests {
         @Override
         public void afterConnectionEstablished(WebSocketSession session) throws Exception {
             logger.info("connected to {}", session.getRemoteAddress());
-
             session.sendMessage(new TextMessage("loki2302"));
         }
 
         @Override
         protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
             logger.info("{} says: {}", session.getRemoteAddress(), message.getPayload());
-
             messageExchanger.exchange(message.getPayload());
         }
 
@@ -92,6 +114,61 @@ public class DummyTests {
         @Override
         public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
             logger.info("{} error: {}", session.getRemoteAddress(), exception.getMessage());
+        }
+    }
+
+    public static class CountDownLatchStompMessageHandler implements StompMessageHandler {
+        private final Logger logger;
+        private final CountDownLatch countDownLatch;
+
+        public CountDownLatchStompMessageHandler(CountDownLatch countDownLatch) {
+            this.countDownLatch = countDownLatch;
+            logger = LoggerFactory.getLogger(StompMessageHandler.class);
+        }
+
+        @Override
+        public void afterConnected(WebSocketStompSession session, StompHeaderAccessor headers) {
+            logger.info("afterConnected()", session);
+
+            session.subscribe("/topic/greetings", null);
+
+            HelloMessage helloMessage = new HelloMessage();
+            helloMessage.name = "qwerty";
+            session.send("/app/hello", helloMessage);
+        }
+
+        @Override
+        public void handleMessage(Message<byte[]> message) {
+            logger.info("handleMessage()");
+
+            String json = new String(message.getPayload(), Charset.forName("UTF-8"));
+            logger.info("json: {}", json);
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                GreetingMessage greetingMessage = objectMapper.readValue(json, GreetingMessage.class);
+                logger.info("message is: {}", greetingMessage.message);
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+
+            countDownLatch.countDown();
+        }
+
+        @Override
+        public void handleReceipt(String receiptId) {
+            logger.info("handleReceipt()");
+        }
+
+        @Override
+        public void handleError(Message<byte[]> message) {
+            logger.info("handleError()");
+        }
+
+        @Override
+        public void afterDisconnected() {
+            logger.info("afterDisconnected()");
         }
     }
 }

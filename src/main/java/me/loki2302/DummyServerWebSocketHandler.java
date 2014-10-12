@@ -18,7 +18,6 @@ public class DummyServerWebSocketHandler extends TextWebSocketHandler {
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         logger.info("{} says: {}", session.getRemoteAddress(), message.getPayload());
-
         session.sendMessage(new TextMessage("hello " + message.getPayload() + "!"));
     }
 
