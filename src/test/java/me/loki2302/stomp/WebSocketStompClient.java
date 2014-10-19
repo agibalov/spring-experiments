@@ -43,10 +43,11 @@ public class WebSocketStompClient {
         this.messageConverter = messageConverter;
     }
 
-    public void connect(StompMessageHandler stompMessageHandler) {
+    public <TPayload> void connect(StompMessageHandler<TPayload> stompMessageHandler, Class<TPayload> payloadClass) {
         try {
             StompWebSocketHandler webSocketHandler = new StompWebSocketHandler(
                     stompMessageHandler,
+                    payloadClass,
                     messageConverter);
             webSocketClient.doHandshake(webSocketHandler, headers, uri).get();
         } catch(Exception e) {
@@ -54,15 +55,21 @@ public class WebSocketStompClient {
         }
     }
 
-    private static class StompWebSocketHandler extends AbstractWebSocketHandler {
+    private static class StompWebSocketHandler<TPayload> extends AbstractWebSocketHandler {
         private static final Charset UTF_8 = Charset.forName("UTF-8");
-        private final StompMessageHandler stompMessageHandler;
+        private final StompMessageHandler<TPayload> stompMessageHandler;
+        private final Class<TPayload> payloadClass;
         private final MessageConverter messageConverter;
         private final StompEncoder encoder = new StompEncoder();
         private final StompDecoder decoder = new StompDecoder();
 
-        private StompWebSocketHandler(StompMessageHandler delegate, MessageConverter messageConverter) {
+        private StompWebSocketHandler(
+                StompMessageHandler<TPayload> delegate,
+                Class<TPayload> payloadClass,
+                MessageConverter messageConverter) {
+
             this.stompMessageHandler = delegate;
+            this.payloadClass = payloadClass;
             this.messageConverter = messageConverter;
         }
 
@@ -82,7 +89,7 @@ public class WebSocketStompClient {
             ByteBuffer payload = ByteBuffer.wrap(textMessage.getPayload().getBytes(UTF_8));
             List<Message<byte[]>> messages = this.decoder.decode(payload);
 
-            for (Message message : messages) {
+            for (Message<byte[]> message : messages) {
                 StompHeaderAccessor headers = StompHeaderAccessor.wrap(message);
                 StompCommand stompCommand = headers.getCommand();
                 if (StompCommand.CONNECTED.equals(stompCommand)) {
@@ -92,7 +99,11 @@ public class WebSocketStompClient {
                     stompMessageHandler.afterConnected(stompSession, headers);
                 } else if (StompCommand.MESSAGE.equals(stompCommand)) {
                     logger.info("Message");
-                    stompMessageHandler.handleMessage(message);
+
+                    TPayload typedPayload = (TPayload)messageConverter.fromMessage(message, payloadClass);
+                    Message<TPayload> typedMessage = MessageBuilder.createMessage(typedPayload, headers.getMessageHeaders());
+
+                    stompMessageHandler.handleMessage(typedMessage);
                 } else if (StompCommand.RECEIPT.equals(stompCommand)) {
                     logger.info("Receipt");
                     stompMessageHandler.handleReceipt(headers.getReceiptId());

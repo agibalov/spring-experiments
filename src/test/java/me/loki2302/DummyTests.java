@@ -1,6 +1,5 @@
 package me.loki2302;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import me.loki2302.stomp.StompMessageHandler;
 import me.loki2302.stomp.WebSocketStompClient;
 import me.loki2302.stomp.WebSocketStompSession;
@@ -27,9 +26,7 @@ import org.springframework.web.socket.sockjs.client.RestTemplateXhrTransport;
 import org.springframework.web.socket.sockjs.client.SockJsClient;
 import org.springframework.web.socket.sockjs.client.Transport;
 
-import java.io.IOException;
 import java.net.URI;
-import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Exchanger;
@@ -81,7 +78,7 @@ public class DummyTests {
         webSocketStompClient.setMessageConverter(new MappingJackson2MessageConverter());
 
         CountDownLatch countDownLatch = new CountDownLatch(1);
-        webSocketStompClient.connect(new CountDownLatchStompMessageHandler(countDownLatch));
+        webSocketStompClient.connect(new CountDownLatchStompMessageHandler(countDownLatch), GreetingMessage.class);
         countDownLatch.await();
     }
 
@@ -117,7 +114,7 @@ public class DummyTests {
         }
     }
 
-    public static class CountDownLatchStompMessageHandler implements StompMessageHandler {
+    public static class CountDownLatchStompMessageHandler implements StompMessageHandler<GreetingMessage> {
         private final Logger logger;
         private final CountDownLatch countDownLatch;
 
@@ -138,20 +135,11 @@ public class DummyTests {
         }
 
         @Override
-        public void handleMessage(Message<byte[]> message) {
+        public void handleMessage(Message<GreetingMessage> message) {
             logger.info("handleMessage()");
 
-            String json = new String(message.getPayload(), Charset.forName("UTF-8"));
-            logger.info("json: {}", json);
-
-            ObjectMapper objectMapper = new ObjectMapper();
-            try {
-                GreetingMessage greetingMessage = objectMapper.readValue(json, GreetingMessage.class);
-                logger.info("message is: {}", greetingMessage.message);
-            } catch (IOException e) {
-                e.printStackTrace();
-                throw new RuntimeException(e);
-            }
+            GreetingMessage greetingMessage = message.getPayload();
+            logger.info("message is: {}", greetingMessage.message);
 
             countDownLatch.countDown();
         }

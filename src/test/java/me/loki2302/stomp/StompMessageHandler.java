@@ -8,9 +8,9 @@ package me.loki2302.stomp;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 
-public interface StompMessageHandler {
+public interface StompMessageHandler<TPayload> {
     void afterConnected(WebSocketStompSession session, StompHeaderAccessor headers);
-    void handleMessage(Message<byte[]> message);
+    void handleMessage(Message<TPayload> message);
     void handleReceipt(String receiptId);
     void handleError(Message<byte[]> message);
     void afterDisconnected();
