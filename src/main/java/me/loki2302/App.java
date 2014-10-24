@@ -1,9 +1,14 @@
 package me.loki2302;
 
+import com.mangofactory.swagger.configuration.SpringSwaggerConfig;
 import com.mangofactory.swagger.plugin.EnableSwagger;
+import com.mangofactory.swagger.plugin.SwaggerSpringMvcPlugin;
 import com.wordnik.swagger.annotations.*;
+import com.wordnik.swagger.model.ApiInfo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -20,12 +25,25 @@ public class App {
     @ComponentScan
     @EnableAutoConfiguration
     public static class Config {
+        @Autowired
+        private SpringSwaggerConfig springSwaggerConfig;
+
+        @Bean
+        public SwaggerSpringMvcPlugin swaggerSpringMvcPlugin() {
+            return new SwaggerSpringMvcPlugin(springSwaggerConfig).apiInfo(new ApiInfo(
+                    "API title",
+                    "API description",
+                    "API TOS url",
+                    "API contact",
+                    "API license",
+                    "API license url"));
+        }
     }
 
     @RestController
     @Api(value = "Person controller", description = "CRUD API for people")
     public static class PersonController {
-        @RequestMapping(value = "/", method = RequestMethod.POST)
+        @RequestMapping(value = "/api/", method = RequestMethod.POST)
         @ApiOperation(value = "Create a new person", notes = "Some notes about creating a new person")
         @ApiResponses({
                 // WTF: response classes are ignored: only code and message are used
@@ -40,7 +58,7 @@ public class App {
             return new ResponseEntity<Object>("hello there", HttpStatus.CREATED);
         }
 
-        @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+        @RequestMapping(value = "/api/{id}", method = RequestMethod.GET)
         @ApiOperation(value = "Get an existing person", notes = "Use this to retrieve an existing person")
         @ApiResponses({
                 @ApiResponse(code = 200, message = "Person found and here it is"),
