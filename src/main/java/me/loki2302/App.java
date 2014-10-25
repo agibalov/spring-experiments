@@ -36,7 +36,7 @@ public class App {
                     "API TOS url",
                     "API contact",
                     "API license",
-                    "API license url"));
+                    "API license url")).apiVersion("1.0.API-VERSION");
         }
     }
 
@@ -46,9 +46,8 @@ public class App {
         @RequestMapping(value = "/api/", method = RequestMethod.POST)
         @ApiOperation(value = "Create a new person", notes = "Some notes about creating a new person")
         @ApiResponses({
-                // WTF: response classes are ignored: only code and message are used
-                @ApiResponse(code = 201, message = "Message for 'created'", response = PersonDTO.class),
-                @ApiResponse(code = 400, message = "Message for 'bad request'", response = BadRequestDTO.class)
+                @ApiResponse(code = 201, message = "Message for 'created'", response = PersonDTO.class), // here, response is not ignored
+                @ApiResponse(code = 400, message = "Message for 'bad request'", response = BadRequestDTO.class) // WTF: here, response is ignored
 
                 // WTF: extra statuses like 401 and 403 are added automatically. WHY???
         })
