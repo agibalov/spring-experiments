@@ -13,6 +13,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,6 +45,13 @@ public class AopTest {
         assertEquals(4, events.size());
         assertEquals("before:hellgateOpen", events.get(2));
         assertEquals("after:hellgateOpen", events.get(3));
+
+        dummyService.ping();
+
+        events = auditService.getEvents();
+        assertEquals(6, events.size());
+        assertEquals("before:ping", events.get(4));
+        assertEquals("after:ping", events.get(5));
     }
 
     @Configuration
@@ -78,6 +87,16 @@ public class AopTest {
             auditService.addEvent("after:" + methodName);
             return result;
         }
+
+        @Around("@annotation(me.loki2302.AopTest$AuditMe)")
+        public Object aroundAnyMethodAnnotatedWithAuditMe(ProceedingJoinPoint pjp) throws Throwable {
+            String methodName = pjp.getSignature().getName();
+
+            auditService.addEvent("before:" + methodName);
+            Object result = pjp.proceed();
+            auditService.addEvent("after:" + methodName);
+            return result;
+        }
     }
 
     public static class DummyService {
@@ -87,6 +106,11 @@ public class AopTest {
 
         public void hellgateOpen() {
             System.out.println("hellgateOpen()");
+        }
+
+        @AuditMe
+        public void ping() {
+            System.out.println("ping()");
         }
     }
 
@@ -100,5 +124,9 @@ public class AopTest {
         public List<String> getEvents() {
             return events;
         }
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    public static @interface AuditMe {
     }
 }
