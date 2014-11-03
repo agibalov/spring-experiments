@@ -12,7 +12,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class Config {
     @Bean
-    AuthenticationManager authenticationManager(AuthenticationManagerBuilder builder) throws Exception {
+    AuthenticationManager authenticationManager(AuthenticationManagerBuilder builder) {
         return builder.getOrBuild();
     }
 }

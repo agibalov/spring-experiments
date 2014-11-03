@@ -40,7 +40,7 @@ public class CustomPermissionEvaluatorTest {
     @EnableGlobalMethodSecurity(prePostEnabled = true)
     public static class Config {
         @Bean
-        AuthenticationManager authenticationManager(AuthenticationManagerBuilder builder) throws Exception {
+        AuthenticationManager authenticationManager(AuthenticationManagerBuilder builder) {
             return builder.getOrBuild();
         }
 
