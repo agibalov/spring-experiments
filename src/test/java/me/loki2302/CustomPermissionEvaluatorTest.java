@@ -41,9 +41,9 @@ public class CustomPermissionEvaluatorTest {
         noteService.viewNote(2);
     }
 
-    @Test
+    @Test(expected = AccessDeniedException.class)
     public void cantEditNoteById() {
-        noteService.viewNote(2);
+        noteService.editNote(2);
     }
 
     @Configuration
