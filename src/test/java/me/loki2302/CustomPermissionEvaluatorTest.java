@@ -27,13 +27,23 @@ public class CustomPermissionEvaluatorTest {
     private NoteService noteService;
 
     @Test
-    public void canViewNote() {
+    public void canViewNoteByInstance() {
         noteService.viewNote(new Note());
     }
 
     @Test(expected = AccessDeniedException.class)
-    public void cantEditNote() {
+    public void cantEditNoteByInstance() {
         noteService.editNote(new Note());
+    }
+
+    @Test
+    public void canViewNoteById() {
+        noteService.viewNote(2);
+    }
+
+    @Test
+    public void cantEditNoteById() {
+        noteService.viewNote(2);
     }
 
     @Configuration
@@ -87,7 +97,14 @@ public class CustomPermissionEvaluatorTest {
                 String targetType,
                 Object permission) {
 
-            // TODO: put something here as well
+            if(targetType.equals("Note")) {
+                if(permission.equals("VIEW")) {
+                    long id = (Long)targetId;
+                    return id % 2 == 0;
+                } else if(permission.equals("EDIT")) {
+                    return false;
+                }
+            }
 
             return false;
         }
@@ -100,6 +117,14 @@ public class CustomPermissionEvaluatorTest {
 
         @PreAuthorize("hasPermission(#note, 'EDIT')")
         public void editNote(Note note) {
+        }
+
+        @PreAuthorize("hasPermission(#id, 'Note', 'VIEW')")
+        public void viewNote(long id) {
+        }
+
+        @PreAuthorize("hasPermission(#id, 'Note', 'EDIT')")
+        public void editNote(long id) {
         }
     }
 
