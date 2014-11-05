@@ -31,7 +31,7 @@ public class AopTest {
     private AuditService auditService;
 
     @Test
-    public void dummy() {
+    public void canUseAopForAudit() {
         dummyService.hello();
 
         List<String> events = auditService.getEvents();
@@ -58,8 +58,8 @@ public class AopTest {
     @EnableAspectJAutoProxy
     public static class Config {
         @Bean
-        DummyAspect dummyAspect() {
-            return new DummyAspect();
+        LogCallsAspect dummyAspect() {
+            return new LogCallsAspect();
         }
 
         @Bean
@@ -74,7 +74,7 @@ public class AopTest {
     }
 
     @Aspect
-    public static class DummyAspect {
+    public static class LogCallsAspect {
         @Autowired
         private AuditService auditService;
 
