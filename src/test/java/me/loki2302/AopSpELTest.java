@@ -56,7 +56,7 @@ public class AopSpELTest {
     @EnableAspectJAutoProxy
     public static class Config {
         @Bean
-        CheckSecurityBeforeCallAspect dummyAspect() {
+        CheckSecurityBeforeCallAspect checkSecurityBeforeCallAspect() {
             return new CheckSecurityBeforeCallAspect();
         }
 
@@ -73,6 +73,8 @@ public class AopSpELTest {
 
     @Aspect
     public static class CheckSecurityBeforeCallAspect implements BeanFactoryAware {
+        private final static Logger logger = LoggerFactory.getLogger(CheckSecurityBeforeCallAspect.class);
+
         private BeanFactory beanFactory;
 
         @Around("@annotation(me.loki2302.AopSpELTest$SecureMe)")
@@ -97,6 +99,9 @@ public class AopSpELTest {
             }
 
             Expression expression = expressionParser.parseExpression(secureMeAnnotation.value());
+
+            logger.info("Checking if it's OK to call {} {}", pjp.getTarget(), method.getName());
+
             Boolean allowOrNull = expression.getValue(evaluationContext, Boolean.class);
             if(allowOrNull == null) {
                 throw new RuntimeException(SecureMe.class.getName() + " expression is not expected to return null");
@@ -104,9 +109,11 @@ public class AopSpELTest {
 
             boolean allow = allowOrNull;
             if(!allow) {
+                logger.info("They say it's not OK to call {} {}", pjp.getTarget(), method.getName());
                 throw new SecurityException();
             }
 
+            logger.info("They say it's OK to call {} {}", pjp.getTarget(), method.getName());
             Object result = pjp.proceed();
 
             return result;
