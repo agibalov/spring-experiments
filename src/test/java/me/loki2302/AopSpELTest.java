@@ -6,6 +6,8 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
@@ -40,13 +42,11 @@ public class AopSpELTest {
 
     @Test
     public void canUseAopForSecurity() {
-        securityService.allowHello();
-        dummyService.hello();
+        dummyService.hello("loki2302");
 
-        securityService.disallowHello();
         try {
-            dummyService.hello();
-            fail("Managed to call hello(), though securityService has been set to not allow it");
+            dummyService.hello("Andrey");
+            fail("Managed to call hello() with name other than loki2302");
         } catch(SecurityException e) {
             // expected
         }
@@ -87,6 +87,15 @@ public class AopSpELTest {
             ExpressionParser expressionParser = new SpelExpressionParser();
             StandardEvaluationContext evaluationContext = new StandardEvaluationContext();
             evaluationContext.setBeanResolver(new BeanFactoryResolver(beanFactory));
+
+            String[] parameterNames = methodSignature.getParameterNames();
+            Object[] arguments = pjp.getArgs();
+            for(int i = 0; i < parameterNames.length; ++i) {
+                String parameterName = parameterNames[i];
+                Object argument = arguments[i];
+                evaluationContext.setVariable(parameterName, argument);
+            }
+
             Expression expression = expressionParser.parseExpression(secureMeAnnotation.value());
             Boolean allowOrNull = expression.getValue(evaluationContext, Boolean.class);
             if(allowOrNull == null) {
@@ -110,25 +119,27 @@ public class AopSpELTest {
     }
 
     public static class DummyService {
-        @SecureMe("@securityService.canDoHello()")
-        public void hello() {
-            System.out.println("hello()");
+        private final static Logger logger = LoggerFactory.getLogger(DummyService.class);
+
+        @SecureMe("@securityService.canSayHello(#name)")
+        public void hello(String name) {
+            logger.info("Hello, {}!", name);
         }
     }
 
     public static class SecurityService {
-        private boolean allowHello = false;
+        private final static Logger logger = LoggerFactory.getLogger(SecurityService.class);
 
-        public void allowHello() {
-            allowHello = true;
-        }
+        public boolean canSayHello(String name) {
+            logger.info("Someone asks if it's OK to say 'hello' to '{}'", name);
+            boolean canSayHello = name != null && name.equals("loki2302");
+            if(canSayHello) {
+                logger.info("It's indeed OK");
+            } else {
+                logger.info("No, it's not OK");
+            }
 
-        public void disallowHello() {
-            allowHello = false;
-        }
-
-        public boolean canDoHello() {
-            return allowHello;
+            return canSayHello;
         }
     }
 
