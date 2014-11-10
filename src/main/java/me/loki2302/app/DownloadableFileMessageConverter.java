@@ -1,4 +1,4 @@
-package me.loki2302;
+package me.loki2302.app;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.http.HttpHeaders;

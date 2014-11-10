@@ -1,4 +1,4 @@
-package me.loki2302;
+package me.loki2302.app;
 
 import com.googlecode.flyway.core.Flyway;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;

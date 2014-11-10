@@ -1,4 +1,4 @@
-package me.loki2302;
+package me.loki2302.app;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;

@@ -1,4 +1,4 @@
-package me.loki2302;
+package me.loki2302.app;
 
 public class FileRow {
     public int Id;

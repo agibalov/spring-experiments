@@ -1,4 +1,4 @@
-package me.loki2302;
+package me.loki2302.app;
 
 import java.io.IOException;
 import java.io.InputStream;

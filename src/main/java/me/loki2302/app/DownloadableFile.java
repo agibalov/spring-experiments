@@ -1,4 +1,4 @@
-package me.loki2302;
+package me.loki2302.app;
 
 public class DownloadableFile {
     private final String fileName;
