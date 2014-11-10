@@ -1,5 +1,3 @@
-@args List<FileRow> files
-
 <!doctype html>
 <html>
 <head>
@@ -15,19 +13,21 @@
 		<form method="post" enctype="multipart/form-data" action="/upload">
 			<div class="form-group">
 				<label for="file">File to upload</label>
-				<input type="file" name="file" placeholder="File here">
+				<input type="file" name="file" id="file" placeholder="File here" />
 			</div>
 			<button type="submit" class="btn btn-default">Upload</button>
 		</form>
-		<p>There are @files.size() files</p>
-		<ul>
-		@for(FileRow fileRow : files) {
-			<li>@fileRow.Name [<a href="/download/@fileRow.Id">download</a>, <a href="/download-mc/@fileRow.Id">download mc</a>]</li>
-		}
+		<p>There are <span data-th-text="${files.size()}">100</span> files.</p>
+		<ul data-th-remove="all-but-first">
+            <li data-th-each="file : ${files}">
+                <span data-th-text="${file.Name}">1.png</span><br/>
+                <a href="http://www.google.com" data-th-href="@{'/download/' + ${file.Id}}">download</a><br/>
+                <a href="http://www.google.com" data-th-href="@{'/download-mc/' + ${file.Id}}">download mc</a>
+            </li>
 		</ul>
 		
-		<hr>
-		&copy; 2013 <a href="http://loki2302.me" target="_blank">loki2302</a>
+		<hr/>
+		&copy; 2013-2014 <a href="http://loki2302.me" target="_blank">loki2302</a>
 	</div>
 </body>
 </html>
