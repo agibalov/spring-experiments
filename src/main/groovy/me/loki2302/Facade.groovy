@@ -23,7 +23,7 @@ class Facade {
     List<PostDTO> getPosts() {
         List<PostRow> postRows = postDAO.all
 
-        Set<Long> uniquePostIds = postRows.collect { it.id }.toSet()
+        Set<Long> uniquePostIds = postRows*.userId.toSet()
         List<CommentRow> commentRows = commentDAO.getRecentCommentsForPosts(uniquePostIds, 3)
 
         Set<Long> uniqueUserIds = [].toSet()
@@ -35,34 +35,31 @@ class Facade {
             it.postId
         }.collectEntries { postId, comments ->
             [postId, comments.collect {
-                CommentDTO.builder()
-                    .id(it.id)
-                    .content(it.content)
-                    .user(userByUserIds[it.userId])
-                    .build()
+                new CommentDTO(
+                    id: it.id,
+                    content: it.content,
+                    user: userByUserIds[it.userId])
             }]
         }
 
         postRows.collect {
-            PostDTO.builder()
-                .id(it.id)
-                .content(it.content)
-                .commentCount(it.commentCount)
-                .user(userByUserIds[it.userId])
-                .recentComments(commentListsByPostIdsMap[it.id] ?: [])
-                .build()
+            new PostDTO(
+                    id: it.id,
+                    content: it.content,
+                    commentCount: it.commentCount,
+                    user: userByUserIds[it.userId],
+                    recentComments: commentListsByPostIdsMap[it.id] ?: [])
         }
     }
 
     private Map<Long, UserDTO> getUsersAndReturnBriefUserDTOByUserIdMap(Set<Long> userIds) {
         Set<UserRow> users = userDAO.findUsers(userIds)
         users.collect {
-            UserDTO.builder()
-                    .id(it.id)
-                    .name(it.name)
-                    .postCount(it.postCount)
-                    .commentCount(it.commentCount)
-                    .build()
+            new UserDTO(
+                    id: it.id,
+                    name: it.name,
+                    postCount: it.postCount,
+                    commentCount: it.commentCount)
         }.collectEntries {
             [it.id, it]
         }
