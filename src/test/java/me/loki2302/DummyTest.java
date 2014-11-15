@@ -17,9 +17,13 @@ import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 @IntegrationTest
 @SpringApplicationConfiguration(classes = Config.class)
@@ -42,6 +46,9 @@ public class DummyTest {
 
     @Autowired
     private Facade facade;
+
+    @Autowired
+    private Validator validator;
 
     @Test
     public void hello() {
@@ -68,6 +75,7 @@ public class DummyTest {
         List<BriefPostDTO> posts = facade.getPosts();
         assertEquals(3L, posts.size());
 
+        assertValid(posts.get(0));
         assertEquals(0, posts.get(0).getId());
         assertEquals("loki2302-post1", posts.get(0).getContent());
         assertEquals(5, posts.get(0).getCommentCount());
@@ -76,6 +84,7 @@ public class DummyTest {
         assertEquals(3, posts.get(0).getUser().getPostCount());
         assertEquals(5, posts.get(0).getUser().getCommentCount());
 
+        assertValid(posts.get(1));
         assertEquals(1, posts.get(1).getId());
         assertEquals("loki2302-post2", posts.get(1).getContent());
         assertEquals(0, posts.get(1).getCommentCount());
@@ -84,6 +93,7 @@ public class DummyTest {
         assertEquals(3, posts.get(1).getUser().getPostCount());
         assertEquals(5, posts.get(1).getUser().getCommentCount());
 
+        assertValid(posts.get(2));
         assertEquals(2, posts.get(2).getId());
         assertEquals("loki2302-post3", posts.get(2).getContent());
         assertEquals(0, posts.get(2).getCommentCount());
@@ -115,5 +125,24 @@ public class DummyTest {
         comment.content = content;
         comment = commentRepository.save(comment);
         return comment;
+    }
+
+    private void assertValid(Object obj) {
+        Set<ConstraintViolation<Object>> violations = validator.validate(obj);
+        if(violations.isEmpty()) {
+            return;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        for(ConstraintViolation<Object> violation : violations) {
+            sb.append(String.format("\n%s[%s]::%s: %s (was %s)",
+                    violation.getRootBeanClass().getSimpleName(),
+                    violation.getLeafBean().getClass().getSimpleName(),
+                    violation.getPropertyPath(),
+                    violation.getMessage(),
+                    violation.getInvalidValue()));
+        }
+
+        fail(sb.toString());
     }
 }
