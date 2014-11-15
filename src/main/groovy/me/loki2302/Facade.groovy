@@ -24,16 +24,14 @@ class Facade {
         List<PostRow> postRows = postDAO.all
 
         Set<Long> uniquePostIds = postRows*.userId.toSet()
-        List<CommentRow> commentRows = commentDAO.getRecentCommentsForPosts(uniquePostIds, 3)
+        Map<Long, CommentRow> commentRowsGroupedByPostId = getCommentRowsGroupedByPostId(uniquePostIds)
 
         Set<Long> uniqueUserIds = [].toSet()
         uniqueUserIds.addAll postRows*.userId
-        uniqueUserIds.addAll commentRows*.userId
+        uniqueUserIds.addAll commentRowsGroupedByPostId.collectMany { postId, comments -> comments*.userId }
         Map<Long, UserDTO> userByUserIds = getUsersAndReturnBriefUserDTOByUserIdMap(uniqueUserIds)
 
-        Map<Long, List<CommentDTO>> commentListsByPostIdsMap = commentRows.groupBy {
-            it.postId
-        }.collectEntries { postId, comments ->
+        Map<Long, List<CommentDTO>> commentDTOsGroupedByPostId = commentRowsGroupedByPostId.collectEntries { postId, comments ->
             [postId, comments.collect {
                 new CommentDTO(
                     id: it.id,
@@ -48,7 +46,7 @@ class Facade {
                     content: it.content,
                     commentCount: it.commentCount,
                     user: userByUserIds[it.userId],
-                    recentComments: commentListsByPostIdsMap[it.id] ?: [])
+                    recentComments: commentDTOsGroupedByPostId[it.id] ?: [])
         }
     }
 
@@ -63,5 +61,9 @@ class Facade {
         }.collectEntries {
             [it.id, it]
         }
+    }
+
+    private Map<Long, CommentRow> getCommentRowsGroupedByPostId(Set<Long> postIds) {
+        commentDAO.getRecentCommentsForPosts(postIds, 3).groupBy { it.postId }
     }
 }
