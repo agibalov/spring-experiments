@@ -3,9 +3,9 @@ package me.loki2302.dao
 import groovy.transform.builder.Builder
 
 @Builder
-class BriefPostRow {
+class CommentRow {
     long id
     String content
-    long commentCount
+    long postId
     long userId
 }

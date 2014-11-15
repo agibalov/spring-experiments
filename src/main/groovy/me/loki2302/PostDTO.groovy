@@ -1,5 +1,6 @@
 package me.loki2302
 
+import groovy.transform.ToString
 import groovy.transform.builder.Builder
 import org.hibernate.validator.constraints.NotEmpty
 
@@ -7,7 +8,8 @@ import javax.validation.Valid
 import javax.validation.constraints.NotNull
 
 @Builder
-class BriefPostDTO {
+@ToString(includeNames = true)
+class PostDTO {
     long id
 
     @NotEmpty
@@ -17,5 +19,7 @@ class BriefPostDTO {
 
     @NotNull
     @Valid
-    BriefUserDTO user
+    UserDTO user
+
+    List<CommentDTO> recentComments
 }

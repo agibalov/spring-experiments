@@ -1,9 +1,11 @@
 package me.loki2302
 
-import me.loki2302.dao.BriefPostRow
-import me.loki2302.dao.BriefUserRow
+import me.loki2302.dao.CommentDAO
+import me.loki2302.dao.CommentRow
 import me.loki2302.dao.PostDAO
+import me.loki2302.dao.PostRow
 import me.loki2302.dao.UserDAO
+import me.loki2302.dao.UserRow
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
@@ -15,26 +17,47 @@ class Facade {
     @Autowired
     PostDAO postDAO
 
-    List<BriefPostDTO> getPosts() {
-        List<BriefPostRow> rows = postDAO.all
-        Set<Long> uniqueUserIds = rows.collect { it.userId }.toSet()
+    @Autowired
+    CommentDAO commentDAO
 
-        Map<Long, BriefUserDTO> usersByIds = getUserMap(uniqueUserIds)
+    List<PostDTO> getPosts() {
+        List<PostRow> postRows = postDAO.all
 
-        rows.collect {
-            BriefPostDTO.builder()
+        Set<Long> uniquePostIds = postRows.collect { it.id }.toSet()
+        List<CommentRow> commentRows = commentDAO.getRecentCommentsForPosts(uniquePostIds, 3)
+
+        Set<Long> uniqueUserIds = [].toSet()
+        uniqueUserIds.addAll postRows*.userId
+        uniqueUserIds.addAll commentRows*.userId
+        Map<Long, UserDTO> userByUserIds = getUsersAndReturnBriefUserDTOByUserIdMap(uniqueUserIds)
+
+        Map<Long, List<CommentDTO>> commentListsByPostIdsMap = commentRows.groupBy {
+            it.postId
+        }.collectEntries { postId, comments ->
+            [postId, comments.collect {
+                CommentDTO.builder()
+                    .id(it.id)
+                    .content(it.content)
+                    .user(userByUserIds[it.userId])
+                    .build()
+            }]
+        }
+
+        postRows.collect {
+            PostDTO.builder()
                 .id(it.id)
                 .content(it.content)
                 .commentCount(it.commentCount)
-                .user(usersByIds[it.userId])
+                .user(userByUserIds[it.userId])
+                .recentComments(commentListsByPostIdsMap[it.id] ?: [])
                 .build()
         }
     }
 
-    private Map<Long, BriefUserDTO> getUserMap(Set<Long> userIds) {
-        Set<BriefUserRow> users = userDAO.findUsers(userIds)
+    private Map<Long, UserDTO> getUsersAndReturnBriefUserDTOByUserIdMap(Set<Long> userIds) {
+        Set<UserRow> users = userDAO.findUsers(userIds)
         users.collect {
-            BriefUserDTO.builder()
+            UserDTO.builder()
                     .id(it.id)
                     .name(it.name)
                     .postCount(it.postCount)

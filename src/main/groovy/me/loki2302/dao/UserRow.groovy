@@ -1,15 +1,11 @@
-package me.loki2302
+package me.loki2302.dao
 
 import groovy.transform.builder.Builder
-import org.hibernate.validator.constraints.NotEmpty
 
 @Builder
-class BriefUserDTO {
+class UserRow {
     long id
-
-    @NotEmpty
     String name
-
     long postCount
     long commentCount
 }

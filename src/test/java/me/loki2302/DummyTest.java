@@ -1,7 +1,8 @@
 package me.loki2302;
 
-import me.loki2302.dao.BriefPostRow;
-import me.loki2302.dao.BriefUserRow;
+import groovy.json.JsonBuilder;
+import me.loki2302.dao.PostRow;
+import me.loki2302.dao.UserRow;
 import me.loki2302.dao.PostDAO;
 import me.loki2302.dao.UserDAO;
 import me.loki2302.entities.Comment;
@@ -63,16 +64,16 @@ public class DummyTest {
         comment(user, post, "loki2302-post1-comment4");
         comment(user, post, "loki2302-post1-comment5");
 
-        BriefUserRow userRow = userDAO.findUser(user.id);
+        UserRow userRow = userDAO.findUser(user.id);
         assertEquals((long) user.id, userRow.getId());
         assertEquals(user.name, userRow.getName());
         assertEquals(3L, userRow.getPostCount());
         assertEquals(5L, userRow.getCommentCount());
 
-        List<BriefPostRow> postRows = postDAO.getAll();
+        List<PostRow> postRows = postDAO.getAll();
         assertEquals(3L, postRows.size());
 
-        List<BriefPostDTO> posts = facade.getPosts();
+        List<PostDTO> posts = facade.getPosts();
         assertEquals(3L, posts.size());
 
         assertValid(posts.get(0));
@@ -83,6 +84,13 @@ public class DummyTest {
         assertEquals(user.name, posts.get(0).getUser().getName());
         assertEquals(3, posts.get(0).getUser().getPostCount());
         assertEquals(5, posts.get(0).getUser().getCommentCount());
+        assertEquals(3, posts.get(0).getRecentComments().size());
+        assertEquals((long)user.id, posts.get(0).getRecentComments().get(0).getUser().getId());
+        assertEquals((long)4, posts.get(0).getRecentComments().get(0).getId());
+        assertEquals((long)user.id, posts.get(0).getRecentComments().get(1).getUser().getId());
+        assertEquals((long)3, posts.get(0).getRecentComments().get(1).getId());
+        assertEquals((long)user.id, posts.get(0).getRecentComments().get(2).getUser().getId());
+        assertEquals((long)2, posts.get(0).getRecentComments().get(2).getId());
 
         assertValid(posts.get(1));
         assertEquals(1, posts.get(1).getId());
@@ -92,6 +100,7 @@ public class DummyTest {
         assertEquals(user.name, posts.get(1).getUser().getName());
         assertEquals(3, posts.get(1).getUser().getPostCount());
         assertEquals(5, posts.get(1).getUser().getCommentCount());
+        assertEquals(0, posts.get(1).getRecentComments().size());
 
         assertValid(posts.get(2));
         assertEquals(2, posts.get(2).getId());
@@ -101,6 +110,9 @@ public class DummyTest {
         assertEquals(user.name, posts.get(2).getUser().getName());
         assertEquals(3, posts.get(2).getUser().getPostCount());
         assertEquals(5, posts.get(2).getUser().getCommentCount());
+        assertEquals(0, posts.get(2).getRecentComments().size());
+
+        System.out.println(new JsonBuilder(posts).toPrettyString());
     }
 
     private User user(String name) {

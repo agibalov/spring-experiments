@@ -8,7 +8,7 @@ class PostDAO {
     @Autowired
     Sql sql
 
-    List<BriefPostRow> getAll() {
+    List<PostRow> getAll() {
         def postRows = sql.rows("""
 select
     P.id as id, P.content as content,
@@ -19,11 +19,12 @@ order by P.id
 """)
 
         postRows.collect {
-            BriefPostRow.builder()
+            PostRow.builder()
                 .id(it.id)
                 .content(it.content)
                 .commentCount(it.commentCount)
                 .userId(it.userId)
+                .build()
         }
     }
 }
