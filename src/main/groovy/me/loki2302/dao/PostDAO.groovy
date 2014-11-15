@@ -11,25 +11,19 @@ class PostDAO {
     List<BriefPostRow> getAll() {
         def postRows = sql.rows("""
 select
-    P.id as postId, P.content as postContent,
-    (select count(C.id) from Comments as C where C.postId = P.id) as postCommentCount,
-    U.id as userId, U.name as userName,
-    (select count(UP.id) from Posts as UP where UP.userId = U.id) as userPostCount,
-    (select count(UC.id) from Comments as UC where UC.userId = U.id) as userCommentCount
+    P.id as id, P.content as content,
+    (select count(C.id) from Comments as C where C.postId = P.id) as commentCount,
+    P.userId as userId
 from Posts as P
-join Users as U on U.id = P.userId
 order by P.id
 """)
 
         postRows.collect {
             BriefPostRow.builder()
-                .postId(it.postId)
-                .postContent(it.postContent)
-                .postCommentCount(it.postCommentCount)
+                .id(it.id)
+                .content(it.content)
+                .commentCount(it.commentCount)
                 .userId(it.userId)
-                .userName(it.userName)
-                .userPostCount(it.userPostCount)
-                .userCommentCount(it.userCommentCount)
         }
     }
 }

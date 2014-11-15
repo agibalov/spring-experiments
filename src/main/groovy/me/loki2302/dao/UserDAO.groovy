@@ -9,24 +9,31 @@ class UserDAO {
     Sql sql
 
     BriefUserRow findUser(long id) {
-        def userRow = sql.firstRow("""
+        def users = findUsers([id].toSet())
+        if(users.isEmpty()) {
+            return null
+        }
+
+        users.first()
+    }
+
+    List<BriefUserRow> findUsers(Set<Long> ids) {
+        def userRows = sql.rows("""
             select
                 U.id, U.name,
                 (select count(P.id) from Posts as P where P.userId = U.id) as postCount,
                 (select count(C.id) from Comments as C where C.userId = U.id) as commentCount
             from Users as U
-            where U.id = $id
+            where U.id in (${ids.join(',')})
         """)
 
-        if(userRow == null) {
-            return null
+        userRows.collect {
+            BriefUserRow.builder()
+                    .id(it.id)
+                    .name(it.name)
+                    .postCount(it.postCount)
+                    .commentCount(it.commentCount)
+                    .build()
         }
-
-        BriefUserRow.builder()
-                .id(userRow.id)
-                .name(userRow.name)
-                .postCount(userRow.postCount)
-                .commentCount(userRow.commentCount)
-                .build()
     }
 }

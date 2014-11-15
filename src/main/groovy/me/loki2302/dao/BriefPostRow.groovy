@@ -4,11 +4,8 @@ import groovy.transform.builder.Builder
 
 @Builder
 class BriefPostRow {
-    long postId
-    String postContent
-    long postCommentCount
+    long id
+    String content
+    long commentCount
     long userId
-    String userName
-    long userPostCount
-    long userCommentCount
 }
