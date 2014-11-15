@@ -7,16 +7,18 @@ import javax.validation.Valid
 import javax.validation.constraints.NotNull
 
 @ToString(includeNames = true)
-class PostDTO {
+class BriefPostDTO {
     long id
 
     @NotEmpty
     String content
+
+    long commentCount
 
     @NotNull
     @Valid
     BriefUserDTO user
 
     @NotNull
-    List<CommentDTO> comments
+    List<CommentDTO> recentComments
 }

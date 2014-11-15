@@ -73,7 +73,7 @@ public class DummyTest {
         List<PostRow> postRows = postDAO.getAll();
         assertEquals(3L, postRows.size());
 
-        List<PostDTO> posts = facade.getPosts();
+        List<BriefPostDTO> posts = facade.getPosts();
         assertEquals(3L, posts.size());
 
         assertValid(posts.get(0));

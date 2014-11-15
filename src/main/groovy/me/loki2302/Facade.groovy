@@ -20,7 +20,7 @@ class Facade {
     @Autowired
     CommentDAO commentDAO
 
-    List<PostDTO> getPosts() {
+    List<BriefPostDTO> getPosts() {
         List<PostRow> postRows = postDAO.all
 
         Set<Long> uniquePostIds = postRows*.userId.toSet()
@@ -29,7 +29,7 @@ class Facade {
         Set<Long> uniqueUserIds = [].toSet()
         uniqueUserIds.addAll postRows*.userId
         uniqueUserIds.addAll commentRowsGroupedByPostId.collectMany { postId, comments -> comments*.userId }
-        Map<Long, UserDTO> userByUserIds = getUsersAndReturnBriefUserDTOByUserIdMap(uniqueUserIds)
+        Map<Long, BriefUserDTO> userByUserIds = getUsersAndReturnBriefUserDTOByUserIdMap(uniqueUserIds)
 
         Map<Long, List<CommentDTO>> commentDTOsGroupedByPostId = commentRowsGroupedByPostId.collectEntries { postId, comments ->
             [postId, comments.collect {
@@ -41,7 +41,7 @@ class Facade {
         }
 
         postRows.collect {
-            new PostDTO(
+            new BriefPostDTO(
                     id: it.id,
                     content: it.content,
                     commentCount: it.commentCount,
@@ -50,10 +50,18 @@ class Facade {
         }
     }
 
-    private Map<Long, UserDTO> getUsersAndReturnBriefUserDTOByUserIdMap(Set<Long> userIds) {
+    PostDTO getPost(long id) {
+        throw new RuntimeException("Not implemented") // TODO
+    }
+
+    UserDTO getUser(long id) {
+        throw new RuntimeException("Not implemented") // TODO
+    }
+
+    private Map<Long, BriefUserDTO> getUsersAndReturnBriefUserDTOByUserIdMap(Set<Long> userIds) {
         Set<UserRow> users = userDAO.findUsers(userIds)
         users.collect {
-            new UserDTO(
+            new BriefUserDTO(
                     id: it.id,
                     name: it.name,
                     postCount: it.postCount,
