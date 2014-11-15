@@ -33,4 +33,23 @@ class CommentDAO {
                 postId: it.postId)
         }
     }
+
+    List<PostRow> getRecentCommentsByUser(long userId, int topCommentCount) {
+        sql.rows("""
+            select top $topCommentCount
+                id,
+                content,
+                userId,
+                postId
+            from Comments
+            where userId = $userId
+            order by id desc
+        """).collect {
+            new CommentRow(
+                id: it.id,
+                content: it.content,
+                userId: it.userId,
+                postId: it.postId)
+        }
+    }
 }

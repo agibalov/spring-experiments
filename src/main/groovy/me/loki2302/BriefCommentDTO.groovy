@@ -7,7 +7,7 @@ import javax.validation.Valid
 import javax.validation.constraints.NotNull
 
 @ToString(includeNames = true)
-class CommentDTO {
+class BriefCommentDTO {
     long id
 
     @NotEmpty

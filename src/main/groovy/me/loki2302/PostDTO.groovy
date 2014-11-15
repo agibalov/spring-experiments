@@ -18,5 +18,5 @@ class PostDTO {
     BriefUserDTO user
 
     @NotNull
-    List<CommentDTO> comments
+    List<BriefCommentDTO> comments
 }

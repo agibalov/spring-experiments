@@ -113,6 +113,11 @@ public class DummyTest {
         assertEquals(0, posts.get(2).getRecentComments().size());
 
         System.out.println(new JsonBuilder(posts).toPrettyString());
+
+        UserDTO userDTO = facade.getUser(user.id);
+        assertValid(userDTO);
+
+        System.out.println(new JsonBuilder(userDTO).toPrettyString());
     }
 
     private User user(String name) {

@@ -31,9 +31,9 @@ class Facade {
         uniqueUserIds.addAll commentRowsGroupedByPostId.collectMany { postId, comments -> comments*.userId }
         Map<Long, BriefUserDTO> userByUserIds = getUsersAndReturnBriefUserDTOByUserIdMap(uniqueUserIds)
 
-        Map<Long, List<CommentDTO>> commentDTOsGroupedByPostId = commentRowsGroupedByPostId.collectEntries { postId, comments ->
+        Map<Long, List<BriefCommentDTO>> commentDTOsGroupedByPostId = commentRowsGroupedByPostId.collectEntries { postId, comments ->
             [postId, comments.collect {
-                new CommentDTO(
+                new BriefCommentDTO(
                     id: it.id,
                     content: it.content,
                     user: userByUserIds[it.userId])
@@ -54,8 +54,58 @@ class Facade {
         throw new RuntimeException("Not implemented") // TODO
     }
 
-    UserDTO getUser(long id) {
-        throw new RuntimeException("Not implemented") // TODO
+    UserDTO getUser(long userId) {
+        UserRow userRow = userDAO.findUser(userId)
+        if(userRow == null) {
+            throw new RuntimeException("No such user")
+        }
+
+        List<PostRow> recentPostRows = postDAO.getRecentPostsByUser(userId, 3)
+        List<CommentRow> recentPostCommentRows = commentDAO.getRecentCommentsForPosts(recentPostRows*.id.toSet(), 3)
+        List<CommentRow> recentCommentRows = commentDAO.getRecentCommentsByUser(userId, 3)
+
+        BriefUserDTO briefUser = new BriefUserDTO(
+                id: userRow.id,
+                name: userRow.name,
+                postCount: userRow.postCount,
+                commentCount: userRow.commentCount)
+
+        Set<Long> recentPostCommentUserIds = recentPostCommentRows*.userId.toSet()
+        Map<Long, BriefUserDTO> recentPostCommentUsersMap = getUsersAndReturnBriefUserDTOByUserIdMap(recentPostCommentUserIds)
+        Map<Long, List<BriefCommentDTO>> recentPostComments = recentPostCommentRows.groupBy {
+            it.postId
+        }.collectEntries { postId, comments ->
+            [postId, comments.collect {
+                new BriefCommentDTO(
+                        id: it.id,
+                        content: it.content,
+                        user: recentPostCommentUsersMap[it.userId])
+            }]
+        }
+
+        List<BriefPostDTO> recentPosts = recentPostRows.collect {
+            new BriefPostDTO(
+                    id: it.id,
+                    content: it.content,
+                    user: briefUser,
+                    commentCount: it.commentCount,
+                    recentComments: recentPostComments[it.id] ?: [])
+        }
+
+        List<BriefCommentDTO> recentComments = recentCommentRows.collect {
+            new BriefCommentDTO(
+                    id: it.id,
+                    content: it.content,
+                    user: briefUser)
+        }
+
+        new UserDTO(
+                id: userRow.id,
+                name: userRow.name,
+                postCount: userRow.postCount,
+                commentCount: userRow.commentCount,
+                recentPosts: recentPosts,
+                recentComments: recentComments)
     }
 
     private Map<Long, BriefUserDTO> getUsersAndReturnBriefUserDTOByUserIdMap(Set<Long> userIds) {

@@ -19,5 +19,5 @@ class UserDTO {
     List<BriefPostDTO> recentPosts;
 
     @NotNull
-    List<CommentDTO> recentComments;
+    List<BriefCommentDTO> recentComments;
 }

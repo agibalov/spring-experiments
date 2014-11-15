@@ -12,11 +12,31 @@ class PostDAO {
     List<PostRow> getAll() {
         sql.rows("""
             select
-                P.id as id, P.content as content,
+                P.id as id,
+                P.content as content,
                 (select count(C.id) from Comments as C where C.postId = P.id) as commentCount,
                 P.userId as userId
             from Posts as P
             order by P.id
+        """).collect {
+            new PostRow(
+                id: it.id,
+                content: it.content,
+                commentCount: it.commentCount,
+                userId: it.userId)
+        }
+    }
+
+    List<PostRow> getRecentPostsByUser(long userId, int topPostCount) {
+        sql.rows("""
+            select top $topPostCount
+                P.id as id,
+                P.content as content,
+                (select count(C.id) from Comments as C where C.postId = P.id) as commentCount,
+                P.userId as userId
+            from Posts as P
+            where userId = $userId
+            order by P.id desc
         """).collect {
             new PostRow(
                 id: it.id,
