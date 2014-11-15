@@ -1,6 +1,5 @@
-package me.loki2302
+package me.loki2302.dao
 import groovy.sql.Sql
-import me.loki2302.repositories.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
@@ -9,10 +8,7 @@ class UserDAO {
     @Autowired
     Sql sql
 
-    @Autowired
-    UserRepository userRepository
-
-    UserDTO findUser(long id) {
+    BriefUserRow findUser(long id) {
         def userRow = sql.firstRow("""
             select
                 U.id, U.name,
@@ -26,7 +22,7 @@ class UserDAO {
             return null
         }
 
-        UserDTO.builder()
+        BriefUserRow.builder()
                 .id(userRow.id)
                 .name(userRow.name)
                 .postCount(userRow.postCount)

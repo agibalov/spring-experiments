@@ -1,5 +1,9 @@
 package me.loki2302;
 
+import me.loki2302.dao.BriefPostRow;
+import me.loki2302.dao.BriefUserRow;
+import me.loki2302.dao.PostDAO;
+import me.loki2302.dao.UserDAO;
 import me.loki2302.entities.Comment;
 import me.loki2302.entities.Post;
 import me.loki2302.entities.User;
@@ -12,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -31,6 +37,12 @@ public class DummyTest {
     @Autowired
     private UserDAO userDAO;
 
+    @Autowired
+    private PostDAO postDAO;
+
+    @Autowired
+    private Facade facade;
+
     @Test
     public void hello() {
         User user = user("loki2302");
@@ -44,11 +56,41 @@ public class DummyTest {
         comment(user, post, "loki2302-post1-comment4");
         comment(user, post, "loki2302-post1-comment5");
 
-        UserDTO userDTO = userDAO.findUser(0);
-        assertEquals(0L, userDTO.getId());
-        assertEquals("loki2302", userDTO.getName());
-        assertEquals(3L, userDTO.getPostCount());
-        assertEquals(5L, userDTO.getCommentCount());
+        BriefUserRow userRow = userDAO.findUser(user.id);
+        assertEquals((long) user.id, userRow.getId());
+        assertEquals(user.name, userRow.getName());
+        assertEquals(3L, userRow.getPostCount());
+        assertEquals(5L, userRow.getCommentCount());
+
+        List<BriefPostRow> postRows = postDAO.getAll();
+        assertEquals(3L, postRows.size());
+
+        List<BriefPostDTO> posts = facade.getPosts();
+        assertEquals(3L, posts.size());
+
+        assertEquals(0, posts.get(0).getId());
+        assertEquals("loki2302-post1", posts.get(0).getContent());
+        assertEquals(5, posts.get(0).getCommentCount());
+        assertEquals((long)user.id, posts.get(0).getUser().getId());
+        assertEquals(user.name, posts.get(0).getUser().getName());
+        assertEquals(3, posts.get(0).getUser().getPostCount());
+        assertEquals(5, posts.get(0).getUser().getCommentCount());
+
+        assertEquals(1, posts.get(1).getId());
+        assertEquals("loki2302-post2", posts.get(1).getContent());
+        assertEquals(0, posts.get(1).getCommentCount());
+        assertEquals((long)user.id, posts.get(1).getUser().getId());
+        assertEquals(user.name, posts.get(1).getUser().getName());
+        assertEquals(3, posts.get(1).getUser().getPostCount());
+        assertEquals(5, posts.get(1).getUser().getCommentCount());
+
+        assertEquals(2, posts.get(2).getId());
+        assertEquals("loki2302-post3", posts.get(2).getContent());
+        assertEquals(0, posts.get(2).getCommentCount());
+        assertEquals((long)user.id, posts.get(2).getUser().getId());
+        assertEquals(user.name, posts.get(2).getUser().getName());
+        assertEquals(3, posts.get(2).getUser().getPostCount());
+        assertEquals(5, posts.get(2).getUser().getCommentCount());
     }
 
     private User user(String name) {
