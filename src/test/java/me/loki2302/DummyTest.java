@@ -69,7 +69,7 @@ public class DummyTest {
         assertEquals(3L, userRow.getPostCount());
         assertEquals(5L, userRow.getCommentCount());
 
-        List<BriefPostDTO> posts = facade.getPosts();
+        List<BriefPostDTO> posts = facade.findAllPosts();
         assertEquals(3L, posts.size());
 
         assertValid(posts.get(0));
@@ -110,7 +110,7 @@ public class DummyTest {
 
         System.out.println(new JsonBuilder(posts).toPrettyString());
 
-        UserDTO userDTO = facade.getUser(user.id);
+        UserDTO userDTO = facade.findUser(user.id);
         assertValid(userDTO);
 
         System.out.println(new JsonBuilder(userDTO).toPrettyString());
