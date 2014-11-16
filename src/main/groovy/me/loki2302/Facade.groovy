@@ -50,7 +50,7 @@ class Facade {
         CommentResultSet recentCommentsForUsersRecentPosts = commentDAO.findRecentCommentsForPosts(usersRecentPosts.postIds, 3)
         CommentResultSet usersRecentComments = commentDAO.findRecentCommentsByUser(userId, 3)
 
-        Set<Long> referencedUserIds = [].toSet() +
+        Set<Long> referencedUserIds =
                 usersRecentPosts.userIds +
                 recentCommentsForUsersRecentPosts.userIds +
                 usersRecentComments.userIds
