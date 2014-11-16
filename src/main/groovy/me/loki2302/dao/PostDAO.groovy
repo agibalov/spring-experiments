@@ -7,9 +7,19 @@ import org.springframework.stereotype.Service
 @Service
 class PostDAO {
     @Autowired
-    Sql sql
+    private Sql sql
 
-    List<PostRow> getAll() {
+    PostResultSet findAll() {
+        def rows = findAllAsRows()
+        new PostResultSet(rows)
+    }
+
+    PostResultSet findRecentByUser(long userId, int topPostCount) {
+        def rows = findRecentByUserAsRows(userId, topPostCount)
+        new PostResultSet(rows)
+    }
+
+    private List<PostRow> findAllAsRows() {
         sql.rows("""
             select
                 P.id as id,
@@ -20,14 +30,14 @@ class PostDAO {
             order by P.id
         """).collect {
             new PostRow(
-                id: it.id,
-                content: it.content,
-                commentCount: it.commentCount,
-                userId: it.userId)
+                    id: it.id,
+                    content: it.content,
+                    commentCount: it.commentCount,
+                    userId: it.userId)
         }
     }
 
-    List<PostRow> getRecentPostsByUser(long userId, int topPostCount) {
+    private List<PostRow> findRecentByUserAsRows(long userId, int topPostCount) {
         sql.rows("""
             select top $topPostCount
                 P.id as id,

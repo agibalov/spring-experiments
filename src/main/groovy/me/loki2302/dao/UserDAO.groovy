@@ -7,18 +7,23 @@ import org.springframework.stereotype.Service
 @Service
 class UserDAO {
     @Autowired
-    Sql sql
+    private Sql sql
 
     UserRow findUser(long id) {
-        def users = findUsers([id].toSet())
-        if(users.isEmpty()) {
+        def rows = findUsersAsRows([id].toSet())
+        if(rows.isEmpty()) {
             return null
         }
 
-        users.first()
+        rows.first()
     }
 
-    List<UserRow> findUsers(Set<Long> ids) {
+    UserResultSet findUsers(Set<Long> ids) {
+        def rows = findUsersAsRows(ids)
+        new UserResultSet(rows)
+    }
+
+    private List<UserRow> findUsersAsRows(Set<Long> ids) {
         // the join() thing is https://jira.codehaus.org/browse/GROOVY-5436
         sql.rows("""
             select

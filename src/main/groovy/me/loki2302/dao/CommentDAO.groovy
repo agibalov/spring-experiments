@@ -7,9 +7,19 @@ import org.springframework.stereotype.Service
 @Service
 class CommentDAO {
     @Autowired
-    Sql sql
+    private Sql sql
 
-    List<CommentRow> getRecentCommentsForPosts(Set<Long> postIds, int topCommentCount) {
+    CommentResultSet findRecentCommentsForPosts(Set<Long> postIds, int topCommentCount) {
+        def rows = findRecentCommentsForPostsAsRows(postIds, topCommentCount)
+        new CommentResultSet(rows)
+    }
+
+    CommentResultSet findRecentCommentsByUser(long userId, int topCommentCount) {
+        def rows = findRecentCommentsByUserAsRows(userId, topCommentCount)
+        new CommentResultSet(rows)
+    }
+
+    private List<CommentRow> findRecentCommentsForPostsAsRows(Set<Long> postIds, int topCommentCount) {
         sql.rows("""
             select
                 C.id,
@@ -27,14 +37,14 @@ class CommentDAO {
             order by C.postId asc, C.id desc
         """).collect {
             new CommentRow(
-                id: it.id,
-                content: it.content,
-                userId: it.userId,
-                postId: it.postId)
+                    id: it.id,
+                    content: it.content,
+                    userId: it.userId,
+                    postId: it.postId)
         }
     }
 
-    List<PostRow> getRecentCommentsByUser(long userId, int topCommentCount) {
+    private List<PostRow> findRecentCommentsByUserAsRows(long userId, int topCommentCount) {
         sql.rows("""
             select top $topCommentCount
                 id,
@@ -46,10 +56,10 @@ class CommentDAO {
             order by id desc
         """).collect {
             new CommentRow(
-                id: it.id,
-                content: it.content,
-                userId: it.userId,
-                postId: it.postId)
+                    id: it.id,
+                    content: it.content,
+                    userId: it.userId,
+                    postId: it.postId)
         }
     }
 }

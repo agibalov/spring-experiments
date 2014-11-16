@@ -1,10 +1,13 @@
 package me.loki2302
 
 import me.loki2302.dao.CommentDAO
+import me.loki2302.dao.CommentResultSet
 import me.loki2302.dao.CommentRow
 import me.loki2302.dao.PostDAO
+import me.loki2302.dao.PostResultSet
 import me.loki2302.dao.PostRow
 import me.loki2302.dao.UserDAO
+import me.loki2302.dao.UserResultSet
 import me.loki2302.dao.UserRow
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -20,33 +23,85 @@ class Facade {
     @Autowired
     CommentDAO commentDAO
 
+    private static BriefUserDTO makeBriefUserDTO(UserRow userRow) {
+        new BriefUserDTO(
+                id: userRow.id,
+                name: userRow.name,
+                postCount: userRow.postCount,
+                commentCount: userRow.commentCount)
+    }
+
+    private static UserDTO makeUserDTO(
+            UserRow userRow,
+            Map<Long, UserRow> userMap,
+            List<PostRow> recentPostRows,
+            Map<Long, CommentRow> commentsForRecentPostsMap,
+            List<CommentRow> recentCommentRows) {
+
+        List<BriefPostDTO> recentPosts = makeBriefPostDTOs(recentPostRows, userMap, commentsForRecentPostsMap)
+        List<BriefCommentDTO> recentComments = makeBriefCommentDTOs(recentCommentRows, userMap)
+
+        new UserDTO(
+                id: userRow.id,
+                name: userRow.name,
+                postCount: userRow.postCount,
+                commentCount: userRow.commentCount,
+                recentPosts: recentPosts,
+                recentComments: recentComments)
+    }
+
+    private static BriefCommentDTO makeBriefCommentDTO(
+            CommentRow commentRow,
+            Map<Long, UserRow> userMap) {
+
+        new BriefCommentDTO(
+                id: commentRow.id,
+                content: commentRow.content,
+                user: makeBriefUserDTO(userMap[commentRow.userId]))
+    }
+
+    private static List<BriefCommentDTO> makeBriefCommentDTOs(List<CommentRow> commentRows, Map<Long, UserRow> userMap) {
+        commentRows.collect { makeBriefCommentDTO(it, userMap) }
+    }
+
+    private static BriefPostDTO makeBriefPostDTO(
+            PostRow postRow,
+            Map<Long, UserRow> userMap,
+            Map<Long, List<CommentRow>> recentCommentsMap) {
+
+        BriefUserDTO userDTO = makeBriefUserDTO(userMap[postRow.userId])
+        List<BriefCommentDTO> recentCommentDTOs = makeBriefCommentDTOs(recentCommentsMap[postRow.id] ?: [], userMap)
+
+        new BriefPostDTO(
+                id: postRow.id,
+                content: postRow.content,
+                commentCount: postRow.commentCount,
+                user: userDTO,
+                recentComments: recentCommentDTOs)
+    }
+
+    private static List<BriefPostDTO> makeBriefPostDTOs(
+            List<PostRow> postRows,
+            Map<Long, UserRow> userMap,
+            Map<Long, List<CommentRow>> recentCommentsMap) {
+
+        postRows.collect { makeBriefPostDTO(it, userMap, recentCommentsMap) }
+    }
+
     List<BriefPostDTO> getPosts() {
-        List<PostRow> postRows = postDAO.all
+        PostResultSet postResultSet = postDAO.findAll()
 
-        Set<Long> uniquePostIds = postRows*.userId.toSet()
-        Map<Long, CommentRow> commentRowsGroupedByPostId = getCommentRowsGroupedByPostId(uniquePostIds)
+        Set<Long> postIds = postResultSet.getPostIds()
+        CommentResultSet commentResultSet = commentDAO.findRecentCommentsForPosts(postIds, 3)
 
-        Set<Long> uniqueUserIds = [].toSet()
-        uniqueUserIds.addAll postRows*.userId
-        uniqueUserIds.addAll commentRowsGroupedByPostId.collectMany { postId, comments -> comments*.userId }
-        Map<Long, BriefUserDTO> userByUserIds = getUsersAndReturnBriefUserDTOByUserIdMap(uniqueUserIds)
+        Set<Long> uniqueUserIds = postResultSet.userIds + commentResultSet.userIds
+        UserResultSet userResultSet = userDAO.findUsers(uniqueUserIds)
 
-        Map<Long, List<BriefCommentDTO>> commentDTOsGroupedByPostId = commentRowsGroupedByPostId.collectEntries { postId, comments ->
-            [postId, comments.collect {
-                new BriefCommentDTO(
-                    id: it.id,
-                    content: it.content,
-                    user: userByUserIds[it.userId])
-            }]
-        }
+        Map<Long, UserRow> userMap = userResultSet.groupById()
+        Map<Long, List<CommentRow>> commentListMap = commentResultSet.groupByPostId()
 
-        postRows.collect {
-            new BriefPostDTO(
-                    id: it.id,
-                    content: it.content,
-                    commentCount: it.commentCount,
-                    user: userByUserIds[it.userId],
-                    recentComments: commentDTOsGroupedByPostId[it.id] ?: [])
+        postResultSet.rows.collect {
+            makeBriefPostDTO(it, userMap, commentListMap)
         }
     }
 
@@ -60,68 +115,21 @@ class Facade {
             throw new RuntimeException("No such user")
         }
 
-        List<PostRow> recentPostRows = postDAO.getRecentPostsByUser(userId, 3)
-        List<CommentRow> recentPostCommentRows = commentDAO.getRecentCommentsForPosts(recentPostRows*.id.toSet(), 3)
-        List<CommentRow> recentCommentRows = commentDAO.getRecentCommentsByUser(userId, 3)
+        PostResultSet usersRecentPostsResultSet = postDAO.findRecentByUser(userId, 3)
+        CommentResultSet recentCommentsForUsersRecentPostsResultsSet = commentDAO.findRecentCommentsForPosts(usersRecentPostsResultSet.postIds, 3)
+        CommentResultSet usersRecentCommentsResultsSet = commentDAO.findRecentCommentsByUser(userId, 3)
 
-        BriefUserDTO briefUser = new BriefUserDTO(
-                id: userRow.id,
-                name: userRow.name,
-                postCount: userRow.postCount,
-                commentCount: userRow.commentCount)
+        Set<Long> uniqueUsersIds = [].toSet() +
+                usersRecentPostsResultSet.userIds +
+                recentCommentsForUsersRecentPostsResultsSet.userIds +
+                usersRecentCommentsResultsSet.userIds
+        UserResultSet userResultSet = userDAO.findUsers(uniqueUsersIds)
 
-        Set<Long> recentPostCommentUserIds = recentPostCommentRows*.userId.toSet()
-        Map<Long, BriefUserDTO> recentPostCommentUsersMap = getUsersAndReturnBriefUserDTOByUserIdMap(recentPostCommentUserIds)
-        Map<Long, List<BriefCommentDTO>> recentPostComments = recentPostCommentRows.groupBy {
-            it.postId
-        }.collectEntries { postId, comments ->
-            [postId, comments.collect {
-                new BriefCommentDTO(
-                        id: it.id,
-                        content: it.content,
-                        user: recentPostCommentUsersMap[it.userId])
-            }]
-        }
-
-        List<BriefPostDTO> recentPosts = recentPostRows.collect {
-            new BriefPostDTO(
-                    id: it.id,
-                    content: it.content,
-                    user: briefUser,
-                    commentCount: it.commentCount,
-                    recentComments: recentPostComments[it.id] ?: [])
-        }
-
-        List<BriefCommentDTO> recentComments = recentCommentRows.collect {
-            new BriefCommentDTO(
-                    id: it.id,
-                    content: it.content,
-                    user: briefUser)
-        }
-
-        new UserDTO(
-                id: userRow.id,
-                name: userRow.name,
-                postCount: userRow.postCount,
-                commentCount: userRow.commentCount,
-                recentPosts: recentPosts,
-                recentComments: recentComments)
-    }
-
-    private Map<Long, BriefUserDTO> getUsersAndReturnBriefUserDTOByUserIdMap(Set<Long> userIds) {
-        Set<UserRow> users = userDAO.findUsers(userIds)
-        users.collect {
-            new BriefUserDTO(
-                    id: it.id,
-                    name: it.name,
-                    postCount: it.postCount,
-                    commentCount: it.commentCount)
-        }.collectEntries {
-            [it.id, it]
-        }
-    }
-
-    private Map<Long, CommentRow> getCommentRowsGroupedByPostId(Set<Long> postIds) {
-        commentDAO.getRecentCommentsForPosts(postIds, 3).groupBy { it.postId }
+        makeUserDTO(
+                userRow,
+                userResultSet.groupById(),
+                usersRecentPostsResultSet.rows,
+                recentCommentsForUsersRecentPostsResultsSet.groupByPostId(),
+                usersRecentCommentsResultsSet.rows)
     }
 }

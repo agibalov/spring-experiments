@@ -1,10 +1,9 @@
 package me.loki2302;
 
 import groovy.json.JsonBuilder;
-import me.loki2302.dao.PostRow;
-import me.loki2302.dao.UserRow;
 import me.loki2302.dao.PostDAO;
 import me.loki2302.dao.UserDAO;
+import me.loki2302.dao.UserRow;
 import me.loki2302.entities.Comment;
 import me.loki2302.entities.Post;
 import me.loki2302.entities.User;
@@ -69,9 +68,6 @@ public class DummyTest {
         assertEquals(user.name, userRow.getName());
         assertEquals(3L, userRow.getPostCount());
         assertEquals(5L, userRow.getCommentCount());
-
-        List<PostRow> postRows = postDAO.getAll();
-        assertEquals(3L, postRows.size());
 
         List<BriefPostDTO> posts = facade.getPosts();
         assertEquals(3L, posts.size());
