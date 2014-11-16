@@ -19,6 +19,28 @@ class PostDAO {
         new PostResultSet(rows)
     }
 
+    PostRow findById(long postId) {
+        def row = sql.firstRow("""
+            select
+                P.id as id,
+                P.content as content,
+                (select count(C.id) from Comments as C where C.postId = P.id) as commentCount,
+                P.userId as userId
+            from Posts as P
+            where P.id = $postId
+        """)
+
+        if(row == null) {
+            return null
+        }
+
+        new PostRow(
+                id: row.id,
+                content: row.content,
+                commentCount: row.commentCount,
+                userId: row.userId)
+    }
+
     private List<PostRow> findAllAsRows() {
         sql.rows("""
             select

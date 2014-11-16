@@ -10,6 +10,11 @@ class CommentDAO {
     @Autowired
     private Sql sql
 
+    CommentResultSet findCommentsForPost(long postId) {
+        def rows = findCommentsForPostAsRows(postId)
+        new CommentResultSet(rows)
+    }
+
     CommentResultSet findRecentCommentsForPosts(Set<Long> postIds, int topCommentCount) {
         def rows = findRecentCommentsForPostsAsRows(postIds, topCommentCount)
         new CommentResultSet(rows)
@@ -18,6 +23,26 @@ class CommentDAO {
     CommentResultSet findRecentCommentsByUser(long userId, int topCommentCount) {
         def rows = findRecentCommentsByUserAsRows(userId, topCommentCount)
         new CommentResultSet(rows)
+    }
+
+    private List<CommentRow> findCommentsForPostAsRows(long postId) {
+        sql.rows("""
+            select
+                C.id,
+                C.content,
+                C.userId,
+                C.postId
+            from Comments as C
+            where
+                C.postId = $postId
+            order by C.id asc
+        """).collect {
+            new CommentRow(
+                    id: it.id,
+                    content: it.content,
+                    userId: it.userId,
+                    postId: it.postId)
+        }
     }
 
     private List<CommentRow> findRecentCommentsForPostsAsRows(Set<Long> postIds, int topCommentCount) {

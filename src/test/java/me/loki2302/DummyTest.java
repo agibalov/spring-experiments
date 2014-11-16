@@ -5,6 +5,7 @@ import me.loki2302.dao.posts.PostDAO;
 import me.loki2302.dao.users.UserDAO;
 import me.loki2302.dao.users.UserRow;
 import me.loki2302.dto.BriefPostDTO;
+import me.loki2302.dto.PostDTO;
 import me.loki2302.dto.UserDTO;
 import me.loki2302.entities.Comment;
 import me.loki2302.entities.Post;
@@ -110,17 +111,23 @@ public class DummyTest {
         assertEquals(5, posts.get(2).getUser().getCommentCount());
         assertEquals(0, posts.get(2).getRecentComments().size());
 
+        System.out.println();
         System.out.println(new JsonBuilder(posts).toPrettyString());
 
         UserDTO userDTO = facade.findUser(user.id);
         assertValid(userDTO);
-
+        System.out.println();
         System.out.println(new JsonBuilder(userDTO).toPrettyString());
+
+        PostDTO postDTO = facade.findPost(0);
+        assertValid(postDTO);
+        System.out.println();
+        System.out.println(new JsonBuilder(postDTO).toPrettyString());
     }
 
     private User user(String name) {
         User user = new User();
-        user.name = "loki2302";
+        user.name = name;
         user = userRepository.save(user);
         return user;
     }

@@ -4,6 +4,7 @@ import me.loki2302.dao.comments.CommentDAO
 import me.loki2302.dao.comments.CommentResultSet
 import me.loki2302.dao.posts.PostDAO
 import me.loki2302.dao.posts.PostResultSet
+import me.loki2302.dao.posts.PostRow
 import me.loki2302.dao.users.UserDAO
 import me.loki2302.dao.users.UserResultSet
 import me.loki2302.dao.users.UserRow
@@ -47,8 +48,21 @@ class Facade {
                 recentCommentsForPosts.groupByPostId())
     }
 
-    PostDTO getPost(long id) {
-        throw new RuntimeException("Not implemented") // TODO
+    PostDTO findPost(long postId) {
+        PostRow postRow = postDAO.findById(postId)
+        if(postRow == null) {
+            return null
+        }
+
+        CommentResultSet postComments = commentDAO.findCommentsForPost(postId)
+
+        Set<Long> referencedUserIds = Collections.singleton(postRow.userId) + postComments.userIds
+        UserResultSet referencedUsers = userDAO.findUsers(referencedUserIds)
+
+        postMapper.makePostDTO(
+                postRow,
+                referencedUsers.groupById(),
+                postComments.rows)
     }
 
     UserDTO findUser(long userId) {
