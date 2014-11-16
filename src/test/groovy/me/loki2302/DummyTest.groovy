@@ -1,32 +1,30 @@
-package me.loki2302;
+package me.loki2302
 
-import groovy.json.JsonBuilder;
-import me.loki2302.dao.posts.PostDAO;
-import me.loki2302.dao.users.UserDAO;
-import me.loki2302.dao.users.UserRow;
-import me.loki2302.dto.BriefPostDTO;
-import me.loki2302.dto.PostDTO;
-import me.loki2302.dto.UserDTO;
-import me.loki2302.entities.Comment;
-import me.loki2302.entities.Post;
-import me.loki2302.entities.User;
-import me.loki2302.repositories.CommentRepository;
-import me.loki2302.repositories.PostRepository;
-import me.loki2302.repositories.UserRepository;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.IntegrationTest;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import groovy.json.JsonBuilder
+import me.loki2302.dao.posts.PostDAO
+import me.loki2302.dao.users.UserDAO
+import me.loki2302.dao.users.UserRow
+import me.loki2302.dto.BriefPostDTO
+import me.loki2302.dto.PostDTO
+import me.loki2302.dto.UserDTO
+import me.loki2302.entities.Comment
+import me.loki2302.entities.Post
+import me.loki2302.entities.User
+import me.loki2302.repositories.CommentRepository
+import me.loki2302.repositories.PostRepository
+import me.loki2302.repositories.UserRepository
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.IntegrationTest
+import org.springframework.boot.test.SpringApplicationConfiguration
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
-import java.util.List;
-import java.util.Set;
+import javax.validation.ConstraintViolation
+import javax.validation.Validator
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals
+import static org.junit.Assert.fail
 
 @IntegrationTest
 @SpringApplicationConfiguration(classes = Config.class)
@@ -55,16 +53,16 @@ public class DummyTest {
 
     @Test
     public void hello() {
-        User user = user("loki2302");
-        Post post = post(user, "loki2302-post1");
-        post(user, "loki2302-post2");
-        post(user, "loki2302-post3");
+        User user = makeUser("loki2302");
+        Post post = makePost(user, "loki2302-post1");
+        makePost(user, "loki2302-post2");
+        makePost(user, "loki2302-post3");
 
-        comment(user, post, "loki2302-post1-comment1");
-        comment(user, post, "loki2302-post1-comment2");
-        comment(user, post, "loki2302-post1-comment3");
-        comment(user, post, "loki2302-post1-comment4");
-        comment(user, post, "loki2302-post1-comment5");
+        makeComment(user, post, "loki2302-post1-comment1");
+        makeComment(user, post, "loki2302-post1-comment2");
+        makeComment(user, post, "loki2302-post1-comment3");
+        makeComment(user, post, "loki2302-post1-comment4");
+        makeComment(user, post, "loki2302-post1-comment5");
 
         UserRow userRow = userDAO.findUser(user.id);
         assertEquals((long) user.id, userRow.getId());
@@ -125,14 +123,14 @@ public class DummyTest {
         System.out.println(new JsonBuilder(postDTO).toPrettyString());
     }
 
-    private User user(String name) {
+    private User makeUser(String name) {
         User user = new User();
         user.name = name;
         user = userRepository.save(user);
         return user;
     }
 
-    private Post post(User user, String content) {
+    private Post makePost(User user, String content) {
         Post post = new Post();
         post.user = user;
         post.content = content;
@@ -140,7 +138,7 @@ public class DummyTest {
         return post;
     }
 
-    private Comment comment(User user, Post post, String content) {
+    private Comment makeComment(User user, Post post, String content) {
         Comment comment = new Comment();
         comment.user = user;
         comment.post = post;
