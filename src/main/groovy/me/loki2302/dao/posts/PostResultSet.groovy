@@ -1,4 +1,4 @@
-package me.loki2302.dao
+package me.loki2302.dao.posts
 
 class PostResultSet {
     private final List<PostRow> postRows

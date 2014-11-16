@@ -1,4 +1,6 @@
-package me.loki2302.dao
+package me.loki2302.dao.comments
+
+import me.loki2302.dao.posts.PostRow
 
 class CommentResultSet {
     private final List<CommentRow> commentRows

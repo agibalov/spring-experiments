@@ -1,12 +1,10 @@
-package me.loki2302
+package me.loki2302.dto
 
 import groovy.transform.ToString
 import org.hibernate.validator.constraints.NotEmpty
 
-import javax.validation.constraints.NotNull
-
 @ToString(includeNames = true)
-class UserDTO {
+class BriefUserDTO {
     long id
 
     @NotEmpty
@@ -14,10 +12,4 @@ class UserDTO {
 
     long postCount
     long commentCount
-
-    @NotNull
-    List<BriefPostDTO> recentPosts;
-
-    @NotNull
-    List<BriefCommentDTO> recentComments;
 }

@@ -1,8 +1,11 @@
-package me.loki2302
+package me.loki2302.dto.mappers
 
-import me.loki2302.dao.CommentRow
-import me.loki2302.dao.PostRow
-import me.loki2302.dao.UserRow
+import me.loki2302.dao.comments.CommentRow
+import me.loki2302.dao.posts.PostRow
+import me.loki2302.dao.users.UserRow
+import me.loki2302.dto.BriefCommentDTO
+import me.loki2302.dto.BriefPostDTO
+import me.loki2302.dto.BriefUserDTO
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 

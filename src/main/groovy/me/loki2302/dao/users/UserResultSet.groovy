@@ -1,4 +1,6 @@
-package me.loki2302.dao
+package me.loki2302.dao.users
+
+import me.loki2302.dao.posts.PostRow
 
 class UserResultSet {
     private final List<UserRow> userRows

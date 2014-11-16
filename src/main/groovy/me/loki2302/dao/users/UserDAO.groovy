@@ -1,4 +1,4 @@
-package me.loki2302.dao
+package me.loki2302.dao.users
 
 import groovy.sql.Sql
 import org.springframework.beans.factory.annotation.Autowired

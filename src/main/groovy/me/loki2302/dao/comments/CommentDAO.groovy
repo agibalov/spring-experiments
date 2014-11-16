@@ -1,6 +1,7 @@
-package me.loki2302.dao
+package me.loki2302.dao.comments
 
 import groovy.sql.Sql
+import me.loki2302.dao.posts.PostRow
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 

@@ -1,9 +1,11 @@
 package me.loki2302;
 
 import groovy.json.JsonBuilder;
-import me.loki2302.dao.PostDAO;
-import me.loki2302.dao.UserDAO;
-import me.loki2302.dao.UserRow;
+import me.loki2302.dao.posts.PostDAO;
+import me.loki2302.dao.users.UserDAO;
+import me.loki2302.dao.users.UserRow;
+import me.loki2302.dto.BriefPostDTO;
+import me.loki2302.dto.UserDTO;
 import me.loki2302.entities.Comment;
 import me.loki2302.entities.Post;
 import me.loki2302.entities.User;
