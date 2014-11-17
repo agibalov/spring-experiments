@@ -22,8 +22,6 @@ import static org.junit.Assert.fail
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class DummyTest {
-
-
     @Autowired
     private Facade facade
 
