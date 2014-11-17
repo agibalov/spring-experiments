@@ -89,6 +89,10 @@ class Facade {
         eventRepository.findAll()
     }
 
+    List<Event> findEventsByUser(User user) {
+        eventRepository.findByUser(user)
+    }
+
     List<BriefPostDTO> findAllPosts() {
         PostResultSet posts = postDAO.findAll()
 

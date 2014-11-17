@@ -53,28 +53,44 @@ public class DummyTest {
         loki2302Post1Comment2 = facade.makeComment(loki2302, loki2302Post1, "loki2302-post1-comment2")
         loki2302Post2 = facade.makePost(loki2302, "loki2302-post2")
         loki2302Post1Comment3 = facade.makeComment(loki2302, loki2302Post1, "loki2302-post1-comment3")
+        andrey = facade.makeUser("andrey")
         loki2302Post3 = facade.makePost(loki2302, "loki2302-post3")
         loki2302Post1Comment4 = facade.makeComment(loki2302, loki2302Post1, "loki2302-post1-comment4")
         loki2302Post1Comment5 = facade.makeComment(loki2302, loki2302Post1, "loki2302-post1-comment5")
 
-        andrey = facade.makeUser("andrey")
+
         andreyPost1 = facade.makePost(andrey, "andrey-post1")
     }
 
     @Test
     void eventsAreOk() {
-        def events = facade.findEvents()
-        assertTrue(events[0] instanceof UserCreatedEvent)
-        assertTrue(events[1] instanceof PostCreatedEvent)
-        assertTrue(events[2] instanceof CommentCreatedEvent)
-        assertTrue(events[3] instanceof CommentCreatedEvent)
-        assertTrue(events[4] instanceof PostCreatedEvent)
-        assertTrue(events[5] instanceof CommentCreatedEvent)
-        assertTrue(events[6] instanceof PostCreatedEvent)
-        assertTrue(events[7] instanceof CommentCreatedEvent)
-        assertTrue(events[8] instanceof CommentCreatedEvent)
-        assertTrue(events[9] instanceof UserCreatedEvent)
-        assertTrue(events[10] instanceof PostCreatedEvent)
+        def allEvents = facade.findEvents()
+        assertTrue(allEvents[0] instanceof UserCreatedEvent)
+        assertTrue(allEvents[1] instanceof PostCreatedEvent)
+        assertTrue(allEvents[2] instanceof CommentCreatedEvent)
+        assertTrue(allEvents[3] instanceof CommentCreatedEvent)
+        assertTrue(allEvents[4] instanceof PostCreatedEvent)
+        assertTrue(allEvents[5] instanceof CommentCreatedEvent)
+        assertTrue(allEvents[6] instanceof UserCreatedEvent)
+        assertTrue(allEvents[7] instanceof PostCreatedEvent)
+        assertTrue(allEvents[8] instanceof CommentCreatedEvent)
+        assertTrue(allEvents[9] instanceof CommentCreatedEvent)
+        assertTrue(allEvents[10] instanceof PostCreatedEvent)
+
+        def loki2302Events = facade.findEventsByUser(loki2302)
+        assertTrue(loki2302Events[0] instanceof UserCreatedEvent)
+        assertTrue(loki2302Events[1] instanceof PostCreatedEvent)
+        assertTrue(loki2302Events[2] instanceof CommentCreatedEvent)
+        assertTrue(loki2302Events[3] instanceof CommentCreatedEvent)
+        assertTrue(loki2302Events[4] instanceof PostCreatedEvent)
+        assertTrue(loki2302Events[5] instanceof CommentCreatedEvent)
+        assertTrue(loki2302Events[6] instanceof PostCreatedEvent)
+        assertTrue(loki2302Events[7] instanceof CommentCreatedEvent)
+        assertTrue(loki2302Events[8] instanceof CommentCreatedEvent)
+
+        def andreyEvents = facade.findEventsByUser(andrey)
+        assertTrue(andreyEvents[0] instanceof UserCreatedEvent)
+        assertTrue(andreyEvents[1] instanceof PostCreatedEvent)
     }
 
     @Test
