@@ -1,12 +1,8 @@
 package me.loki2302
-
 import me.loki2302.dto.*
 import me.loki2302.entities.Comment
 import me.loki2302.entities.Post
 import me.loki2302.entities.User
-import me.loki2302.repositories.CommentRepository
-import me.loki2302.repositories.PostRepository
-import me.loki2302.repositories.UserRepository
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -26,14 +22,7 @@ import static org.junit.Assert.fail
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class DummyTest {
-    @Autowired
-    private UserRepository userRepository
 
-    @Autowired
-    private PostRepository postRepository
-
-    @Autowired
-    private CommentRepository commentRepository
 
     @Autowired
     private Facade facade
@@ -56,18 +45,18 @@ public class DummyTest {
 
     @Before
     void populate() {
-        loki2302 = makeUser("loki2302")
-        loki2302Post1 = makePost(loki2302, "loki2302-post1")
-        loki2302Post2 = makePost(loki2302, "loki2302-post2")
-        loki2302Post3 = makePost(loki2302, "loki2302-post3")
-        loki2302Post1Comment1 = makeComment(loki2302, loki2302Post1, "loki2302-post1-comment1")
-        loki2302Post1Comment2 = makeComment(loki2302, loki2302Post1, "loki2302-post1-comment2")
-        loki2302Post1Comment3 = makeComment(loki2302, loki2302Post1, "loki2302-post1-comment3")
-        loki2302Post1Comment4 = makeComment(loki2302, loki2302Post1, "loki2302-post1-comment4")
-        loki2302Post1Comment5 = makeComment(loki2302, loki2302Post1, "loki2302-post1-comment5")
+        loki2302 = facade.makeUser("loki2302")
+        loki2302Post1 = facade.makePost(loki2302, "loki2302-post1")
+        loki2302Post2 = facade.makePost(loki2302, "loki2302-post2")
+        loki2302Post3 = facade.makePost(loki2302, "loki2302-post3")
+        loki2302Post1Comment1 = facade.makeComment(loki2302, loki2302Post1, "loki2302-post1-comment1")
+        loki2302Post1Comment2 = facade.makeComment(loki2302, loki2302Post1, "loki2302-post1-comment2")
+        loki2302Post1Comment3 = facade.makeComment(loki2302, loki2302Post1, "loki2302-post1-comment3")
+        loki2302Post1Comment4 = facade.makeComment(loki2302, loki2302Post1, "loki2302-post1-comment4")
+        loki2302Post1Comment5 = facade.makeComment(loki2302, loki2302Post1, "loki2302-post1-comment5")
 
-        andrey = makeUser("andrey")
-        andreyPost1 = makePost(andrey, "andrey-post1")
+        andrey = facade.makeUser("andrey")
+        andreyPost1 = facade.makePost(andrey, "andrey-post1")
     }
 
     @Test
@@ -332,27 +321,6 @@ public class DummyTest {
         assertEquals(expected.name, actual.name)
         assertEquals(expected.postCount, actual.postCount)
         assertEquals(expected.commentCount, actual.commentCount)
-    }
-
-    private User makeUser(String name) {
-        def user = new User()
-        user.name = name
-        userRepository.save(user)
-    }
-
-    private Post makePost(User user, String content) {
-        def post = new Post()
-        post.user = user
-        post.content = content
-        postRepository.save(post)
-    }
-
-    private Comment makeComment(User user, Post post, String content) {
-        def comment = new Comment()
-        comment.user = user
-        comment.post = post
-        comment.content = content
-        commentRepository.save(comment)
     }
 
     private void assertValid(Object obj) {

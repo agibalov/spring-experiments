@@ -13,11 +13,26 @@ import me.loki2302.dto.PostDTO
 import me.loki2302.dto.UserDTO
 import me.loki2302.dto.mappers.PostMapper
 import me.loki2302.dto.mappers.UserMapper
+import me.loki2302.entities.Comment
+import me.loki2302.entities.Post
+import me.loki2302.entities.User
+import me.loki2302.repositories.CommentRepository
+import me.loki2302.repositories.PostRepository
+import me.loki2302.repositories.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
 @Service
 class Facade {
+    @Autowired
+    private UserRepository userRepository
+
+    @Autowired
+    private PostRepository postRepository
+
+    @Autowired
+    private CommentRepository commentRepository
+
     @Autowired
     private UserDAO userDAO
 
@@ -32,6 +47,27 @@ class Facade {
 
     @Autowired
     private UserMapper userMapper
+
+    public User makeUser(String name) {
+        def user = new User()
+        user.name = name
+        userRepository.save(user)
+    }
+
+    public Post makePost(User user, String content) {
+        def post = new Post()
+        post.user = user
+        post.content = content
+        postRepository.save(post)
+    }
+
+    public Comment makeComment(User user, Post post, String content) {
+        def comment = new Comment()
+        comment.user = user
+        comment.post = post
+        comment.content = content
+        commentRepository.save(comment)
+    }
 
     List<BriefPostDTO> findAllPosts() {
         PostResultSet posts = postDAO.findAll()
