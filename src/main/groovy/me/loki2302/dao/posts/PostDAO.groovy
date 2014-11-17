@@ -49,7 +49,7 @@ class PostDAO {
                 (select count(C.id) from Comments as C where C.postId = P.id) as commentCount,
                 P.userId as userId
             from Posts as P
-            order by P.id
+            order by P.id desc
         """).collect {
             new PostRow(
                     id: it.id,

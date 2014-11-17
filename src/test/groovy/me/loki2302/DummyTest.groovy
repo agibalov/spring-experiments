@@ -1,26 +1,21 @@
 package me.loki2302
 
-import groovy.json.JsonBuilder
-import me.loki2302.dao.posts.PostDAO
-import me.loki2302.dao.users.UserDAO
-import me.loki2302.dao.users.UserRow
-import me.loki2302.dto.BriefPostDTO
-import me.loki2302.dto.PostDTO
-import me.loki2302.dto.UserDTO
+import me.loki2302.dto.*
 import me.loki2302.entities.Comment
 import me.loki2302.entities.Post
 import me.loki2302.entities.User
 import me.loki2302.repositories.CommentRepository
 import me.loki2302.repositories.PostRepository
 import me.loki2302.repositories.UserRepository
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.IntegrationTest
 import org.springframework.boot.test.SpringApplicationConfiguration
+import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
 
-import javax.validation.ConstraintViolation
 import javax.validation.Validator
 
 import static org.junit.Assert.assertEquals
@@ -29,140 +24,356 @@ import static org.junit.Assert.fail
 @IntegrationTest
 @SpringApplicationConfiguration(classes = Config.class)
 @RunWith(SpringJUnit4ClassRunner.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class DummyTest {
     @Autowired
-    private UserRepository userRepository;
+    private UserRepository userRepository
 
     @Autowired
-    private PostRepository postRepository;
+    private PostRepository postRepository
 
     @Autowired
-    private CommentRepository commentRepository;
+    private CommentRepository commentRepository
 
     @Autowired
-    private UserDAO userDAO;
+    private Facade facade
 
     @Autowired
-    private PostDAO postDAO;
+    private Validator validator
 
-    @Autowired
-    private Facade facade;
+    private User loki2302
+    private Post loki2302Post1
+    private Post loki2302Post2
+    private Post loki2302Post3
+    private Comment loki2302Post1Comment1
+    private Comment loki2302Post1Comment2
+    private Comment loki2302Post1Comment3
+    private Comment loki2302Post1Comment4
+    private Comment loki2302Post1Comment5
 
-    @Autowired
-    private Validator validator;
+    private User andrey
+    private Post andreyPost1
+
+    @Before
+    void populate() {
+        loki2302 = makeUser("loki2302")
+        loki2302Post1 = makePost(loki2302, "loki2302-post1")
+        loki2302Post2 = makePost(loki2302, "loki2302-post2")
+        loki2302Post3 = makePost(loki2302, "loki2302-post3")
+        loki2302Post1Comment1 = makeComment(loki2302, loki2302Post1, "loki2302-post1-comment1")
+        loki2302Post1Comment2 = makeComment(loki2302, loki2302Post1, "loki2302-post1-comment2")
+        loki2302Post1Comment3 = makeComment(loki2302, loki2302Post1, "loki2302-post1-comment3")
+        loki2302Post1Comment4 = makeComment(loki2302, loki2302Post1, "loki2302-post1-comment4")
+        loki2302Post1Comment5 = makeComment(loki2302, loki2302Post1, "loki2302-post1-comment5")
+
+        andrey = makeUser("andrey")
+        andreyPost1 = makePost(andrey, "andrey-post1")
+    }
 
     @Test
-    public void hello() {
-        User user = makeUser("loki2302");
-        Post post = makePost(user, "loki2302-post1");
-        makePost(user, "loki2302-post2");
-        makePost(user, "loki2302-post3");
+    void loki2302IsOk() {
+        def loki2302Actual = facade.findUser(loki2302.id)
 
-        makeComment(user, post, "loki2302-post1-comment1");
-        makeComment(user, post, "loki2302-post1-comment2");
-        makeComment(user, post, "loki2302-post1-comment3");
-        makeComment(user, post, "loki2302-post1-comment4");
-        makeComment(user, post, "loki2302-post1-comment5");
+        def loki2302BriefUserDTO = new BriefUserDTO(
+                id: loki2302.id,
+                name: 'loki2302',
+                postCount: 3,
+                commentCount: 5)
 
-        UserRow userRow = userDAO.findUser(user.id);
-        assertEquals((long) user.id, userRow.getId());
-        assertEquals(user.name, userRow.getName());
-        assertEquals(3L, userRow.getPostCount());
-        assertEquals(5L, userRow.getCommentCount());
+        def loki2302Expected = new UserDTO(
+                id: loki2302.id,
+                name: 'loki2302',
+                postCount: 3,
+                commentCount: 5,
+                recentPosts: [
+                        new BriefPostDTO(
+                                id: loki2302Post3.id,
+                                content: loki2302Post3.content,
+                                commentCount: 0,
+                                user: loki2302BriefUserDTO,
+                                recentComments: []),
+                        new BriefPostDTO(
+                                id: loki2302Post2.id,
+                                content: loki2302Post2.content,
+                                commentCount: 0,
+                                user: loki2302BriefUserDTO,
+                                recentComments: []),
+                        new BriefPostDTO(
+                                id: loki2302Post1.id,
+                                content: loki2302Post1.content,
+                                commentCount: 5,
+                                user: loki2302BriefUserDTO,
+                                recentComments: [
+                                        new BriefCommentDTO(
+                                                id: loki2302Post1Comment5.id,
+                                                content: loki2302Post1Comment5.content,
+                                                user: loki2302BriefUserDTO),
+                                        new BriefCommentDTO(
+                                                id: loki2302Post1Comment4.id,
+                                                content: loki2302Post1Comment4.content,
+                                                user: loki2302BriefUserDTO),
+                                        new BriefCommentDTO(
+                                                id: loki2302Post1Comment3.id,
+                                                content: loki2302Post1Comment3.content,
+                                                user: loki2302BriefUserDTO)
+                                ])
+                ],
+                recentComments: [
+                        new BriefCommentDTO(
+                                id: loki2302Post1Comment5.id,
+                                content: loki2302Post1Comment5.content,
+                                user: loki2302BriefUserDTO),
+                        new BriefCommentDTO(
+                                id: loki2302Post1Comment4.id,
+                                content: loki2302Post1Comment4.content,
+                                user: loki2302BriefUserDTO),
+                        new BriefCommentDTO(
+                                id: loki2302Post1Comment3.id,
+                                content: loki2302Post1Comment3.content,
+                                user: loki2302BriefUserDTO)
+                ])
 
-        List<BriefPostDTO> posts = facade.findAllPosts();
-        assertEquals(3L, posts.size());
+        assertUserDTOEquals(loki2302Expected, loki2302Actual)
+    }
 
-        assertValid(posts.get(0));
-        assertEquals(0, posts.get(0).getId());
-        assertEquals("loki2302-post1", posts.get(0).getContent());
-        assertEquals(5, posts.get(0).getCommentCount());
-        assertEquals((long)user.id, posts.get(0).getUser().getId());
-        assertEquals(user.name, posts.get(0).getUser().getName());
-        assertEquals(3, posts.get(0).getUser().getPostCount());
-        assertEquals(5, posts.get(0).getUser().getCommentCount());
-        assertEquals(3, posts.get(0).getRecentComments().size());
-        assertEquals((long)user.id, posts.get(0).getRecentComments().get(0).getUser().getId());
-        assertEquals((long)4, posts.get(0).getRecentComments().get(0).getId());
-        assertEquals((long)user.id, posts.get(0).getRecentComments().get(1).getUser().getId());
-        assertEquals((long)3, posts.get(0).getRecentComments().get(1).getId());
-        assertEquals((long)user.id, posts.get(0).getRecentComments().get(2).getUser().getId());
-        assertEquals((long)2, posts.get(0).getRecentComments().get(2).getId());
+    @Test
+    void andreyIsOk() {
+        def andreyActual = facade.findUser(andrey.id)
 
-        assertValid(posts.get(1));
-        assertEquals(1, posts.get(1).getId());
-        assertEquals("loki2302-post2", posts.get(1).getContent());
-        assertEquals(0, posts.get(1).getCommentCount());
-        assertEquals((long)user.id, posts.get(1).getUser().getId());
-        assertEquals(user.name, posts.get(1).getUser().getName());
-        assertEquals(3, posts.get(1).getUser().getPostCount());
-        assertEquals(5, posts.get(1).getUser().getCommentCount());
-        assertEquals(0, posts.get(1).getRecentComments().size());
+        def andreyBriefUserDTO = new BriefUserDTO(
+                id: andrey.id,
+                name: 'andrey',
+                postCount: 1,
+                commentCount: 0)
 
-        assertValid(posts.get(2));
-        assertEquals(2, posts.get(2).getId());
-        assertEquals("loki2302-post3", posts.get(2).getContent());
-        assertEquals(0, posts.get(2).getCommentCount());
-        assertEquals((long)user.id, posts.get(2).getUser().getId());
-        assertEquals(user.name, posts.get(2).getUser().getName());
-        assertEquals(3, posts.get(2).getUser().getPostCount());
-        assertEquals(5, posts.get(2).getUser().getCommentCount());
-        assertEquals(0, posts.get(2).getRecentComments().size());
+        def andreyExpected = new UserDTO(
+                id: andrey.id,
+                name: 'andrey',
+                postCount: 1,
+                commentCount: 0,
+                recentPosts: [
+                        new BriefPostDTO(
+                                id: andreyPost1.id,
+                                content: andreyPost1.content,
+                                commentCount: 0,
+                                user: andreyBriefUserDTO,
+                                recentComments: [])
+                ],
+                recentComments: [])
 
-        System.out.println();
-        System.out.println(new JsonBuilder(posts).toPrettyString());
+        assertUserDTOEquals(andreyExpected, andreyActual)
+    }
 
-        UserDTO userDTO = facade.findUser(user.id);
-        assertValid(userDTO);
-        System.out.println();
-        System.out.println(new JsonBuilder(userDTO).toPrettyString());
+    @Test
+    void loki2302Post1IsOk() {
+        def loki2302BriefUserDTO = new BriefUserDTO(
+                id: loki2302.id,
+                name: 'loki2302',
+                postCount: 3,
+                commentCount: 5)
 
-        PostDTO postDTO = facade.findPost(0);
-        assertValid(postDTO);
-        System.out.println();
-        System.out.println(new JsonBuilder(postDTO).toPrettyString());
+        def actualPost = facade.findPost(loki2302Post1.id)
+        def expectedPost = new PostDTO(
+                id: loki2302Post1.id,
+                content: loki2302Post1.content,
+                user: loki2302BriefUserDTO,
+                comments: [
+                        new BriefCommentDTO(
+                                id: loki2302Post1Comment1.id,
+                                content: loki2302Post1Comment1.content,
+                                user: loki2302BriefUserDTO),
+                        new BriefCommentDTO(
+                                id: loki2302Post1Comment2.id,
+                                content: loki2302Post1Comment2.content,
+                                user: loki2302BriefUserDTO),
+                        new BriefCommentDTO(
+                                id: loki2302Post1Comment3.id,
+                                content: loki2302Post1Comment3.content,
+                                user: loki2302BriefUserDTO),
+                        new BriefCommentDTO(
+                                id: loki2302Post1Comment4.id,
+                                content: loki2302Post1Comment4.content,
+                                user: loki2302BriefUserDTO),
+                        new BriefCommentDTO(
+                                id: loki2302Post1Comment5.id,
+                                content: loki2302Post1Comment5.content,
+                                user: loki2302BriefUserDTO)
+                ]
+        )
+
+        assertPostDTOEquals(expectedPost, actualPost)
+    }
+
+    @Test
+    void andreyPost1IsOk() {
+        def andreyBriefUserDTO = new BriefUserDTO(
+                id: andrey.id,
+                name: 'andrey',
+                postCount: 1,
+                commentCount: 0)
+
+        def actualPost = facade.findPost(andreyPost1.id)
+        def expectedPost = new PostDTO(
+                id: andreyPost1.id,
+                content: andreyPost1.content,
+                user: andreyBriefUserDTO,
+                comments: []
+        )
+
+        assertPostDTOEquals(expectedPost, actualPost)
+    }
+
+    @Test
+    void listOfPostsIsOk() {
+        def loki2302BriefUserDTO = new BriefUserDTO(
+                id: loki2302.id,
+                name: 'loki2302',
+                postCount: 3,
+                commentCount: 5)
+
+        def andreyBriefUserDTO = new BriefUserDTO(
+                id: andrey.id,
+                name: 'andrey',
+                postCount: 1,
+                commentCount: 0)
+
+        def actualPosts = facade.findAllPosts()
+        def expectedPosts = [
+                new BriefPostDTO(
+                        id: andreyPost1.id,
+                        content: andreyPost1.content,
+                        commentCount: 0,
+                        user: andreyBriefUserDTO,
+                        recentComments: []),
+                new BriefPostDTO(
+                        id: loki2302Post3.id,
+                        content: loki2302Post3.content,
+                        commentCount: 0,
+                        user: loki2302BriefUserDTO,
+                        recentComments: []),
+                new BriefPostDTO(
+                        id: loki2302Post2.id,
+                        content: loki2302Post2.content,
+                        commentCount: 0,
+                        user: loki2302BriefUserDTO,
+                        recentComments: []),
+                new BriefPostDTO(
+                        id: loki2302Post1.id,
+                        content: loki2302Post1.content,
+                        commentCount: 5,
+                        user: loki2302BriefUserDTO,
+                        recentComments: [
+                                new BriefCommentDTO(
+                                        id: loki2302Post1Comment5.id,
+                                        content: loki2302Post1Comment5.content,
+                                        user: loki2302BriefUserDTO),
+                                new BriefCommentDTO(
+                                        id: loki2302Post1Comment4.id,
+                                        content: loki2302Post1Comment4.content,
+                                        user: loki2302BriefUserDTO),
+                                new BriefCommentDTO(
+                                        id: loki2302Post1Comment3.id,
+                                        content: loki2302Post1Comment3.content,
+                                        user: loki2302BriefUserDTO)
+                        ]),
+        ]
+
+        assertBriefPostDTOsEqual(expectedPosts, actualPosts)
+    }
+
+    private static void assertPostDTOEquals(PostDTO expected, PostDTO actual) {
+        assertEquals(expected.id, actual.id)
+        assertEquals(expected.content, actual.content)
+        assertBriefUserDTOEquals(expected.user, actual.user)
+        assertBriefCommentDTOsEqual(expected.comments, actual.comments)
+    }
+
+    private static void assertUserDTOEquals(UserDTO expected, UserDTO actual) {
+        assertEquals(expected.id, actual.id)
+        assertEquals(expected.name, actual.name)
+        assertEquals(expected.postCount, actual.postCount)
+        assertEquals(expected.commentCount, actual.commentCount)
+        assertBriefPostDTOsEqual(expected.recentPosts, actual.recentPosts)
+        assertBriefCommentDTOsEqual(expected.recentComments, actual.recentComments)
+    }
+
+    private static void assertBriefPostDTOsEqual(List<BriefPostDTO> expectedPosts, List<BriefPostDTO> actualPosts) {
+        assertEquals(expectedPosts.size(), actualPosts.size())
+        expectedPosts.eachWithIndex { BriefPostDTO expected, int i ->
+            def actual = actualPosts[i]
+            assertBriefPostDTOEquals(expected, actual)
+        }
+    }
+
+    private static void assertBriefPostDTOEquals(BriefPostDTO expected, BriefPostDTO actual) {
+        assertEquals(expected.id, actual.id)
+        assertEquals(expected.content, actual.content)
+        assertEquals(expected.commentCount, actual.commentCount)
+        assertBriefUserDTOEquals(expected.user, actual.user)
+        assertBriefCommentDTOsEqual(expected.recentComments, actual.recentComments)
+    }
+
+    private static void assertBriefCommentDTOsEqual(List<BriefCommentDTO> expectedComments, List<BriefCommentDTO> actualComments) {
+        assertEquals(expectedComments.size(), actualComments.size())
+        expectedComments.eachWithIndex { BriefCommentDTO expected, int i ->
+            def actual = actualComments[i]
+            assertBriefCommentDTOEquals(expected, actual)
+        }
+    }
+
+    private static void assertBriefCommentDTOEquals(BriefCommentDTO expected, BriefCommentDTO actual) {
+        assertEquals(expected.id, actual.id)
+        assertEquals(expected.content, actual.content)
+        assertBriefUserDTOEquals(expected.user, actual.user)
+    }
+
+    private static void assertBriefUserDTOEquals(BriefUserDTO expected, BriefUserDTO actual) {
+        assertEquals(expected.id, actual.id)
+        assertEquals(expected.name, actual.name)
+        assertEquals(expected.postCount, actual.postCount)
+        assertEquals(expected.commentCount, actual.commentCount)
     }
 
     private User makeUser(String name) {
-        User user = new User();
-        user.name = name;
-        user = userRepository.save(user);
-        return user;
+        def user = new User()
+        user.name = name
+        user = userRepository.save(user)
+        return user
     }
 
     private Post makePost(User user, String content) {
-        Post post = new Post();
-        post.user = user;
-        post.content = content;
-        post = postRepository.save(post);
-        return post;
+        def post = new Post()
+        post.user = user
+        post.content = content
+        post = postRepository.save(post)
+        return post
     }
 
     private Comment makeComment(User user, Post post, String content) {
-        Comment comment = new Comment();
-        comment.user = user;
-        comment.post = post;
-        comment.content = content;
-        comment = commentRepository.save(comment);
-        return comment;
+        def comment = new Comment()
+        comment.user = user
+        comment.post = post
+        comment.content = content
+        comment = commentRepository.save(comment)
+        return comment
     }
 
     private void assertValid(Object obj) {
-        Set<ConstraintViolation<Object>> violations = validator.validate(obj);
+        def violations = validator.validate(obj);
         if(violations.isEmpty()) {
-            return;
+            return
         }
 
-        StringBuilder sb = new StringBuilder();
-        for(ConstraintViolation<Object> violation : violations) {
+        def sb = new StringBuilder();
+        for(def violation : violations) {
             sb.append(String.format("\n%s[%s]::%s: %s (was %s)",
                     violation.getRootBeanClass().getSimpleName(),
                     violation.getLeafBean().getClass().getSimpleName(),
                     violation.getPropertyPath(),
                     violation.getMessage(),
-                    violation.getInvalidValue()));
+                    violation.getInvalidValue()))
         }
 
-        fail(sb.toString());
+        fail(sb.toString())
     }
 }
