@@ -13,10 +13,9 @@ import me.loki2302.dto.PostDTO
 import me.loki2302.dto.UserDTO
 import me.loki2302.dto.mappers.PostMapper
 import me.loki2302.dto.mappers.UserMapper
-import me.loki2302.entities.Comment
-import me.loki2302.entities.Post
-import me.loki2302.entities.User
+import me.loki2302.entities.*
 import me.loki2302.repositories.CommentRepository
+import me.loki2302.repositories.EventRepository
 import me.loki2302.repositories.PostRepository
 import me.loki2302.repositories.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
@@ -34,6 +33,9 @@ class Facade {
     private CommentRepository commentRepository
 
     @Autowired
+    private EventRepository eventRepository
+
+    @Autowired
     private UserDAO userDAO
 
     @Autowired
@@ -49,16 +51,25 @@ class Facade {
     private UserMapper userMapper
 
     public User makeUser(String name) {
-        def user = new User()
-        user.name = name
-        userRepository.save(user)
+        def user = new User(name: name)
+        user = userRepository.save(user)
+
+        def userCreatedEvent = new UserCreatedEvent(user: user)
+        eventRepository.save(userCreatedEvent)
+
+        user
     }
 
     public Post makePost(User user, String content) {
         def post = new Post()
         post.user = user
         post.content = content
-        postRepository.save(post)
+        post = postRepository.save(post)
+
+        def postCreatedEvent = new PostCreatedEvent(user: user, post: post)
+        eventRepository.save(postCreatedEvent)
+
+        post
     }
 
     public Comment makeComment(User user, Post post, String content) {
@@ -66,7 +77,16 @@ class Facade {
         comment.user = user
         comment.post = post
         comment.content = content
-        commentRepository.save(comment)
+        comment = commentRepository.save(comment)
+
+        def commentCreatedEvent = new CommentCreatedEvent(user: user, comment: comment)
+        eventRepository.save(commentCreatedEvent)
+
+        comment
+    }
+
+    List<Event> findEvents() {
+        eventRepository.findAll()
     }
 
     List<BriefPostDTO> findAllPosts() {

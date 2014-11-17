@@ -1,8 +1,11 @@
 package me.loki2302
 import me.loki2302.dto.*
 import me.loki2302.entities.Comment
+import me.loki2302.entities.CommentCreatedEvent
 import me.loki2302.entities.Post
+import me.loki2302.entities.PostCreatedEvent
 import me.loki2302.entities.User
+import me.loki2302.entities.UserCreatedEvent
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -15,6 +18,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
 import javax.validation.Validator
 
 import static org.junit.Assert.assertEquals
+import static org.junit.Assert.assertTrue
 import static org.junit.Assert.fail
 
 @IntegrationTest
@@ -45,16 +49,32 @@ public class DummyTest {
     void populate() {
         loki2302 = facade.makeUser("loki2302")
         loki2302Post1 = facade.makePost(loki2302, "loki2302-post1")
-        loki2302Post2 = facade.makePost(loki2302, "loki2302-post2")
-        loki2302Post3 = facade.makePost(loki2302, "loki2302-post3")
         loki2302Post1Comment1 = facade.makeComment(loki2302, loki2302Post1, "loki2302-post1-comment1")
         loki2302Post1Comment2 = facade.makeComment(loki2302, loki2302Post1, "loki2302-post1-comment2")
+        loki2302Post2 = facade.makePost(loki2302, "loki2302-post2")
         loki2302Post1Comment3 = facade.makeComment(loki2302, loki2302Post1, "loki2302-post1-comment3")
+        loki2302Post3 = facade.makePost(loki2302, "loki2302-post3")
         loki2302Post1Comment4 = facade.makeComment(loki2302, loki2302Post1, "loki2302-post1-comment4")
         loki2302Post1Comment5 = facade.makeComment(loki2302, loki2302Post1, "loki2302-post1-comment5")
 
         andrey = facade.makeUser("andrey")
         andreyPost1 = facade.makePost(andrey, "andrey-post1")
+    }
+
+    @Test
+    void eventsAreOk() {
+        def events = facade.findEvents()
+        assertTrue(events[0] instanceof UserCreatedEvent)
+        assertTrue(events[1] instanceof PostCreatedEvent)
+        assertTrue(events[2] instanceof CommentCreatedEvent)
+        assertTrue(events[3] instanceof CommentCreatedEvent)
+        assertTrue(events[4] instanceof PostCreatedEvent)
+        assertTrue(events[5] instanceof CommentCreatedEvent)
+        assertTrue(events[6] instanceof PostCreatedEvent)
+        assertTrue(events[7] instanceof CommentCreatedEvent)
+        assertTrue(events[8] instanceof CommentCreatedEvent)
+        assertTrue(events[9] instanceof UserCreatedEvent)
+        assertTrue(events[10] instanceof PostCreatedEvent)
     }
 
     @Test
