@@ -57,8 +57,6 @@ public class DummyTest {
         loki2302Post3 = facade.makePost(loki2302, "loki2302-post3")
         loki2302Post1Comment4 = facade.makeComment(loki2302, loki2302Post1, "loki2302-post1-comment4")
         loki2302Post1Comment5 = facade.makeComment(loki2302, loki2302Post1, "loki2302-post1-comment5")
-
-
         andreyPost1 = facade.makePost(andrey, "andrey-post1")
     }
 
