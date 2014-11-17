@@ -337,16 +337,14 @@ public class DummyTest {
     private User makeUser(String name) {
         def user = new User()
         user.name = name
-        user = userRepository.save(user)
-        return user
+        userRepository.save(user)
     }
 
     private Post makePost(User user, String content) {
         def post = new Post()
         post.user = user
         post.content = content
-        post = postRepository.save(post)
-        return post
+        postRepository.save(post)
     }
 
     private Comment makeComment(User user, Post post, String content) {
@@ -354,8 +352,7 @@ public class DummyTest {
         comment.user = user
         comment.post = post
         comment.content = content
-        comment = commentRepository.save(comment)
-        return comment
+        commentRepository.save(comment)
     }
 
     private void assertValid(Object obj) {

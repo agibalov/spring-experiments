@@ -16,8 +16,8 @@ class UserDTO {
     long commentCount
 
     @NotNull
-    List<BriefPostDTO> recentPosts;
+    List<BriefPostDTO> recentPosts
 
     @NotNull
-    List<BriefCommentDTO> recentComments;
+    List<BriefCommentDTO> recentComments
 }
