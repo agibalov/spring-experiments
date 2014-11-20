@@ -1,12 +1,7 @@
 package me.loki2302
 
 import me.loki2302.dto.*
-import me.loki2302.entities.Comment
-import me.loki2302.entities.CommentCreatedEvent
-import me.loki2302.entities.Post
-import me.loki2302.entities.PostCreatedEvent
-import me.loki2302.entities.User
-import me.loki2302.entities.UserCreatedEvent
+import me.loki2302.entities.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -18,9 +13,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
 
 import javax.validation.Validator
 
-import static org.junit.Assert.assertEquals
-import static org.junit.Assert.assertTrue
-import static org.junit.Assert.fail
+import static org.junit.Assert.*
 
 @IntegrationTest
 @SpringApplicationConfiguration(classes = Config.class)
@@ -64,32 +57,32 @@ public class DummyTest {
     @Test
     void eventsAreOk() {
         def allEvents = facade.findEvents()
-        assertTrue(allEvents[0] instanceof UserCreatedEvent)
-        assertTrue(allEvents[1] instanceof PostCreatedEvent)
-        assertTrue(allEvents[2] instanceof CommentCreatedEvent)
-        assertTrue(allEvents[3] instanceof CommentCreatedEvent)
-        assertTrue(allEvents[4] instanceof PostCreatedEvent)
-        assertTrue(allEvents[5] instanceof CommentCreatedEvent)
-        assertTrue(allEvents[6] instanceof UserCreatedEvent)
-        assertTrue(allEvents[7] instanceof PostCreatedEvent)
-        assertTrue(allEvents[8] instanceof CommentCreatedEvent)
-        assertTrue(allEvents[9] instanceof CommentCreatedEvent)
-        assertTrue(allEvents[10] instanceof PostCreatedEvent)
+        assertUserCreatedEvent(loki2302.id, allEvents[0])
+        assertPostCreatedEvent(loki2302.id, loki2302Post1.id, allEvents[1])
+        assertCommentCreatedEvent(loki2302.id, loki2302Post1Comment1.id, allEvents[2])
+        assertCommentCreatedEvent(loki2302.id, loki2302Post1Comment2.id, allEvents[3])
+        assertPostCreatedEvent(loki2302.id, loki2302Post2.id, allEvents[4])
+        assertCommentCreatedEvent(loki2302.id, loki2302Post1Comment3.id, allEvents[5])
+        assertUserCreatedEvent(andrey.id, allEvents[6])
+        assertPostCreatedEvent(loki2302.id, loki2302Post3.id, allEvents[7])
+        assertCommentCreatedEvent(loki2302.id, loki2302Post1Comment4.id, allEvents[8])
+        assertCommentCreatedEvent(loki2302.id, loki2302Post1Comment5.id, allEvents[9])
+        assertPostCreatedEvent(andrey.id, andreyPost1.id, allEvents[10])
 
         def loki2302Events = facade.findEventsByUser(loki2302)
-        assertTrue(loki2302Events[0] instanceof UserCreatedEvent)
-        assertTrue(loki2302Events[1] instanceof PostCreatedEvent)
-        assertTrue(loki2302Events[2] instanceof CommentCreatedEvent)
-        assertTrue(loki2302Events[3] instanceof CommentCreatedEvent)
-        assertTrue(loki2302Events[4] instanceof PostCreatedEvent)
-        assertTrue(loki2302Events[5] instanceof CommentCreatedEvent)
-        assertTrue(loki2302Events[6] instanceof PostCreatedEvent)
-        assertTrue(loki2302Events[7] instanceof CommentCreatedEvent)
-        assertTrue(loki2302Events[8] instanceof CommentCreatedEvent)
+        assertUserCreatedEvent(loki2302.id, loki2302Events[0])
+        assertPostCreatedEvent(loki2302.id, loki2302Post1.id, loki2302Events[1])
+        assertCommentCreatedEvent(loki2302.id, loki2302Post1Comment1.id, loki2302Events[2])
+        assertCommentCreatedEvent(loki2302.id, loki2302Post1Comment2.id, loki2302Events[3])
+        assertPostCreatedEvent(loki2302.id, loki2302Post2.id, loki2302Events[4])
+        assertCommentCreatedEvent(loki2302.id, loki2302Post1Comment3.id, loki2302Events[5])
+        assertPostCreatedEvent(loki2302.id, loki2302Post3.id, loki2302Events[6])
+        assertCommentCreatedEvent(loki2302.id, loki2302Post1Comment4.id, loki2302Events[7])
+        assertCommentCreatedEvent(loki2302.id, loki2302Post1Comment5.id, loki2302Events[8])
 
         def andreyEvents = facade.findEventsByUser(andrey)
-        assertTrue(andreyEvents[0] instanceof UserCreatedEvent)
-        assertTrue(andreyEvents[1] instanceof PostCreatedEvent)
+        assertUserCreatedEvent(andrey.id, andreyEvents[0])
+        assertPostCreatedEvent(andrey.id, andreyPost1.id, andreyEvents[1])
     }
 
     @Test
@@ -354,6 +347,26 @@ public class DummyTest {
         assertEquals(expected.name, actual.name)
         assertEquals(expected.postCount, actual.postCount)
         assertEquals(expected.commentCount, actual.commentCount)
+    }
+
+    private static void assertUserCreatedEvent(long userId, Event event) {
+        assertTrue(event instanceof UserCreatedEvent)
+        def userCreatedEvent = (UserCreatedEvent)event
+        assertEquals(userId, userCreatedEvent.user.id)
+    }
+
+    private static void assertPostCreatedEvent(long userId, long postId, Event event) {
+        assertTrue(event instanceof PostCreatedEvent)
+        def postCreatedEvent = (PostCreatedEvent)event
+        assertEquals(userId, postCreatedEvent.user.id)
+        assertEquals(postId, postCreatedEvent.post.id)
+    }
+
+    private static void assertCommentCreatedEvent(long userId, long commentId, Event event) {
+        assertTrue(event instanceof CommentCreatedEvent)
+        def commentCreatedEvent = (CommentCreatedEvent)event
+        assertEquals(userId, commentCreatedEvent.user.id)
+        assertEquals(commentId, commentCreatedEvent.comment.id)
     }
 
     private void assertValid(Object obj) {
