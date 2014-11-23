@@ -1,6 +1,4 @@
-package me.loki2302.transactions;
-
-import org.springframework.data.jpa.repository.JpaRepository;
+package me.loki2302.decltransactions;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
