@@ -10,11 +10,13 @@ public class PersonService {
     private PersonRepository personRepository;
 
     @Transactional
-    public void createPersonAndThenThrow() {
+    public void createPerson(boolean throwEventually) {
         Person person = new Person();
         person.name = "loki2302";
         personRepository.save(person);
 
-        throw new OopsException();
+        if(throwEventually) {
+            throw new OopsException();
+        }
     }
 }
