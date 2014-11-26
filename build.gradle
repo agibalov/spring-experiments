@@ -9,8 +9,9 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
-    testCompile "org.springframework.boot:spring-boot-starter-test:1.1.6.RELEASE"
-    compile "org.springframework.boot:spring-boot-starter-data-jpa:1.1.6.RELEASE"
+    testCompile 'org.springframework.boot:spring-boot-starter-test:1.1.6.RELEASE'
+    testCompile 'joda-time:joda-time:2.5'
+    compile 'org.springframework.boot:spring-boot-starter-data-jpa:1.1.6.RELEASE'
     compile 'com.h2database:h2:1.4.181'
 }
 
