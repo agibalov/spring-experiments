@@ -1,4 +1,4 @@
-package me.loki2302.entitylistener;
+package me.loki2302.lifecyclecallbacks;
 
 import javax.persistence.*;
 
@@ -42,7 +42,7 @@ public class NoteEntityListener {
         appendLog("onPostLoad,");
     }
 
-    public static void reset() {
+    public static void resetLog() {
         log = "";
     }
 

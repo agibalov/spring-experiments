@@ -1,4 +1,4 @@
-package me.loki2302.entitylistener;
+package me.loki2302.lifecyclecallbacks;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
