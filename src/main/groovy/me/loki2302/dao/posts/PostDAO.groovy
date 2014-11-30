@@ -61,7 +61,7 @@ class PostDAO {
 
     private List<PostRow> findRecentByUserAsRows(long userId, int topPostCount) {
         sql.rows("""
-            select top $topPostCount
+            select
                 P.id as id,
                 P.content as content,
                 (select count(C.id) from Comments as C where C.postId = P.id) as commentCount,
@@ -69,6 +69,7 @@ class PostDAO {
             from Posts as P
             where userId = $userId
             order by P.id desc
+            limit $topPostCount
         """).collect {
             new PostRow(
                 id: it.id,
@@ -76,5 +77,10 @@ class PostDAO {
                 commentCount: it.commentCount,
                 userId: it.userId)
         }
+    }
+
+    Long getRandomPostId() {
+        def row = sql.firstRow('select id from Posts order by random() limit 1')
+        row?.id
     }
 }

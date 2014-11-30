@@ -148,4 +148,14 @@ class Facade {
                 recentCommentsForUsersRecentPosts.groupByPostId(),
                 usersRecentComments.rows)
     }
+
+    User findRandomUser() {
+        def randomUserId = userDAO.randomUserId
+        randomUserId ? userRepository.findOne(randomUserId) : null
+    }
+
+    Post findRandomPost() {
+        def randomPostId = postDAO.randomPostId
+        randomPostId ? postRepository.findOne(randomPostId) : null
+    }
 }

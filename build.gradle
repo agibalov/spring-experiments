@@ -1,11 +1,17 @@
 apply plugin: 'java'
 apply plugin: 'groovy'
+apply plugin: 'application'
+
+mainClassName = 'me.loki2302.App'
 
 sourceCompatibility = 1.5
 version = '1.0'
 
 repositories {
     mavenCentral()
+    maven {
+        url 'https://raw.github.com/loki2302/charlatan/mvn-repo/'
+    }
 }
 
 dependencies {
@@ -16,6 +22,7 @@ dependencies {
     compile 'org.hsqldb:hsqldb:2.3.2'
     compile 'org.hibernate:hibernate-validator:4.3.0.Final'
     compile 'org.postgresql:postgresql:9.3-1102-jdbc41'
+    compile 'me.loki2302:charlatan:0.0.1-SNAPSHOT'
 }
 
 test {

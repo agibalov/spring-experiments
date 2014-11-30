@@ -24,6 +24,10 @@ class UserDAO {
     }
 
     private List<UserRow> findUsersAsRows(Set<Long> ids) {
+        if(ids.empty) {
+            return []
+        }
+
         // the join() thing is https://jira.codehaus.org/browse/GROOVY-5436
         sql.rows("""
             select
@@ -39,5 +43,10 @@ class UserDAO {
                     postCount: it.postCount,
                     commentCount: it.commentCount)
         }
+    }
+
+    Long getRandomUserId() {
+        def row = sql.firstRow('select id from Users order by random() limit 1')
+        row?.id
     }
 }

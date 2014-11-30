@@ -6,7 +6,7 @@ import javax.persistence.*;
 @Table(name = "Comments")
 public class Comment {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     public Long id;
 

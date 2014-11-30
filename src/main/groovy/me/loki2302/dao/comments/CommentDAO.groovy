@@ -33,8 +33,7 @@ class CommentDAO {
                 C.userId,
                 C.postId
             from Comments as C
-            where
-                C.postId = $postId
+            where C.postId = $postId
             order by C.id asc
         """).collect {
             new CommentRow(
@@ -46,6 +45,10 @@ class CommentDAO {
     }
 
     private List<CommentRow> findRecentCommentsForPostsAsRows(Set<Long> postIds, int topCommentCount) {
+        if(postIds.empty) {
+            return []
+        }
+
         sql.rows("""
             select
                 C.id,
@@ -56,10 +59,11 @@ class CommentDAO {
             where
                 C.postId in (""" + postIds.join(',') + """) and
                 C.id in (
-                    select top $topCommentCount id
+                    select id
                     from Comments
                     where postId = C.postId
-                    order by id desc)
+                    order by id desc
+                    limit $topCommentCount)
             order by C.postId asc, C.id desc
         """).collect {
             new CommentRow(
@@ -72,7 +76,7 @@ class CommentDAO {
 
     private List<PostRow> findRecentCommentsByUserAsRows(long userId, int topCommentCount) {
         sql.rows("""
-            select top $topCommentCount
+            select
                 id,
                 content,
                 userId,
@@ -80,6 +84,7 @@ class CommentDAO {
             from Comments
             where userId = $userId
             order by id desc
+            limit $topCommentCount
         """).collect {
             new CommentRow(
                     id: it.id,

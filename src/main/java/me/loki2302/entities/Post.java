@@ -7,7 +7,7 @@ import java.util.List;
 @Table(name = "Posts")
 public class Post {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     public Long id;
 
