@@ -23,6 +23,8 @@ dependencies {
     compile 'org.hibernate:hibernate-validator:4.3.0.Final'
     compile 'org.postgresql:postgresql:9.3-1102-jdbc41'
     compile 'me.loki2302:charlatan:0.0.1-SNAPSHOT'
+    compile 'com.codahale.metrics:metrics-core:3.0.2'
+    compile 'com.zaxxer:HikariCP-java6:2.2.5'
 }
 
 test {

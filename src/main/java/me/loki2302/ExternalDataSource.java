@@ -1,10 +1,10 @@
 package me.loki2302;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.jdbc.datasource.SimpleDriverDataSource;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 
 import javax.sql.DataSource;
 
@@ -13,10 +13,15 @@ import javax.sql.DataSource;
 public class ExternalDataSource {
     @Bean
     DataSource dataSource() {
-        return new SimpleDriverDataSource(
-                new org.postgresql.Driver(),
-                "jdbc:postgresql://localhost/testdb",
-                "postgres",
-                "qwerty");
+        HikariConfig config = new HikariConfig();
+        config.setDataSourceClassName("org.postgresql.ds.PGSimpleDataSource");
+        config.setJdbcUrl("jdbc:postgresql://localhost/testdb");
+        config.setUsername("postgres");
+        config.setPassword("qwerty");
+        config.setMaximumPoolSize(100);
+
+        HikariDataSource hikariDataSource = new HikariDataSource(config);
+
+        return hikariDataSource;
     }
 }

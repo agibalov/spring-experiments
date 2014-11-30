@@ -1,9 +1,10 @@
 package me.loki2302
 
-import com.google.common.base.Stopwatch
+import com.codahale.metrics.ConsoleReporter
+import com.codahale.metrics.MetricRegistry
+import groovy.sql.Sql
 import me.loki2302.charlatan.RandomEventGeneratorBuilder
 import org.springframework.boot.SpringApplication
-
 import java.util.concurrent.TimeUnit
 
 class App {
@@ -15,18 +16,19 @@ class App {
             def facade = context.getBean(Facade)
             generateFakeData(facade)
 
-            def stopwatch = Stopwatch.createUnstarted()
-            final repetitions = 10000
-            repetitions.times {
+            def metrics = new MetricRegistry()
+            def reporter = ConsoleReporter.forRegistry(metrics).build()
+            reporter.start(1, TimeUnit.SECONDS)
+
+            def findRandomUserTime = metrics.timer("find random user")
+
+            1000.times {
                 def randomUserId = facade.findRandomUser().id
 
-                stopwatch.start()
+                def t = findRandomUserTime.time()
                 facade.findUser(randomUserId)
-                stopwatch.stop()
+                t.stop()
             }
-
-            def elapsed = stopwatch.elapsed(TimeUnit.SECONDS) / repetitions
-            println "$elapsed per request ($repetitions requests)"
         } finally {
             context.close()
         }
@@ -42,6 +44,10 @@ class App {
         for(int i = 0; i < 1000; ++i) {
             def event = reg.makeEvent()
             event.execute(facade)
+
+            if((i + 1) % 100 == 0) {
+                println "${i + 1}..."
+            }
         }
     }
 
