@@ -3,19 +3,19 @@ package me.loki2302.dao.posts
 class PostResultSet {
     private final List<PostRow> postRows
 
-    public PostResultSet(List<PostRow> postRows) {
+    PostResultSet(List<PostRow> postRows) {
         this.postRows = postRows
     }
 
-    public Set<Long> getPostIds() {
+    Set<Long> getPostIds() {
         (postRows*.id).toSet()
     }
 
-    public Set<Long> getUserIds() {
+    Set<Long> getUserIds() {
         (postRows*.userId).toSet()
     }
 
-    public List<PostRow> getRows() {
+    List<PostRow> getRows() {
         postRows
     }
 }

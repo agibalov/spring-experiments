@@ -18,7 +18,7 @@ class PostMapper {
     @Autowired
     private CommentMapper commentMapper
 
-    public BriefPostDTO makeBriefPostDTO(
+    BriefPostDTO makeBriefPostDTO(
             PostRow postRow,
             Map<Long, UserRow> userMap,
             Map<Long, List<CommentRow>> recentCommentsMap) {
@@ -37,7 +37,7 @@ class PostMapper {
                 recentComments: recentCommentDTOs)
     }
 
-    public List<BriefPostDTO> makeBriefPostDTOs(
+    List<BriefPostDTO> makeBriefPostDTOs(
             List<PostRow> postRows,
             Map<Long, UserRow> userMap,
             Map<Long, List<CommentRow>> recentCommentsMap) {
@@ -47,7 +47,7 @@ class PostMapper {
         }
     }
 
-    public PostDTO makePostDTO(
+    PostDTO makePostDTO(
             PostRow postRow,
             Map<Long, UserRow> userMap,
             List<CommentRow> commentRows) {

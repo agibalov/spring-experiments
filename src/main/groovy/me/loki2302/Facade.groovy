@@ -50,7 +50,7 @@ class Facade {
     @Autowired
     private UserMapper userMapper
 
-    public User makeUser(String name) {
+    User makeUser(String name) {
         def user = new User(name: name)
         user = userRepository.save(user)
 
@@ -60,7 +60,7 @@ class Facade {
         user
     }
 
-    public Post makePost(User user, String content) {
+    Post makePost(User user, String content) {
         def post = new Post()
         post.user = user
         post.content = content
@@ -72,7 +72,7 @@ class Facade {
         post
     }
 
-    public Comment makeComment(User user, Post post, String content) {
+    Comment makeComment(User user, Post post, String content) {
         def comment = new Comment()
         comment.user = user
         comment.post = post

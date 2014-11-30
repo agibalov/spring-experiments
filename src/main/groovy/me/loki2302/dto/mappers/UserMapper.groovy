@@ -18,7 +18,7 @@ class UserMapper {
     @Autowired
     private CommentMapper commentMapper
 
-    public BriefUserDTO makeBriefUserDTO(UserRow userRow) {
+    BriefUserDTO makeBriefUserDTO(UserRow userRow) {
         new BriefUserDTO(
                 id: userRow.id,
                 name: userRow.name,
@@ -26,7 +26,7 @@ class UserMapper {
                 commentCount: userRow.commentCount)
     }
 
-    public UserDTO makeUserDTO(
+    UserDTO makeUserDTO(
             UserRow userRow,
             Map<Long, UserRow> userMap,
             List<PostRow> recentPostRows,

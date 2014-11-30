@@ -12,7 +12,7 @@ class CommentMapper {
     @Autowired
     private UserMapper userMapper
 
-    public BriefCommentDTO makeBriefCommentDTO(
+    BriefCommentDTO makeBriefCommentDTO(
             CommentRow commentRow,
             Map<Long, UserRow> userMap) {
 
@@ -25,7 +25,7 @@ class CommentMapper {
                 user: commentUser)
     }
 
-    public List<BriefCommentDTO> makeBriefCommentDTOs(
+    List<BriefCommentDTO> makeBriefCommentDTOs(
             List<CommentRow> commentRows,
             Map<Long, UserRow> userMap) {
 
