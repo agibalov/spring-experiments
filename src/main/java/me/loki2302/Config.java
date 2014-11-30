@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 import javax.sql.DataSource;
@@ -21,13 +20,8 @@ import javax.sql.DataSource;
 @EntityScan(basePackageClasses = User.class)
 public class Config {
     @Bean
-    DataSource dataSource() {
-        return new EmbeddedDatabaseBuilder().build();
-    }
-
-    @Bean
-    Sql sql() {
-        return new Sql(dataSource());
+    Sql sql(DataSource dataSource) {
+        return new Sql(dataSource);
     }
 
     @Bean
