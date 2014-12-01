@@ -2,7 +2,6 @@ package me.loki2302
 
 import com.codahale.metrics.ConsoleReporter
 import com.codahale.metrics.MetricRegistry
-import groovy.sql.Sql
 import me.loki2302.charlatan.RandomEventGeneratorBuilder
 import org.springframework.boot.SpringApplication
 import java.util.concurrent.TimeUnit
@@ -20,13 +19,21 @@ class App {
             def reporter = ConsoleReporter.forRegistry(metrics).build()
             reporter.start(1, TimeUnit.SECONDS)
 
-            def findRandomUserTime = metrics.timer("find random user")
-
-            1000.times {
+            def findRandomUserTime = metrics.timer('find random user')
+            10000.times {
                 def randomUserId = facade.findRandomUser().id
 
                 def t = findRandomUserTime.time()
                 facade.findUser(randomUserId)
+                t.stop()
+            }
+
+            def findRandomPostTime = metrics.timer('find random post')
+            10000.times {
+                def randomPostId = facade.findRandomPost().id
+
+                def t = findRandomPostTime.time()
+                facade.findPost(randomPostId)
                 t.stop()
             }
         } finally {
