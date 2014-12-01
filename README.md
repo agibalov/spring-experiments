@@ -86,6 +86,38 @@ find random user
             99.9% <= 81.57 milliseconds
 ```
 
-#### DigitalOcean
-
-TODO
+#### DigitalOcean - Ubuntu Server 14.10 x64, 1GB RAM, 1 CPU core
+```
+find random post
+             count = 9777
+         mean rate = 184.54 calls/second
+     1-minute rate = 169.70 calls/second
+     5-minute rate = 149.99 calls/second
+    15-minute rate = 146.17 calls/second
+               min = 1.44 milliseconds
+               max = 16.62 milliseconds
+              mean = 3.38 milliseconds
+            stddev = 2.00 milliseconds
+            median = 2.72 milliseconds
+              75% <= 4.04 milliseconds
+              95% <= 7.45 milliseconds
+              98% <= 9.35 milliseconds
+              99% <= 10.97 milliseconds
+            99.9% <= 16.52 milliseconds
+find random user
+             count = 10000
+         mean rate = 91.76 calls/second
+     1-minute rate = 72.21 calls/second
+     5-minute rate = 119.97 calls/second
+    15-minute rate = 128.93 calls/second
+               min = 2.01 milliseconds
+               max = 20.76 milliseconds
+              mean = 4.30 milliseconds
+            stddev = 2.14 milliseconds
+            median = 3.47 milliseconds
+              75% <= 4.22 milliseconds
+              95% <= 8.46 milliseconds
+              98% <= 9.90 milliseconds
+              99% <= 11.06 milliseconds
+            99.9% <= 20.73 milliseconds
+```
