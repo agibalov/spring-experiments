@@ -20,58 +20,65 @@ import org.springframework.web.socket.sockjs.client.RestTemplateXhrTransport;
 import org.springframework.web.socket.sockjs.client.SockJsClient;
 import org.springframework.web.socket.sockjs.client.Transport;
 
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Exchanger;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 
-// This test passes, but when it comes to shutdown, Spring says:
-// Transport error in XhrClientSockJsSession[id='e79e603642fd3f5911e6e425a15ba2f8,
-// url=ws://localhost:8080/sockjs]
-// org.springframework.web.client.ResourceAccessException: I/O error on POST request for
-// "http://localhost:8080/sockjs/191/e79e603642fd3f5911e6e425a15ba2f8/xhr_streaming":
-// Connection reset; nested exception is java.net.SocketException: Connection reset
-// at org.springframework.web.client.RestTemplate.doExecute(RestTemplate.java:584)
-//        at org.springframework.web.client.RestTemplate.execute(RestTemplate.java:544)
-//        at org.springframework.web.socket.sockjs.client.RestTemplateXhrTransport$1.run(RestTemplateXhrTransport.java:128)
-//        at java.lang.Thread.run(Thread.java:745)
-//        Caused by: java.net.SocketException: Connection reset
-//        at java.net.SocketInputStream.read(SocketInputStream.java:209)
-//        at java.net.SocketInputStream.read(SocketInputStream.java:141)
-//        at org.apache.http.impl.io.SessionInputBufferImpl.streamRead(SessionInputBufferImpl.java:136)
-//        at org.apache.http.impl.io.SessionInputBufferImpl.fillBuffer(SessionInputBufferImpl.java:152)
-//        at org.apache.http.impl.io.SessionInputBufferImpl.readLine(SessionInputBufferImpl.java:270)
-// TODO: fix it
+// TODO: it looks like when using RestTemplateXhrTransport, session.close() doesn't work, try to fix
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @IntegrationTest
 @WebAppConfiguration
 @SpringApplicationConfiguration(classes = SockJsConfig.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 public class SockJsTests {
+    private final static Logger logger = LoggerFactory.getLogger(SockJsTests.class);
+
     @Test
     public void canUseSockJs() throws InterruptedException {
         Exchanger<String> messageExchanger = new Exchanger<String>();
+        CountDownLatch disconnectCountDownLatch = new CountDownLatch(1);
 
-        SockJsClient sockJsClient = new SockJsClient(Arrays.<Transport>asList(
-                new RestTemplateXhrTransport(
-                        new RestTemplate(new HttpComponentsClientHttpRequestFactory()))));
+        HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
+        RestTemplate restTemplate = new RestTemplate(requestFactory);
+        Transport restTemplateXhrTransport = new RestTemplateXhrTransport(restTemplate);
+        SockJsClient sockJsClient = new SockJsClient(Collections.singletonList(restTemplateXhrTransport));
+        DummyClientWebSocketHandler webSocketHandler = new DummyClientWebSocketHandler(
+                messageExchanger,
+                disconnectCountDownLatch);
         WebSocketConnectionManager webSocketConnectionManager = new WebSocketConnectionManager(
                 sockJsClient,
-                new DummyClientWebSocketHandler(messageExchanger),
+                webSocketHandler,
                 "ws://localhost:8080/sockjs");
         webSocketConnectionManager.start();
 
+        logger.info("receiving message");
         String message = messageExchanger.exchange(null);
         assertEquals("hello loki2302!", message);
+        logger.info("received message");
+
+        logger.info("awaiting disconnection");
+        if(disconnectCountDownLatch.await(3, TimeUnit.SECONDS)) {
+            logger.info("disconnected");
+        } else {
+            logger.warn("failed to disconnect gracefully");
+        }
     }
 
     public static class DummyClientWebSocketHandler extends TextWebSocketHandler {
         private final static Logger logger = LoggerFactory.getLogger(DummyClientWebSocketHandler.class);
 
         private final Exchanger<String> messageExchanger;
+        private final CountDownLatch disconnectCountDownLatch;
 
-        public DummyClientWebSocketHandler(Exchanger<String> messageExchanger) {
+        public DummyClientWebSocketHandler(
+                Exchanger<String> messageExchanger,
+                CountDownLatch disconnectCountDownLatch) {
+
             this.messageExchanger = messageExchanger;
+            this.disconnectCountDownLatch = disconnectCountDownLatch;
         }
 
         @Override
@@ -81,14 +88,21 @@ public class SockJsTests {
         }
 
         @Override
-        protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-            logger.info("{} says: {}", session.getRemoteAddress(), message.getPayload());
-            messageExchanger.exchange(message.getPayload());
+        public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+            logger.info("{} disconnected", session.getRemoteAddress());
+            logger.info("updating countdownlatch");
+            disconnectCountDownLatch.countDown();
+            logger.info("updated countdownlatch");
         }
 
         @Override
-        public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-            logger.info("{} disconnected", session.getRemoteAddress());
+        protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+            logger.info("{} says: {}", session.getRemoteAddress(), message.getPayload());
+            logger.info("exchanging message");
+            messageExchanger.exchange(message.getPayload());
+            logger.info("exchanged message");
+            logger.info("closing session");
+            session.close();
         }
 
         @Override
