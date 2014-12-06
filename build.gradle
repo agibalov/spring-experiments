@@ -1,7 +1,7 @@
 apply plugin: 'java'
 apply plugin: 'application'
 
-mainClassName = 'me.loki2302.App'
+mainClassName = 'me.loki2302.time.App'
 
 sourceCompatibility = 1.5
 version = '1.0'

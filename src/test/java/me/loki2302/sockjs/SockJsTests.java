@@ -1,0 +1,99 @@
+package me.loki2302.sockjs;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.test.IntegrationTest;
+import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.socket.CloseStatus;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketSession;
+import org.springframework.web.socket.client.WebSocketConnectionManager;
+import org.springframework.web.socket.handler.TextWebSocketHandler;
+import org.springframework.web.socket.sockjs.client.RestTemplateXhrTransport;
+import org.springframework.web.socket.sockjs.client.SockJsClient;
+import org.springframework.web.socket.sockjs.client.Transport;
+
+import java.util.Arrays;
+import java.util.concurrent.Exchanger;
+
+import static org.junit.Assert.assertEquals;
+
+// This test passes, but when it comes to shutdown, Spring says:
+// Transport error in XhrClientSockJsSession[id='e79e603642fd3f5911e6e425a15ba2f8,
+// url=ws://localhost:8080/sockjs]
+// org.springframework.web.client.ResourceAccessException: I/O error on POST request for
+// "http://localhost:8080/sockjs/191/e79e603642fd3f5911e6e425a15ba2f8/xhr_streaming":
+// Connection reset; nested exception is java.net.SocketException: Connection reset
+// at org.springframework.web.client.RestTemplate.doExecute(RestTemplate.java:584)
+//        at org.springframework.web.client.RestTemplate.execute(RestTemplate.java:544)
+//        at org.springframework.web.socket.sockjs.client.RestTemplateXhrTransport$1.run(RestTemplateXhrTransport.java:128)
+//        at java.lang.Thread.run(Thread.java:745)
+//        Caused by: java.net.SocketException: Connection reset
+//        at java.net.SocketInputStream.read(SocketInputStream.java:209)
+//        at java.net.SocketInputStream.read(SocketInputStream.java:141)
+//        at org.apache.http.impl.io.SessionInputBufferImpl.streamRead(SessionInputBufferImpl.java:136)
+//        at org.apache.http.impl.io.SessionInputBufferImpl.fillBuffer(SessionInputBufferImpl.java:152)
+//        at org.apache.http.impl.io.SessionInputBufferImpl.readLine(SessionInputBufferImpl.java:270)
+// TODO: fix it
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@IntegrationTest
+@WebAppConfiguration
+@SpringApplicationConfiguration(classes = SockJsConfig.class)
+@RunWith(SpringJUnit4ClassRunner.class)
+public class SockJsTests {
+    @Test
+    public void canUseSockJs() throws InterruptedException {
+        Exchanger<String> messageExchanger = new Exchanger<String>();
+
+        SockJsClient sockJsClient = new SockJsClient(Arrays.<Transport>asList(
+                new RestTemplateXhrTransport(
+                        new RestTemplate(new HttpComponentsClientHttpRequestFactory()))));
+        WebSocketConnectionManager webSocketConnectionManager = new WebSocketConnectionManager(
+                sockJsClient,
+                new DummyClientWebSocketHandler(messageExchanger),
+                "ws://localhost:8080/sockjs");
+        webSocketConnectionManager.start();
+
+        String message = messageExchanger.exchange(null);
+        assertEquals("hello loki2302!", message);
+    }
+
+    public static class DummyClientWebSocketHandler extends TextWebSocketHandler {
+        private final static Logger logger = LoggerFactory.getLogger(DummyClientWebSocketHandler.class);
+
+        private final Exchanger<String> messageExchanger;
+
+        public DummyClientWebSocketHandler(Exchanger<String> messageExchanger) {
+            this.messageExchanger = messageExchanger;
+        }
+
+        @Override
+        public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+            logger.info("connected to {}", session.getRemoteAddress());
+            session.sendMessage(new TextMessage("loki2302"));
+        }
+
+        @Override
+        protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+            logger.info("{} says: {}", session.getRemoteAddress(), message.getPayload());
+            messageExchanger.exchange(message.getPayload());
+        }
+
+        @Override
+        public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+            logger.info("{} disconnected", session.getRemoteAddress());
+        }
+
+        @Override
+        public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
+            logger.info("{} error: {}", session.getRemoteAddress(), exception.getMessage());
+        }
+    }
+}

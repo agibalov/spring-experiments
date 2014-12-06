@@ -3,7 +3,7 @@
 // https://github.com/rstoyanchev/spring-websocket-portfolio/tree/master/src/test/java/org/springframework/samples/portfolio/web/support/client
 //
 
-package me.loki2302.stomp;
+package me.loki2302.stomp.client;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
