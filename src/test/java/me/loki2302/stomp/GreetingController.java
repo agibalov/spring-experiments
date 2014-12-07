@@ -12,7 +12,7 @@ public class GreetingController {
 
     @MessageMapping("/hello")
     @SendTo("/topic/greetings")
-    public GreetingMessage greeting(HelloMessage helloMessage) throws InterruptedException {
+    public GreetingMessage greeting(HelloMessage helloMessage) {
         logger.info("Someone connected: {}", helloMessage.name);
 
         GreetingMessage greetingMessage = new GreetingMessage();
