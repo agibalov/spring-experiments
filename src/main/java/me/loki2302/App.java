@@ -46,10 +46,10 @@ public class App {
         @RequestMapping(value = "/api/", method = RequestMethod.POST)
         @ApiOperation(value = "Create a new person", notes = "Some notes about creating a new person")
         @ApiResponses({
-                @ApiResponse(code = 201, message = "Message for 'created'", response = PersonDTO.class), // here, response is not ignored
-                @ApiResponse(code = 400, message = "Message for 'bad request'", response = BadRequestDTO.class) // WTF: here, response is ignored
+                @ApiResponse(code = 201, message = "Message for 'created'", response = PersonDTO.class),
+                @ApiResponse(code = 400, message = "Message for 'bad request'", response = BadRequestDTO.class)
 
-                // WTF: extra statuses like 401 and 403 are added automatically. WHY???
+                // WTF: there's an extra status 200 - why?
         })
         // WTF: there's no special handling for ResponseEntity<T>, it just gets described as is
         // WTF: can't play with it using Swagger UI
