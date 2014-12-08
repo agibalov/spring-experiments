@@ -1,5 +1,6 @@
 package me.loki2302.time;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,7 +20,12 @@ public class AppConfig implements WebSocketConfigurer {
     }
 
     @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
+    }
+
+    @Bean
     public CurrentTimeWebSocketHandler currentTimeWebSocketHandler() {
-        return new CurrentTimeWebSocketHandler();
+        return new CurrentTimeWebSocketHandler(objectMapper());
     }
 }
