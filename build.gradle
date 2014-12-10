@@ -1,0 +1,21 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+mainClassName = 'me.loki2302.App'
+
+sourceCompatibility = 1.5
+version = '1.0'
+
+repositories {
+    mavenCentral()
+    maven {
+        url 'http://repo.spring.io/milestone'
+    }
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+    testCompile 'org.springframework.boot:spring-boot-starter-test:1.2.0.RC2'
+    compile 'org.springframework.boot:spring-boot-starter-integration:1.2.0.RC2'
+    compile 'org.springframework.integration:spring-integration-java-dsl:1.0.0.RELEASE'
+}
