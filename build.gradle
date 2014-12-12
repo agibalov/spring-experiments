@@ -15,8 +15,8 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
-    testCompile 'org.springframework.boot:spring-boot-starter-test:1.2.0.RC2'
-    compile 'org.springframework.boot:spring-boot-starter-websocket:1.2.0.RC2'
+    testCompile 'org.springframework.boot:spring-boot-starter-test:1.2.0.RELEASE'
+    compile 'org.springframework.boot:spring-boot-starter-websocket:1.2.0.RELEASE'
     compile 'org.springframework.boot:spring-boot-starter-web:1.2.0.RC2'
     compile 'org.apache.httpcomponents:httpclient:4.3.5'
     compile 'org.webjars:bootstrap:3.3.1'
