@@ -26,7 +26,7 @@ public class TransactionsTest {
             neo4jTemplate.save(person);
             tx.failure();            
         } finally {
-            tx.finish();
+            tx.close();
         }
         
         long countAfter = neo4jTemplate.count(Person.class);
@@ -43,7 +43,7 @@ public class TransactionsTest {
             neo4jTemplate.save(person);
             tx.success();            
         } finally {
-            tx.finish();
+            tx.close();
         }
         
         long countAfter = neo4jTemplate.count(Person.class);

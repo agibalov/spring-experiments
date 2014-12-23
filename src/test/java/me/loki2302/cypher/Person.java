@@ -7,6 +7,7 @@ import org.springframework.data.neo4j.annotation.GraphId;
 import org.springframework.data.neo4j.annotation.Indexed;
 import org.springframework.data.neo4j.annotation.NodeEntity;
 import org.springframework.data.neo4j.annotation.RelatedTo;
+import org.springframework.data.neo4j.support.index.IndexType;
 
 @NodeEntity
 public class Person {
@@ -15,7 +16,7 @@ public class Person {
     @GraphId
     private Long id;
     
-    @Indexed(indexName = NAME_INDEX)
+    @Indexed(indexName = NAME_INDEX, indexType = IndexType.SIMPLE)
     private String name;
     
     @RelatedTo(type = "LIKES", direction = Direction.OUTGOING)
