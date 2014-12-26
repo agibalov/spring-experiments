@@ -1,7 +1,8 @@
 package me.loki2302;
 
 import me.loki2302.client.Client;
-import me.loki2302.server.Server;
+import me.loki2302.server.Note;
+import me.loki2302.server.ServerConfiguration;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,7 +19,7 @@ public class DummyTest {
 
     @Before
     public void start() throws InterruptedException {
-        serverContext = SpringApplication.run(Server.class);
+        serverContext = SpringApplication.run(ServerConfiguration.class);
         clientContext = new SpringApplicationBuilder(Client.class)
                 .web(false).build().run();
     }
@@ -33,9 +34,16 @@ public class DummyTest {
     }
 
     @Test
-    public void canHave2Contexts() throws InterruptedException {
+    public void canHave2Contexts() {
         RestTemplate restTemplate = clientContext.getBean(RestTemplate.class);
-        String message = restTemplate.getForObject("http://localhost:8080/", String.class);
-        assertEquals("hello", message);
+        Long noteCount = restTemplate.getForObject("http://localhost:8080/notes", Long.class);
+        assertEquals(0L, (long)noteCount);
+
+        Note note = new Note();
+        note.text = "hello there";
+        restTemplate.postForObject("http://localhost:8080/notes", note, Void.class);
+
+        noteCount = restTemplate.getForObject("http://localhost:8080/notes", Long.class);
+        assertEquals(1L, (long)noteCount);
     }
 }
