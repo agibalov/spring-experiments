@@ -10,8 +10,6 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.concurrent.Exchanger;
-
 import static org.junit.Assert.assertEquals;
 
 public class DummyTest {
@@ -20,23 +18,7 @@ public class DummyTest {
 
     @Before
     public void start() throws InterruptedException {
-        final Exchanger<ConfigurableApplicationContext> serverContextExchanger
-                = new Exchanger<ConfigurableApplicationContext>();
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                ConfigurableApplicationContext serverContext = SpringApplication.run(Server.class);
-                try {
-                    serverContextExchanger.exchange(serverContext);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    return;
-                }
-            }
-        }).start();
-
-        serverContext = serverContextExchanger.exchange(null);
-
+        serverContext = SpringApplication.run(Server.class);
         clientContext = new SpringApplicationBuilder(Client.class)
                 .web(false).build().run();
     }
