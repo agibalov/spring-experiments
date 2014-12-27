@@ -1,7 +1,7 @@
 package me.loki2302;
 
-import me.loki2302.client.Client;
-import me.loki2302.server.Note;
+import me.loki2302.client.ClientConfiguration;
+import me.loki2302.client.NoteClient;
 import me.loki2302.server.ServerConfiguration;
 import org.junit.After;
 import org.junit.Before;
@@ -9,7 +9,6 @@ import org.junit.Test;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.web.client.RestTemplate;
 
 import static org.junit.Assert.assertEquals;
 
@@ -20,7 +19,7 @@ public class DummyTest {
     @Before
     public void start() throws InterruptedException {
         serverContext = SpringApplication.run(ServerConfiguration.class);
-        clientContext = new SpringApplicationBuilder(Client.class)
+        clientContext = new SpringApplicationBuilder(ClientConfiguration.class)
                 .web(false).build().run();
     }
 
@@ -35,15 +34,14 @@ public class DummyTest {
 
     @Test
     public void canHave2Contexts() {
-        RestTemplate restTemplate = clientContext.getBean(RestTemplate.class);
-        Long noteCount = restTemplate.getForObject("http://localhost:8080/notes", Long.class);
-        assertEquals(0L, (long)noteCount);
+        NoteClient noteClient = clientContext.getBean(NoteClient.class);
 
-        Note note = new Note();
-        note.text = "hello there";
-        restTemplate.postForObject("http://localhost:8080/notes", note, Void.class);
+        long noteCount = noteClient.getNoteCount();
+        assertEquals(0, noteCount);
 
-        noteCount = restTemplate.getForObject("http://localhost:8080/notes", Long.class);
-        assertEquals(1L, (long)noteCount);
+        noteClient.createNote("hello there");
+
+        noteCount = noteClient.getNoteCount();
+        assertEquals(1, noteCount);
     }
 }
