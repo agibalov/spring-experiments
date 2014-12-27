@@ -36,12 +36,20 @@ public class DummyTest {
     public void canHave2Contexts() {
         NoteClient noteClient = clientContext.getBean(NoteClient.class);
 
-        long noteCount = noteClient.getNoteCount();
-        assertEquals(0, noteCount);
+        long remoteNoteCount = noteClient.getNoteCount();
+        assertEquals(0, remoteNoteCount);
 
         noteClient.createNote("hello there");
 
-        noteCount = noteClient.getNoteCount();
-        assertEquals(1, noteCount);
+        remoteNoteCount = noteClient.getNoteCount();
+        assertEquals(1, remoteNoteCount);
+
+        long localNoteCount = noteClient.getClientNoteCount();
+        assertEquals(0, localNoteCount);
+
+        noteClient.createClientNote("hello there");
+
+        localNoteCount = noteClient.getClientNoteCount();
+        assertEquals(1, localNoteCount);
     }
 }

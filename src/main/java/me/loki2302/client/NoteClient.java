@@ -10,6 +10,9 @@ public class NoteClient {
     @Autowired
     private RestTemplate restTemplate;
 
+    @Autowired
+    private ClientNoteRepository clientNoteRepository;
+
     public long getNoteCount() {
         return restTemplate.getForObject("http://localhost:8080/notes", Long.class);
     }
@@ -18,5 +21,15 @@ public class NoteClient {
         Note note = new Note();
         note.text = "hello there";
         restTemplate.postForObject("http://localhost:8080/notes", note, Void.class);
+    }
+
+    public long getClientNoteCount() {
+        return clientNoteRepository.count();
+    }
+
+    public void createClientNote(String text) {
+        ClientNote note = new ClientNote();
+        note.text = text;
+        clientNoteRepository.save(note);
     }
 }
