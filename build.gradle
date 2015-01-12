@@ -9,14 +9,18 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
-    testCompile 'org.springframework.boot:spring-boot-starter-test:1.1.9.RELEASE'
+    testCompile 'org.springframework.boot:spring-boot-starter-test:1.2.1.RELEASE'
     testCompile 'joda-time:joda-time:2.5'
-    compile 'org.springframework.boot:spring-boot-starter-data-jpa:1.1.9.RELEASE'
-    compile 'com.h2database:h2:1.4.181'
+    testCompile 'org.springframework.boot:spring-boot-starter-data-jpa:1.2.1.RELEASE'
+    testCompile 'com.h2database:h2:1.4.181'
 }
 
 test {
     testLogging {
         events "failed", "passed", "skipped"
     }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.2.1'
 }

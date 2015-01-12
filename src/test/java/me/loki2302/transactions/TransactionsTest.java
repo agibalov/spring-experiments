@@ -68,4 +68,5 @@ public class TransactionsTest {
 
     private static class DoNotWantException extends RuntimeException {
     }
+
 }
