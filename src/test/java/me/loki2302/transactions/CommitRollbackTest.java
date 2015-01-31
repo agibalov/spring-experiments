@@ -18,7 +18,7 @@ import static org.junit.Assert.fail;
 @IntegrationTest
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Config.class)
-public class TransactionsTest {
+public class CommitRollbackTest {
     @Autowired
     private PlatformTransactionManager transactionManager;
 
