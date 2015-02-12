@@ -4,7 +4,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConfigurationProperties(name = "app")
+@ConfigurationProperties("app")
 public class AppProperties {
     private String message;
 
