@@ -24,3 +24,9 @@ dependencies {
 task wrapper(type: Wrapper) {
     gradleVersion = '2.2.1'
 }
+
+jar {
+    manifest {
+        attributes "Implementation-Version": "12.34.RELEASE"
+    }
+}

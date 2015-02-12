@@ -8,3 +8,8 @@
                    |___/                                 |_|
 
 super 31337 by loki2302
+
+Application version: ${application.version} (only available when running a package)
+Application formatted version: ${application.formatted-version} (only available when running a package)
+Spring Boot version: ${spring-boot.version}
+Spring Boot formatted version: ${spring-boot.formatted-version}
