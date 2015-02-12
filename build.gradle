@@ -16,3 +16,7 @@ dependencies {
     compile group: "org.springframework.boot", name: "spring-boot-starter-web", version: "1.0.0.RC5"
     compile group: "org.springframework.boot", name: "spring-boot-starter-remote-shell", version: "1.0.0.RC5"
 }
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.2.1'
+}
