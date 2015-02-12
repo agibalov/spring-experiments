@@ -14,7 +14,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = AppConfiguration.class)
+@SpringApplicationConfiguration(classes = App.class)
 @WebAppConfiguration
 @IntegrationTest
 public class AppTest {

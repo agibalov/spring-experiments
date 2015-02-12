@@ -9,7 +9,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = AppConfiguration.class)
+@SpringApplicationConfiguration(classes = App.class)
 public class ApplicationPropertiesTest {
     @Autowired
     private AppProperties appProperties;
