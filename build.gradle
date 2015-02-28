@@ -1,0 +1,26 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.2.1.RELEASE")
+    }
+}
+
+apply plugin: 'spring-boot'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile "junit:junit:4.11"
+    testCompile "org.springframework.boot:spring-boot-starter-test:1.2.1.RELEASE"
+    testCompile 'org.mockito:mockito-all:1.10.8'
+    compile "org.springframework.boot:spring-boot-starter:1.2.1.RELEASE"
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.2.1'
+}
