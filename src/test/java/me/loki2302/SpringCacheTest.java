@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
@@ -55,6 +56,19 @@ public class SpringCacheTest {
         verify(slowService, only()).getData();
     }
 
+    @Test
+    public void slowServiceIsAccessedAgainAfterCacheEviction() {
+        when(slowService.getData()).thenReturn("hello");
+
+        assertEquals("hello", slowServiceConsumer.getData());
+
+        slowServiceConsumer.updateData();
+
+        assertEquals("hello", slowServiceConsumer.getData());
+
+        verify(slowService, times(2)).getData();
+    }
+
     public static class SlowServiceConsumer {
         @Autowired
         private SlowService slowService;
@@ -62,6 +76,10 @@ public class SpringCacheTest {
         @Cacheable("data")
         public String getData() {
             return slowService.getData();
+        }
+
+        @CacheEvict("data")
+        public void updateData() {
         }
     }
 
