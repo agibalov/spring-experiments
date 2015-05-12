@@ -3,10 +3,8 @@ package me.loki2302;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.function.FlatMapFunction;
-import org.apache.spark.api.java.function.Function;
-import org.apache.spark.api.java.function.Function2;
-import org.apache.spark.api.java.function.PairFunction;
+import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.*;
 import org.apache.spark.storage.StorageLevel;
 import org.apache.spark.streaming.Durations;
 import org.apache.spark.streaming.Time;
@@ -22,6 +20,29 @@ import java.util.Map;
 
 public class App {
     public static void main(String[] args) {
+        SparkConf sparkConf = new SparkConf().setMaster("local[2]").setAppName("helloworld");
+        JavaSparkContext jsc = new JavaSparkContext(sparkConf);
+
+        JavaRDD<Integer> data = jsc.parallelize(Arrays.asList(11, 22, 33, 44, 55, 66), 2);
+
+        final Map<Long, Integer> activityMap = new HashMap<>();
+
+        int sum = data.reduce(new Function2<Integer, Integer, Integer>() {
+            @Override
+            public Integer call(Integer v1, Integer v2) throws Exception {
+                long threadId = Thread.currentThread().getId();
+                System.out.printf("[thread=%d]: %d + %d => %d\n",
+                        threadId, v1, v2, v1 + v2);
+                return v1 + v2;
+            }
+        });
+
+        jsc.stop();
+
+        System.out.println(sum);
+    }
+
+    private static void kafkaConsumptionSparkStreamingHelloWorld() {
         SparkConf sparkConf = new SparkConf().setMaster("local[2]").setAppName("helloworld");
         JavaStreamingContext jsc = new JavaStreamingContext(sparkConf, Durations.seconds(1));
 
@@ -59,7 +80,7 @@ public class App {
         jsc.awaitTermination();
     }
 
-    private static void sparkStandaloneHelloWorld() {
+    private static void customReceiverSparkStreamingHelloWorld() {
         SparkConf sparkConf = new SparkConf().setMaster("local[2]").setAppName("helloworld");
         JavaStreamingContext jsc = new JavaStreamingContext(sparkConf, Durations.seconds(1));
         JavaReceiverInputDStream<String> lines = jsc.receiverStream(new DummyReceiver());
