@@ -20,8 +20,17 @@ import java.util.Map;
 
 public class App {
     public static void main(String[] args) {
-        SparkConf sparkConf = new SparkConf().setMaster("local[2]").setAppName("helloworld");
+        // SparkConf sparkConf = new SparkConf().setMaster("local[2]").setAppName("helloworld");
+        // spark://sparkmaster:7077
+        SparkConf sparkConf = new SparkConf()
+                // in /etc/hosts, I've added 127.0.0.1 sparkmaster
+                .setMaster("spark://sparkmaster:7077")
+                .setAppName("helloworld");
         JavaSparkContext jsc = new JavaSparkContext(sparkConf);
+
+        // it doesn't work:
+        // 15/05/14 10:28:38 WARN TaskSetManager: Lost task 1.0 in stage 0.0 (TID 1, sparkworker1): java.lang.ClassNotFoundException: me.loki2302.App$1
+        // looks like I need to deploy the packaged application in any case
 
         JavaRDD<Integer> data = jsc.parallelize(Arrays.asList(11, 22, 33, 44, 55, 66), 2);
 

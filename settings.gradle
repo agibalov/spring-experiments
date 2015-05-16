@@ -1,2 +1,5 @@
-rootProject.name = 'spark-experiment'
+rootProject.name = 'apache-spark-experiment'
+
+include 'spark-core-app'
+include 'playground'
 
