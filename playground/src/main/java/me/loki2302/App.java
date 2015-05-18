@@ -20,35 +20,7 @@ import java.util.Map;
 
 public class App {
     public static void main(String[] args) {
-        // SparkConf sparkConf = new SparkConf().setMaster("local[2]").setAppName("helloworld");
-        // spark://sparkmaster:7077
-        SparkConf sparkConf = new SparkConf()
-                // in /etc/hosts, I've added 127.0.0.1 sparkmaster
-                .setMaster("spark://sparkmaster:7077")
-                .setAppName("helloworld");
-        JavaSparkContext jsc = new JavaSparkContext(sparkConf);
-
-        // it doesn't work:
-        // 15/05/14 10:28:38 WARN TaskSetManager: Lost task 1.0 in stage 0.0 (TID 1, sparkworker1): java.lang.ClassNotFoundException: me.loki2302.App$1
-        // looks like I need to deploy the packaged application in any case
-
-        JavaRDD<Integer> data = jsc.parallelize(Arrays.asList(11, 22, 33, 44, 55, 66), 2);
-
-        final Map<Long, Integer> activityMap = new HashMap<>();
-
-        int sum = data.reduce(new Function2<Integer, Integer, Integer>() {
-            @Override
-            public Integer call(Integer v1, Integer v2) throws Exception {
-                long threadId = Thread.currentThread().getId();
-                System.out.printf("[thread=%d]: %d + %d => %d\n",
-                        threadId, v1, v2, v1 + v2);
-                return v1 + v2;
-            }
-        });
-
-        jsc.stop();
-
-        System.out.println(sum);
+        kafkaConsumptionSparkStreamingHelloWorld();
     }
 
     private static void kafkaConsumptionSparkStreamingHelloWorld() {
@@ -58,7 +30,7 @@ public class App {
         Map<String, Integer> topicMap = new HashMap<String, Integer>();
         topicMap.put("the-topic", 1);
         JavaPairReceiverInputDStream<String, String> kafkaStream =
-                KafkaUtils.createStream(jsc, "localhost", "group1", topicMap);
+                KafkaUtils.createStream(jsc, "zookeeper", "group1", topicMap);
         JavaDStream<Integer> values = kafkaStream.map(new Function<Tuple2<String, String>, Integer>() {
             @Override
             public Integer call(Tuple2<String, String> v1) throws Exception {

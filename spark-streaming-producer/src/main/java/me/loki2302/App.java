@@ -9,10 +9,10 @@ import java.util.concurrent.ExecutionException;
 
 public class App {
     public static void main(String[] args) throws InterruptedException, ExecutionException {
-        String topicName = "the-topic";
+        String topicName = "the-topic-3";
 
         Properties properties = new Properties();
-        properties.put("bootstrap.servers", "localhost:9092");
+        properties.put("bootstrap.servers", "kafka:9092");
         properties.put("client.id", "DemoProducer");
         properties.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         properties.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
@@ -23,9 +23,12 @@ public class App {
             for (int i = 0; i < 10; ++i) {
                 String key = String.format("key-%d", i + 1);
                 String value = String.valueOf(r.nextInt(1000));
+                System.out.printf("Sending (%s, %s) to %s\n", key, value, topicName);
                 producer.send(new ProducerRecord<String, String>(topicName, key, value)).get();
+                System.out.printf("Sent (%s, %s) to %s\n", key, value, topicName);
                 Thread.sleep(5);
             }
+            System.out.println("Pause");
             Thread.sleep(300);
         }
     }

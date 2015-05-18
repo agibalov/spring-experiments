@@ -1,6 +1,9 @@
 sparkmaster:
   image: loki2302/sparkmaster
   hostname: sparkmaster
+  links:
+    - zookeeper
+    - kafka
   ports:
     - "8080:8080"
     - "7077:7077"
@@ -14,6 +17,8 @@ sparkworker1:
     CORES: 2
   links:
     - sparkmaster
+    - zookeeper
+    - kafka
   ports:
     - "8081:8081"
 
@@ -26,6 +31,8 @@ sparkworker2:
     CORES: 2
   links:
     - sparkmaster
+    - zookeeper
+    - kafka
   ports:
     - "8082:8082"
 
@@ -37,12 +44,15 @@ zookeeper:
 
 kafka:
   image: wurstmeister/kafka:0.8.2.1
+  hostname: kafka
   ports:
     - "9092:9092"
   links:
     - zookeeper
   environment:
-    KAFKA_ADVERTISED_HOST_NAME: localhost
+    KAFKA_ADVERTISED_HOST_NAME: kafka
+    KAFKA_ADVERTISED_PORT: 9092
+    KAFKA_BROKER_ID: 0
     KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
   volumes:
     - /var/run/docker.sock:/var/run/docker.sock

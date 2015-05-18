@@ -17,12 +17,13 @@ import java.util.Map;
 
 public class App {
     public static void main(String[] args) {
-        String zookeeperQuorum = "zookeeper";
+        String zookeeperQuorum = "zookeeper:2181";
         String kafkaGroup = "group1";
-        String kafkaTopic = "the-topic";
+        String kafkaTopic = "the-topic-3";
 
+        //SparkConf sparkConf = new SparkConf().setMaster("local[2]").setAppName("KafkaConsumer");
         SparkConf sparkConf = new SparkConf().setAppName("KafkaConsumer");
-        JavaStreamingContext jsc = new JavaStreamingContext(sparkConf, Durations.seconds(1));
+        JavaStreamingContext jsc = new JavaStreamingContext(sparkConf, Durations.seconds(5));
 
         Map<String, Integer> topicMap = new HashMap<String, Integer>();
         topicMap.put(kafkaTopic, 1);
@@ -31,12 +32,14 @@ public class App {
         JavaDStream<Integer> values = kafkaStream.map(new Function<Tuple2<String, String>, Integer>() {
             @Override
             public Integer call(Tuple2<String, String> v1) throws Exception {
+                System.out.printf("MAP: %s\n", v1._2());
                 return Integer.parseInt(v1._2());
             }
         });
         JavaDStream<Integer> sum = values.reduce(new Function2<Integer, Integer, Integer>() {
             @Override
             public Integer call(Integer v1, Integer v2) throws Exception {
+                System.out.printf("REDUCE: %d + %d\n", v1, v2);
                 return v1 + v2;
             }
         });
@@ -44,6 +47,7 @@ public class App {
             @Override
             public Void call(JavaRDD<Integer> v1) throws Exception {
                 List<Integer> sumOptional = v1.collect();
+                System.out.printf("FOREACH: size=%d\n", sumOptional.size());
                 if(sumOptional.isEmpty()) {
                     System.out.println("no data");
                 } else {
