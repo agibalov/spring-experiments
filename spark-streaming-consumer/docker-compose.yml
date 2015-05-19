@@ -22,20 +22,6 @@ sparkworker1:
   ports:
     - "8081:8081"
 
-sparkworker2:
-  image: loki2302/sparkworker
-  hostname: sparkworker2
-  environment:
-    SPARK_MASTER: "sparkmaster:7077"
-    WEBUI_PORT: 8082
-    CORES: 2
-  links:
-    - sparkmaster
-    - zookeeper
-    - kafka
-  ports:
-    - "8082:8082"
-
 zookeeper:
   image: jplock/zookeeper:3.4.6
   hostname: zookeeper
