@@ -1,9 +1,12 @@
 package me.loki2302.udt;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.usertype.UserType;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -11,15 +14,18 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Objects;
 
-public class IntegerAsVarcharUserType implements UserType {
+public class DTOAsJSONUserType implements UserType {
+    private final static Class<?> clazz = SomeUselessDto.class;
+    private final static ObjectMapper objectMapper = new ObjectMapper();
+
     @Override
     public int[] sqlTypes() {
-        return new int[] {Types.VARCHAR };
+        return new int[] { Types.VARCHAR };
     }
 
     @Override
     public Class returnedClass() {
-        return Integer.class;
+        return clazz;
     }
 
     @Override
@@ -34,20 +40,30 @@ public class IntegerAsVarcharUserType implements UserType {
 
     @Override
     public Object nullSafeGet(ResultSet rs, String[] names, SessionImplementor session, Object owner) throws HibernateException, SQLException {
-        String readString = rs.getString(names[0]);
-        if(readString == null) {
+        String jsonString = rs.getString(names[0]);
+        if(jsonString == null) {
             return null;
         }
 
-        return Integer.valueOf(readString);
+        try {
+            return objectMapper.readValue(jsonString, clazz);
+        } catch (IOException e) {
+            throw new HibernateException("Can't read JSON from result set", e);
+        }
     }
 
     @Override
     public void nullSafeSet(PreparedStatement st, Object value, int index, SessionImplementor session) throws HibernateException, SQLException {
         if(value == null) {
             st.setNull(index, Types.VARCHAR);
-        } else {
-            st.setString(index, value.toString());
+            return;
+        }
+
+        try {
+            String jsonString = objectMapper.writeValueAsString(value);
+            st.setString(index, jsonString);
+        } catch (JsonProcessingException e) {
+            throw new HibernateException("Can't convert object to JSON", e);
         }
     }
 
@@ -57,7 +73,15 @@ public class IntegerAsVarcharUserType implements UserType {
             return null;
         }
 
-        return Integer.valueOf(value.toString());
+        try {
+            String json = objectMapper.writeValueAsString(value);
+            Object obj =  objectMapper.readValue(json, clazz);
+            return obj;
+        } catch (JsonProcessingException e) {
+            throw new HibernateException("Failed to deep copy object", e);
+        } catch (IOException e) {
+            throw new HibernateException("Failed to deep copy object", e);
+        }
     }
 
     @Override
@@ -67,7 +91,11 @@ public class IntegerAsVarcharUserType implements UserType {
 
     @Override
     public Serializable disassemble(Object value) throws HibernateException {
-        return (Serializable)deepCopy(value);
+        try {
+            return objectMapper.writeValueAsString(value);
+        } catch (JsonProcessingException e) {
+            throw new HibernateException("Can't convert object to JSON", e);
+        }
     }
 
     @Override

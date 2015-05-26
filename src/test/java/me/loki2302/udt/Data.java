@@ -1,13 +1,15 @@
 package me.loki2302.udt;
 
-import me.loki2302.lobs.TheBLOB;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.*;
 
 import javax.persistence.*;
+import javax.persistence.Entity;
 
 @Entity
-@TypeDef(name = "myUdt", typeClass = IntegerAsVarcharUserType.class)
+@TypeDefs({
+        @TypeDef(name = "myUdt", typeClass = IntegerAsVarcharUserType.class),
+        @TypeDef(name = "json", typeClass = DTOAsJSONUserType.class)
+})
 public class Data {
     @Id
     @GeneratedValue
@@ -15,4 +17,7 @@ public class Data {
 
     @Type(type = "myUdt", parameters = {})
     public Integer someInteger;
+
+    @Type(type = "json")
+    public SomeUselessDto someUselessDto;
 }
