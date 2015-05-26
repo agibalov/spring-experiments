@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.internal.util.ReflectHelper;
+import org.hibernate.usertype.ParameterizedType;
 import org.hibernate.usertype.UserType;
 
 import java.io.IOException;
@@ -13,10 +15,25 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Objects;
+import java.util.Properties;
 
-public class DTOAsJSONUserType implements UserType {
-    private final static Class<?> clazz = SomeUselessDto.class;
+public class DTOAsJSONUserType implements UserType, ParameterizedType {
     private final static ObjectMapper objectMapper = new ObjectMapper();
+    private Class<?> clazz;
+
+    @Override
+    public void setParameterValues(Properties parameters) {
+        String className = parameters.getProperty("className");
+        if(className == null) {
+            throw new HibernateException("className is required");
+        }
+
+        try {
+            clazz = ReflectHelper.classForName(className);
+        } catch (ClassNotFoundException e) {
+            throw new HibernateException("class not found", e);
+        }
+    }
 
     @Override
     public int[] sqlTypes() {

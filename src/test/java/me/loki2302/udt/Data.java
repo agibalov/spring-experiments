@@ -1,6 +1,7 @@
 package me.loki2302.udt;
 
 import org.hibernate.annotations.*;
+import org.hibernate.annotations.Parameter;
 
 import javax.persistence.*;
 import javax.persistence.Entity;
@@ -18,6 +19,8 @@ public class Data {
     @Type(type = "myUdt", parameters = {})
     public Integer someInteger;
 
-    @Type(type = "json")
+    @Type(type = "json", parameters = {
+            @Parameter(name = "className", value = "me.loki2302.udt.SomeUselessDto")
+    })
     public SomeUselessDto someUselessDto;
 }
