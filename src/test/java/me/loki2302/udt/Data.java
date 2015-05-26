@@ -19,6 +19,8 @@ public class Data {
     @Type(type = "myUdt", parameters = {})
     public Integer someInteger;
 
+    // TODO: can I replace this with my custom annotation, like @Json?
+    // TODO: how do I force varchar(max) from within DTOAsJSONUserType?
     @Type(type = "json", parameters = {
             @Parameter(name = "className", value = "me.loki2302.udt.SomeUselessDto")
     })
