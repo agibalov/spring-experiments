@@ -24,5 +24,6 @@ public class Data {
     @Type(type = "json", parameters = {
             @Parameter(name = "className", value = "me.loki2302.udt.SomeUselessDto")
     })
+    @Column(length = 1024) // otherwise it's 255
     public SomeUselessDto someUselessDto;
 }
