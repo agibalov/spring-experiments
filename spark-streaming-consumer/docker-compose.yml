@@ -42,3 +42,22 @@ kafka:
     KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
   volumes:
     - /var/run/docker.sock:/var/run/docker.sock
+
+consumer:
+  image: apache-spark-experiment/streaming-consumer:1.0
+  hostname: consumer
+  links:
+    - kafka
+    - sparkmaster
+    - sparkworker1
+    - zookeeper
+    - producer
+
+producer:
+  image: apache-spark-experiment/streaming-producer:1.0
+  hostname: producer
+  links:
+    - kafka
+    - sparkmaster
+    - sparkworker1
+    - zookeeper

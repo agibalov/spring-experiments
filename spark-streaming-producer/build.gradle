@@ -1,9 +1,17 @@
-apply plugin: 'java'
+buildscript {
+    repositories { jcenter() }
+    dependencies {
+        classpath 'se.transmode.gradle:gradle-docker:1.2'
+    }
+}
+
 apply plugin: 'application'
+apply plugin: 'docker'
 
 mainClassName = 'me.loki2302.App'
 
-sourceCompatibility = 1.5
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
 version = '1.0'
 
 repositories {
@@ -14,3 +22,14 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
     compile 'org.apache.kafka:kafka_2.10:0.8.2.1'
 }
+
+task dockerContainer(type: Docker) {
+    applicationName = 'streaming-producer'
+    tagVersion = '1.0'
+
+    baseImage = 'aglover/java8-pier'
+    addFile "${buildDir}/distributions/spark-streaming-producer-1.0.tar", '/'
+    workingDir '/spark-streaming-producer-1.0/bin'
+    defaultCommand = ['./spark-streaming-producer']
+}
+dockerContainer.dependsOn 'distTar'

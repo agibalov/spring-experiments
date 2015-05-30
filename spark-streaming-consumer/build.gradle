@@ -1,7 +1,16 @@
+buildscript {
+    repositories { jcenter() }
+    dependencies {
+        classpath 'se.transmode.gradle:gradle-docker:1.2'
+    }
+}
+
 plugins {
     id 'application'
     id 'com.github.johnrengelman.shadow' version '1.2.1'
 }
+
+apply plugin: 'docker'
 
 configurations {
     provided
@@ -34,3 +43,17 @@ dependencies {
     // this one is
     compile 'org.apache.spark:spark-streaming-kafka_2.10:1.3.1'
 }
+
+task dockerContainer(type: Docker) {
+    applicationName = 'streaming-consumer'
+    tagVersion = '1.0'
+
+    baseImage = 'loki2302/sparkbase:latest'
+    addFile "${buildDir}/libs/spark-streaming-consumer-1.0-all.jar", '/'
+    workingDir '/opt/spark-1.3.1-bin-hadoop2.6'
+    defaultCommand = [
+            './bin/spark-submit',
+            '/spark-streaming-consumer-1.0-all.jar',
+            '--master', 'spark://sparkmaster:7077']
+}
+dockerContainer.dependsOn 'shadowJar'
