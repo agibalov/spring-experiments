@@ -53,7 +53,7 @@ task dockerContainer(type: Docker) {
     workingDir '/opt/spark-1.3.1-bin-hadoop2.6'
     defaultCommand = [
             './bin/spark-submit',
-            '/spark-streaming-consumer-1.0-all.jar',
-            '--master', 'spark://sparkmaster:7077']
+            '--master', 'spark://sparkmaster.weave.local:7077',
+            '/spark-streaming-consumer-1.0-all.jar']
 }
 dockerContainer.dependsOn 'shadowJar'

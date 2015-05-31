@@ -17,7 +17,7 @@ import java.util.Map;
 
 public class App {
     public static void main(String[] args) {
-        String zookeeperQuorum = "zookeeper:2181";
+        String zookeeperQuorum = "zookeeper.weave.local:2181";
         String kafkaGroup = "group1";
         String kafkaTopic = "the-topic-3";
 

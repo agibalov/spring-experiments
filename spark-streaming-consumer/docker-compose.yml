@@ -1,63 +1,65 @@
 sparkmaster:
   image: loki2302/sparkmaster
-  hostname: sparkmaster
-  links:
-    - zookeeper
-    - kafka
+  hostname: sparkmaster.weave.local
+  dns: 10.2.1.254
+  net: none
+  environment:
+    WEAVE_CIDR: 10.2.1.11/24
   ports:
     - "8080:8080"
     - "7077:7077"
 
 sparkworker1:
   image: loki2302/sparkworker
-  hostname: sparkworker1
+  hostname: sparkworker1.weave.local
+  dns: 10.2.1.254
+  net: none
   environment:
-    SPARK_MASTER: "sparkmaster:7077"
+    SPARK_MASTER: sparkmaster.weave.local:7077
     WEBUI_PORT: 8081
     CORES: 2
-  links:
-    - sparkmaster
-    - zookeeper
-    - kafka
+    WEAVE_CIDR: 10.2.1.12/24
   ports:
     - "8081:8081"
 
 zookeeper:
   image: jplock/zookeeper:3.4.6
-  hostname: zookeeper
+  hostname: zookeeper.weave.local
+  dns: 10.2.1.254
+  net: none
+  environment:
+    WEAVE_CIDR: 10.2.1.13/24
   ports:
     - "2181:2181"
 
 kafka:
   image: wurstmeister/kafka:0.8.2.1
-  hostname: kafka
+  hostname: kafka.weave.local
+  dns: 10.2.1.254
+  net: none
   ports:
     - "9092:9092"
-  links:
-    - zookeeper
   environment:
-    KAFKA_ADVERTISED_HOST_NAME: kafka
+    KAFKA_ADVERTISED_HOST_NAME: kafka.weave.local
     KAFKA_ADVERTISED_PORT: 9092
     KAFKA_BROKER_ID: 0
-    KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+    KAFKA_ZOOKEEPER_CONNECT: "zookeeper.weave.local:2181"
+    WEAVE_CIDR: 10.2.1.14/24
   volumes:
     - /var/run/docker.sock:/var/run/docker.sock
 
 consumer:
   image: apache-spark-experiment/streaming-consumer:1.0
-  hostname: consumer
-  links:
-    - kafka
-    - sparkmaster
-    - sparkworker1
-    - zookeeper
-    - producer
+  hostname: consumer.weave.local
+  dns: 10.2.1.254
+  net: none
+  environment:
+    WEAVE_CIDR: 10.2.1.15/24
 
 producer:
   image: apache-spark-experiment/streaming-producer:1.0
-  hostname: producer
-  links:
-    - kafka
-    - sparkmaster
-    - sparkworker1
-    - zookeeper
+  hostname: producer.weave.local
+  dns: 10.2.1.254
+  net: none
+  environment:
+    WEAVE_CIDR: 10.2.1.16/24
