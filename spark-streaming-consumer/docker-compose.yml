@@ -62,6 +62,7 @@ consumer:
   volumes_from:
     - sparkworker1
     - sparkmaster
+    - zookeeper
     - kafka
     - producer
 
@@ -76,5 +77,3 @@ producer:
     TOPIC: the-topic-3
   volumes_from:
     - kafka
-
-

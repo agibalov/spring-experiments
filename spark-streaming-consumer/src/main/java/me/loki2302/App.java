@@ -1,5 +1,6 @@
 package me.loki2302;
 
+import org.apache.commons.cli.*;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
@@ -17,9 +18,44 @@ import java.util.Map;
 
 public class App {
     public static void main(String[] args) {
-        String zookeeperQuorum = "zookeeper.weave.local:2181";
-        String kafkaGroup = "group1";
-        String kafkaTopic = "the-topic-3";
+        Options options = new Options();
+        options.addOption(OptionBuilder
+                .isRequired()
+                .withLongOpt("kafka-zk-connect")
+                .hasArg()
+                .withArgName("KAFKA_ZK_CONNECT_HOST_AND_PORT")
+                .withDescription("Kafka ZooKeeper connect host and port, zookeeper.weave.local:2181")
+                .create("k"));
+        options.addOption(OptionBuilder
+                .isRequired()
+                .withLongOpt("topic")
+                .hasArg()
+                .withArgName("KAFKA_TOPIC")
+                .withDescription("Kafka topic name, like the-topic-3")
+                .create("t"));
+
+        if(args.length == 0) {
+            HelpFormatter helpFormatter = new HelpFormatter();
+            helpFormatter.printHelp("consumer", options);
+            return;
+        }
+
+        CommandLineParser commandLineParser = new BasicParser();
+        CommandLine commandLine = null;
+        try {
+            commandLine = commandLineParser.parse(options, args);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        String zookeeperQuorum = commandLine.getOptionValue("kafka-zk-connect");
+        String kafkaTopic = commandLine.getOptionValue("topic");
+
+        System.out.printf("zookeeperQuorum: %s\n", zookeeperQuorum);
+        System.out.printf("topic: %s\n", kafkaTopic);
+
+        final String kafkaGroup = "group1";
 
         //SparkConf sparkConf = new SparkConf().setMaster("local[2]").setAppName("KafkaConsumer");
         SparkConf sparkConf = new SparkConf().setAppName("KafkaConsumer");

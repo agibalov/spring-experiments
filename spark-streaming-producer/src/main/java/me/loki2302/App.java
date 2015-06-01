@@ -12,20 +12,20 @@ import java.util.concurrent.ExecutionException;
 public class App {
     public static void main(String[] args) throws InterruptedException, ExecutionException {
         Options options = new Options();
-        options.addOption(Option.builder("k")
-                .required()
-                .longOpt("kafka")
+        options.addOption(OptionBuilder
+                .isRequired()
+                .withLongOpt("kafka")
                 .hasArg()
-                .argName("KAFKA_HOST_AND_PORT")
-                .desc("Kafka host and port, like kafka.weave.local:9092")
-                .build());
-        options.addOption(Option.builder("t")
-                .required()
-                .longOpt("topic")
+                .withArgName("KAFKA_HOST_AND_PORT")
+                .withDescription("Kafka host and port, like kafka.weave.local:9092")
+                .create("k"));
+        options.addOption(OptionBuilder
+                .isRequired()
+                .withLongOpt("topic")
                 .hasArg()
-                .argName("KAFKA_TOPIC")
-                .desc("Kafka topic name, like the-topic-3")
-                .build());
+                .withArgName("KAFKA_TOPIC")
+                .withDescription("Kafka topic name, like the-topic-3")
+                .create("t"));
 
         if(args.length == 0) {
             HelpFormatter helpFormatter = new HelpFormatter();
@@ -33,7 +33,7 @@ public class App {
             return;
         }
 
-        CommandLineParser commandLineParser = new DefaultParser();
+        CommandLineParser commandLineParser = new BasicParser();
         CommandLine commandLine = null;
         try {
             commandLine = commandLineParser.parse(options, args);
