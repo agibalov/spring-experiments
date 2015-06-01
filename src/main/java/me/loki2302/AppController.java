@@ -13,12 +13,6 @@ public class AppController {
     @RequestMapping(value = "/")
     @ResponseBody
     public String index() {
-        return "hello";
-    }
-
-    @RequestMapping(value = "/property")
-    @ResponseBody
-    public String property() {
         return appProperties.getMessage();
     }
 }
