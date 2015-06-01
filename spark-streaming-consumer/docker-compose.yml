@@ -21,6 +21,8 @@ sparkworker1:
     WEAVE_CIDR: 10.2.1.12/24
   ports:
     - "8081:8081"
+  volumes_from:
+    - sparkmaster
 
 zookeeper:
   image: jplock/zookeeper:3.4.6
@@ -47,6 +49,8 @@ kafka:
     WEAVE_CIDR: 10.2.1.14/24
   volumes:
     - /var/run/docker.sock:/var/run/docker.sock
+  volumes_from:
+    - zookeeper
 
 consumer:
   image: apache-spark-experiment/streaming-consumer:1.0
@@ -55,6 +59,11 @@ consumer:
   net: none
   environment:
     WEAVE_CIDR: 10.2.1.15/24
+  volumes_from:
+    - sparkworker1
+    - sparkmaster
+    - kafka
+    - producer
 
 producer:
   image: apache-spark-experiment/streaming-producer:1.0
@@ -65,4 +74,7 @@ producer:
     WEAVE_CIDR: 10.2.1.16/24
     KAFKA: kafka.weave.local:9092
     TOPIC: the-topic-3
+  volumes_from:
+    - kafka
+
 
