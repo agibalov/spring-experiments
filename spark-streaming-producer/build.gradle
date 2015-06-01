@@ -28,14 +28,7 @@ task dockerContainer(type: Docker) {
     applicationName = 'streaming-producer'
     tagVersion = '1.0'
 
-    // baseImage = 'aglover/java8-pier'
     dockerfile = file('Dockerfile')
     addFile "${buildDir}/distributions/spark-streaming-producer-1.0.tar", '/'
-    // workingDir '/spark-streaming-producer-1.0/bin'
-    // setEnvironment 'KAFKA', 'meaningless default KAFKA value'
-    // setEnvironment 'TOPIC', 'meaningless default TOPIC value'
-    // defaultCommand = ['./spark-streaming-producer',
-    //                  '--kafka', '${KAFKA}',
-    //                  '--topic', '${TOPIC}']
 }
 dockerContainer.dependsOn 'distTar'
