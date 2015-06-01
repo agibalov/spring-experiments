@@ -1,5 +1,6 @@
 package me.loki2302;
 
+import org.apache.commons.cli.*;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.config.ConfigException;
@@ -10,10 +11,45 @@ import java.util.concurrent.ExecutionException;
 
 public class App {
     public static void main(String[] args) throws InterruptedException, ExecutionException {
-        String topicName = "the-topic-3";
+        Options options = new Options();
+        options.addOption(Option.builder("k")
+                .required()
+                .longOpt("kafka")
+                .hasArg()
+                .argName("KAFKA_HOST_AND_PORT")
+                .desc("Kafka host and port, like kafka.weave.local:9092")
+                .build());
+        options.addOption(Option.builder("t")
+                .required()
+                .longOpt("topic")
+                .hasArg()
+                .argName("KAFKA_TOPIC")
+                .desc("Kafka topic name, like the-topic-3")
+                .build());
+
+        if(args.length == 0) {
+            HelpFormatter helpFormatter = new HelpFormatter();
+            helpFormatter.printHelp("producer", options);
+            return;
+        }
+
+        CommandLineParser commandLineParser = new DefaultParser();
+        CommandLine commandLine = null;
+        try {
+            commandLine = commandLineParser.parse(options, args);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        String kafkaHostAndPort = commandLine.getOptionValue("kafka");
+        String kafkaTopic = commandLine.getOptionValue("topic");
+
+        System.out.printf("kafka: %s\n", kafkaHostAndPort);
+        System.out.printf("topic: %s\n", kafkaTopic);
 
         Properties properties = new Properties();
-        properties.put("bootstrap.servers", "kafka.weave.local:9092");
+        properties.put("bootstrap.servers", kafkaHostAndPort);
         properties.put("client.id", "DemoProducer");
         properties.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         properties.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
@@ -42,8 +78,8 @@ public class App {
             for (int i = 0; i < 10; ++i) {
                 String key = String.format("key-%d", i + 1);
                 String value = String.valueOf(r.nextInt(1000));
-                producer.send(new ProducerRecord<String, String>(topicName, key, value)).get();
-                System.out.printf("Sent (%s, %s) to %s\n", key, value, topicName);
+                producer.send(new ProducerRecord<String, String>(kafkaTopic, key, value)).get();
+                System.out.printf("Sent (%s, %s) to %s\n", key, value, kafkaTopic);
                 Thread.sleep(5);
             }
             System.out.println("Pause");

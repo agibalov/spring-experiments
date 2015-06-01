@@ -63,3 +63,6 @@ producer:
   net: none
   environment:
     WEAVE_CIDR: 10.2.1.16/24
+    KAFKA: kafka.weave.local:9092
+    TOPIC: the-topic-3
+
