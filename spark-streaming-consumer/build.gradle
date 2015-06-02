@@ -11,6 +11,7 @@ plugins {
 }
 
 apply plugin: 'docker'
+apply plugin: 'idea'
 
 configurations {
     provided
@@ -53,3 +54,9 @@ task dockerContainer(type: Docker) {
     addFile "${buildDir}/libs/spark-streaming-consumer-1.0-all.jar", '/'
 }
 dockerContainer.dependsOn 'shadowJar'
+
+idea {
+    module {
+        scopes.PROVIDED.plus += [ configurations.provided ]
+    }
+}
