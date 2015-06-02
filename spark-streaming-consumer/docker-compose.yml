@@ -45,7 +45,7 @@ kafka:
     KAFKA_ADVERTISED_HOST_NAME: kafka.weave.local
     KAFKA_ADVERTISED_PORT: 9092
     KAFKA_BROKER_ID: 0
-    KAFKA_ZOOKEEPER_CONNECT: "zookeeper.weave.local:2181"
+    KAFKA_ZOOKEEPER_CONNECT: zookeeper.weave.local:2181
     WEAVE_CIDR: 10.2.1.14/24
   volumes:
     - /var/run/docker.sock:/var/run/docker.sock
@@ -59,6 +59,8 @@ consumer:
   net: none
   environment:
     WEAVE_CIDR: 10.2.1.15/24
+    KAFKA_ZK_CONNECT: zookeeper.weave.local:2181
+    TOPIC: the-topic-3
   volumes_from:
     - sparkworker1
     - sparkmaster

@@ -49,14 +49,7 @@ task dockerContainer(type: Docker) {
     applicationName = 'streaming-consumer'
     tagVersion = '1.0'
 
-    baseImage = 'loki2302/sparkbase:latest'
+    dockerfile = file('Dockerfile')
     addFile "${buildDir}/libs/spark-streaming-consumer-1.0-all.jar", '/'
-    workingDir '/opt/spark-1.3.1-bin-hadoop2.6'
-    defaultCommand = [
-            './bin/spark-submit',
-            '--master', 'spark://sparkmaster.weave.local:7077',
-            '/spark-streaming-consumer-1.0-all.jar',
-            '--kafka-zk-connect', 'zookeeper.weave.local:2181',
-            '--topic', 'the-topic-3']
 }
 dockerContainer.dependsOn 'shadowJar'
