@@ -1,21 +1,22 @@
 sparkmaster:
   image: loki2302/sparkmaster
-  hostname: sparkmaster.weave.local
+  hostname: sparkmaster.weave.lan
   dns: 10.2.1.254
   net: none
   environment:
     WEAVE_CIDR: 10.2.1.11/24
+    SPARK_MASTER_IP: sparkmaster.weave.lan
   ports:
     - "8080:8080"
     - "7077:7077"
 
 sparkworker1:
   image: loki2302/sparkworker
-  hostname: sparkworker1.weave.local
+  hostname: sparkworker1.weave.lan
   dns: 10.2.1.254
   net: none
   environment:
-    SPARK_MASTER: sparkmaster.weave.local:7077
+    SPARK_MASTER: sparkmaster.weave.lan:7077
     WEBUI_PORT: 8081
     CORES: 2
     WEAVE_CIDR: 10.2.1.12/24
@@ -26,7 +27,7 @@ sparkworker1:
 
 zookeeper:
   image: jplock/zookeeper:3.4.6
-  hostname: zookeeper.weave.local
+  hostname: zookeeper.weave.lan
   dns: 10.2.1.254
   net: none
   environment:
@@ -36,16 +37,16 @@ zookeeper:
 
 kafka:
   image: wurstmeister/kafka:0.8.2.1
-  hostname: kafka.weave.local
+  hostname: kafka.weave.lan
   dns: 10.2.1.254
   net: none
   ports:
     - "9092:9092"
   environment:
-    KAFKA_ADVERTISED_HOST_NAME: kafka.weave.local
+    KAFKA_ADVERTISED_HOST_NAME: kafka.weave.lan
     KAFKA_ADVERTISED_PORT: 9092
     KAFKA_BROKER_ID: 0
-    KAFKA_ZOOKEEPER_CONNECT: zookeeper.weave.local:2181
+    KAFKA_ZOOKEEPER_CONNECT: zookeeper.weave.lan:2181
     WEAVE_CIDR: 10.2.1.14/24
   volumes:
     - /var/run/docker.sock:/var/run/docker.sock
@@ -54,12 +55,13 @@ kafka:
 
 consumer:
   image: apache-spark-experiment/streaming-consumer:1.0
-  hostname: consumer.weave.local
+  hostname: consumer.weave.lan
   dns: 10.2.1.254
   net: none
   environment:
     WEAVE_CIDR: 10.2.1.15/24
-    KAFKA_ZK_CONNECT: zookeeper.weave.local:2181
+    SPARK_MASTER: spark://sparkmaster.weave.lan:7077
+    KAFKA_ZK_CONNECT: zookeeper.weave.lan:2181
     TOPIC: the-topic-3
   volumes_from:
     - sparkworker1
@@ -70,12 +72,12 @@ consumer:
 
 producer:
   image: apache-spark-experiment/streaming-producer:1.0
-  hostname: producer.weave.local
+  hostname: producer.weave.lan
   dns: 10.2.1.254
   net: none
   environment:
     WEAVE_CIDR: 10.2.1.16/24
-    KAFKA: kafka.weave.local:9092
+    KAFKA: kafka.weave.lan:9092
     TOPIC: the-topic-3
   volumes_from:
     - kafka

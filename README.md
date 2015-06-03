@@ -35,8 +35,20 @@ sudo chmod a+x /usr/local/bin/weave
 
 ```bash
 sudo weave launch
-sudo weave launch-dns 10.2.1.254/24
+sudo weave launch-dns 10.2.1.254/24 --domain="weave.lan"
 sudo weave launch-proxy --with-dns
+```
+
+#### Expose host OS to Weave network
+
+```bash
+sudo weave expose 10.2.1.23/24 -h the-ubuntu.weave.lan
+```
+
+#### Add Weave DNS to ethwe
+
+```bash
+nmcli con mod ethwe ipv4.dns "10.2.1.254"
 ```
 
 #### Launch the app
@@ -45,3 +57,5 @@ Go to `spark-streaming-consumer` and
 ```bash
 sudo DOCKER_HOST=tcp://localhost:12375 docker-compose up
 ```
+
+http://sparkmaster.weave.lan:8080 should be available.
