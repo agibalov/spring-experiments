@@ -4,5 +4,5 @@ include 'spark-core-app'
 include 'playground'
 include 'spark-streaming-producer'
 include 'spark-streaming-consumer'
-
+include 'spark-streaming-console'
 

@@ -10,8 +10,12 @@ import org.apache.spark.streaming.api.java.JavaDStream;
 import org.apache.spark.streaming.api.java.JavaPairReceiverInputDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.apache.spark.streaming.kafka.KafkaUtils;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.web.client.RestTemplate;
 import scala.Tuple2;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +28,7 @@ public class App {
                 .withLongOpt("kafka-zk-connect")
                 .hasArg()
                 .withArgName("KAFKA_ZK_CONNECT_HOST_AND_PORT")
-                .withDescription("Kafka ZooKeeper connect host and port, zookeeper.weave.local:2181")
+                .withDescription("Kafka ZooKeeper connect host and port, zookeeper.weave.lan:2181")
                 .create("k"));
         options.addOption(OptionBuilder
                 .isRequired()
@@ -32,6 +36,13 @@ public class App {
                 .hasArg()
                 .withArgName("KAFKA_TOPIC")
                 .withDescription("Kafka topic name, like the-topic-3")
+                .create("t"));
+        options.addOption(OptionBuilder
+                .isRequired()
+                .withLongOpt("console")
+                .hasArg()
+                .withArgName("CONSOLE")
+                .withDescription("Console URL, like http://console.weave.lan:8080/")
                 .create("t"));
 
         if(args.length == 0) {
@@ -49,11 +60,13 @@ public class App {
             return;
         }
 
-        String zookeeperQuorum = commandLine.getOptionValue("kafka-zk-connect");
-        String kafkaTopic = commandLine.getOptionValue("topic");
+        final String zookeeperQuorum = commandLine.getOptionValue("kafka-zk-connect");
+        final String kafkaTopic = commandLine.getOptionValue("topic");
+        final String consoleUrl = commandLine.getOptionValue("console");
 
         System.out.printf("zookeeperQuorum: %s\n", zookeeperQuorum);
         System.out.printf("topic: %s\n", kafkaTopic);
+        System.out.printf("console: %s\n", consoleUrl);
 
         final String kafkaGroup = "group1";
 
@@ -84,11 +97,19 @@ public class App {
             public Void call(JavaRDD<Integer> v1) throws Exception {
                 List<Integer> sumOptional = v1.collect();
                 System.out.printf("FOREACH: size=%d\n", sumOptional.size());
-                if(sumOptional.isEmpty()) {
+
+                Integer sumOrNull = sumOptional.isEmpty() ? null : sumOptional.get(0);
+                if(sumOrNull == null) {
                     System.out.println("no data");
                 } else {
-                    System.out.printf("sum is %d\n", sumOptional.get(0));
+                    System.out.printf("sum is %d\n", sumOrNull);
                 }
+
+                RestTemplate restTemplate = new RestTemplate();
+                restTemplate.setMessageConverters(Arrays.<HttpMessageConverter<?>>asList(new MappingJackson2HttpMessageConverter()));
+                UpdateDTO updateDTO = new UpdateDTO();
+                updateDTO.sum = sumOrNull;
+                restTemplate.put(consoleUrl, updateDTO);
 
                 return null;
             }
@@ -96,5 +117,9 @@ public class App {
 
         jsc.start();
         jsc.awaitTermination();
+    }
+
+    public static class UpdateDTO {
+        public Integer sum;
     }
 }

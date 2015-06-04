@@ -1,0 +1,34 @@
+buildscript {
+    repositories { jcenter() }
+    dependencies {
+        classpath 'se.transmode.gradle:gradle-docker:1.2'
+    }
+}
+
+apply plugin: 'application'
+apply plugin: 'docker'
+
+mainClassName = 'me.loki2302.App'
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+version = '1.0'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+    compile 'commons-cli:commons-cli:1.2'
+    compile 'org.springframework.boot:spring-boot-starter-web:1.2.3.RELEASE'
+}
+
+task dockerContainer(type: Docker) {
+    applicationName = 'streaming-console'
+    tagVersion = '1.0'
+
+    dockerfile = file('Dockerfile')
+    addFile "${buildDir}/distributions/spark-streaming-console-1.0.tar", '/'
+}
+dockerContainer.dependsOn 'distTar'

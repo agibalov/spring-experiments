@@ -63,12 +63,14 @@ consumer:
     SPARK_MASTER: spark://sparkmaster.weave.lan:7077
     KAFKA_ZK_CONNECT: zookeeper.weave.lan:2181
     TOPIC: the-topic-3
+    CONSOLE: http://console.weave.lan:8080/
   volumes_from:
     - sparkworker1
     - sparkmaster
     - zookeeper
     - kafka
     - producer
+    - console
 
 producer:
   image: apache-spark-experiment/streaming-producer:1.0
@@ -81,3 +83,11 @@ producer:
     TOPIC: the-topic-3
   volumes_from:
     - kafka
+
+console:
+  image: apache-spark-experiment/streaming-console:1.0
+  hostname: console.weave.lan
+  dns: 10.2.1.254
+  net: none
+  environment:
+    WEAVE_CIDR: 10.2.1.17/24
