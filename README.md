@@ -45,10 +45,10 @@ sudo weave launch-proxy --with-dns
 sudo weave expose 10.2.1.23/24 -h the-ubuntu.weave.lan
 ```
 
-#### Add Weave DNS to ethwe
+#### Make host OS use Weave DNS
 
 ```bash
-nmcli con mod ethwe ipv4.dns "10.2.1.254"
+echo "nameserver 10.2.1.254" | sudo tee -a /etc/resolvconf/resolv.conf.d/base
 ```
 
 #### Launch the app
