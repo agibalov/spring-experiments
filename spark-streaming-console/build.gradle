@@ -2,11 +2,13 @@ buildscript {
     repositories { jcenter() }
     dependencies {
         classpath 'se.transmode.gradle:gradle-docker:1.2'
+        classpath 'com.moowork.gradle:gradle-node-plugin:0.10'
     }
 }
 
 apply plugin: 'application'
 apply plugin: 'docker'
+apply plugin: 'com.moowork.node'
 
 mainClassName = 'me.loki2302.App'
 
@@ -23,6 +25,30 @@ dependencies {
     compile 'commons-cli:commons-cli:1.2'
     compile 'org.springframework.boot:spring-boot-starter-web:1.2.3.RELEASE'
 }
+
+node {
+    version = '0.12.4'
+    download = true
+    workDir = file("${project.projectDir}/nodejs")
+}
+
+task bowerInstall(type: NodeTask, dependsOn: 'npmInstall') {
+    script = file('node_modules/bower/bin/bower')
+    args = ['install', '--allow-root']
+}
+
+task gruntBuild(type: NodeTask, dependsOn: 'bowerInstall') {
+    script = file('node_modules/grunt-cli/bin/grunt')
+    args = ['build']
+}
+
+task gruntClean(type: NodeTask, dependsOn: 'npmInstall') {
+    script = file('node_modules/grunt-cli/bin/grunt')
+    args = ['clean']
+}
+
+processResources.dependsOn('gruntBuild')
+clean.dependsOn('gruntClean')
 
 task dockerContainer(type: Docker) {
     applicationName = 'streaming-console'

@@ -63,7 +63,7 @@ consumer:
     SPARK_MASTER: spark://sparkmaster.weave.lan:7077
     KAFKA_ZK_CONNECT: zookeeper.weave.lan:2181
     TOPIC: the-topic-3
-    CONSOLE: http://console.weave.lan:8080/
+    CONSOLE: http://console.weave.lan:8080/status
   volumes_from:
     - sparkworker1
     - sparkmaster

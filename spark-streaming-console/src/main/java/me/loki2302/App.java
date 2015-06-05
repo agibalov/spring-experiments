@@ -22,22 +22,16 @@ public class App {
         private Object updateLock = new Object();
         private UpdateDTO update;
 
-        @RequestMapping(value = "/", method = RequestMethod.GET)
-        public String index() {
+        @RequestMapping(value = "/status", method = RequestMethod.GET)
+        public UpdateDTO index() {
             log.info("Update has been requested");
 
             synchronized (updateLock) {
-                if (update == null) {
-                    log.info("Telling them there were no updates so far");
-                    return String.format("Didn't have any updates yet");
-                }
-
-                log.info("Telling them: {}", update.sum);
-                return String.format("Last known sum: %d", update.sum);
+                return update;
             }
         }
 
-        @RequestMapping(value = "/", method = RequestMethod.PUT)
+        @RequestMapping(value = "/status", method = RequestMethod.PUT)
         public void update(@RequestBody UpdateDTO update) {
             synchronized (updateLock) {
                 log.info("Someone has sent an update: {}", update.sum);
