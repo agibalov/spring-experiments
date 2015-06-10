@@ -56,7 +56,7 @@ public class FactoryBeanTest {
         }
 
         public int addNumbers(int a, int b) {
-            return a + b;
+            return addNumbersHandler.addNumbers(a, b);
         }
     }
 
