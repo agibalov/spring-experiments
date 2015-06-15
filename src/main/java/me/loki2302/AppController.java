@@ -15,4 +15,16 @@ public class AppController {
     public String index() {
         return appProperties.getMessage();
     }
+
+    @RequestMapping(value = "/version")
+    @ResponseBody
+    public String version() {
+        Package meLoki2302Package = Package.getPackage("me.loki2302");
+        String version = meLoki2302Package.getImplementationVersion();
+        if(version == null) {
+            version = "no version info";
+        }
+
+        return String.format("%s (%s)", meLoki2302Package.getName(), version);
+    }
 }
