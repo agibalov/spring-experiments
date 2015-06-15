@@ -14,7 +14,6 @@ import org.springframework.social.connect.support.OAuth1ConnectionFactory;
 import org.springframework.social.connect.support.OAuth2ConnectionFactory;
 import org.springframework.social.connect.web.ConnectSupport;
 import org.springframework.social.facebook.api.Facebook;
-import org.springframework.social.facebook.api.FacebookProfile;
 import org.springframework.social.facebook.connect.FacebookConnectionFactory;
 import org.springframework.social.google.api.Google;
 import org.springframework.social.google.api.plus.Person;
@@ -243,7 +242,7 @@ public class App {
             model.addAttribute("profileUrl", facebookConnection.getProfileUrl());
             model.addAttribute("imageUrl", facebookConnection.getImageUrl());
 
-            FacebookProfile facebookProfile = facebookConnection.getApi().userOperations().getUserProfile();
+            org.springframework.social.facebook.api.User facebookProfile = facebookConnection.getApi().userOperations().getUserProfile();
             model.addAttribute("email", facebookProfile.getEmail());
         }
 
