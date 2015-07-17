@@ -43,6 +43,5 @@ public class DummyTest {
         MimeMessage mimeMessage = message.getMimeMessage();
         assertEquals("hello", mimeMessage.getSubject());
         assertTrue(((String) mimeMessage.getContent()).contains("Hi there!"));
-
     }
 }

@@ -9,8 +9,10 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
-    testCompile("org.springframework.boot:spring-boot-starter-test:1.0.2.RELEASE")
-    compile('org.subethamail:subethasmtp:3.1.7')
-    compile("org.springframework.boot:spring-boot-starter:1.0.2.RELEASE")
-    compile('org.springframework:spring-context-support:4.0.4.RELEASE')
+    compile 'org.subethamail:subethasmtp:3.1.7'
+    compile 'org.springframework.boot:spring-boot-starter-mail:1.2.5.RELEASE'
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.4'
 }
