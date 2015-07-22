@@ -9,12 +9,12 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
-    testCompile 'org.springframework.boot:spring-boot-starter-test:1.2.3.RELEASE'
-    testCompile 'joda-time:joda-time:2.5'
-    testCompile 'org.springframework.boot:spring-boot-starter-data-jpa:1.2.3.RELEASE'
-    testCompile 'com.h2database:h2:1.4.181'
-    testCompile 'org.hsqldb:hsqldb:2.3.2'
-    testCompile 'com.fasterxml.jackson.core:jackson-databind:2.5.3'
+    testCompile 'org.springframework.boot:spring-boot-starter-test:1.2.5.RELEASE'
+    testCompile 'joda-time:joda-time:2.8.1'
+    testCompile 'org.springframework.boot:spring-boot-starter-data-jpa:1.2.5.RELEASE'
+    testCompile 'com.h2database:h2:1.4.187'
+    testCompile 'org.hsqldb:hsqldb:2.3.3'
+    testCompile 'com.fasterxml.jackson.core:jackson-databind:2.6.0'
 }
 
 test {
@@ -25,5 +25,5 @@ test {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.3'
+    gradleVersion = '2.4'
 }
