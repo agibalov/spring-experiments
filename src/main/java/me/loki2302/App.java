@@ -1,11 +1,6 @@
 package me.loki2302;
 
-import com.mangofactory.swagger.configuration.SpringSwaggerConfig;
-import com.mangofactory.swagger.plugin.EnableSwagger;
-import com.mangofactory.swagger.plugin.SwaggerSpringMvcPlugin;
-import com.wordnik.swagger.annotations.*;
-import com.wordnik.swagger.model.ApiInfo;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.swagger.annotations.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -14,6 +9,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.builders.ApiInfoBuilder;
+import springfox.documentation.service.ApiInfo;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger1.annotations.EnableSwagger;
+
+import static com.google.common.base.Predicates.or;
+import static springfox.documentation.builders.PathSelectors.ant;
 
 public class App {
     public static void main(String[] args) {
@@ -25,18 +28,26 @@ public class App {
     @ComponentScan
     @EnableAutoConfiguration
     public static class Config {
-        @Autowired
-        private SpringSwaggerConfig springSwaggerConfig;
+        @Bean
+        public Docket api() {
+            return new Docket(DocumentationType.SWAGGER_12)
+                    .apiInfo(apiInfo())
+                    .select()
+                    .paths(or(ant("/api/*"), ant("/api/**/*")))
+                    .build();
+        }
 
         @Bean
-        public SwaggerSpringMvcPlugin swaggerSpringMvcPlugin() {
-            return new SwaggerSpringMvcPlugin(springSwaggerConfig).apiInfo(new ApiInfo(
-                    "API title",
-                    "API description",
-                    "API TOS url",
-                    "API contact",
-                    "API license",
-                    "API license url")).apiVersion("1.0.API-VERSION");
+        public ApiInfo apiInfo() {
+            return new ApiInfoBuilder()
+                    .title("My API title")
+                    .contact("My API contact")
+                    .description("My API description")
+                    .license("My API license")
+                    .licenseUrl("http://retask.me/license")
+                    .termsOfServiceUrl("http://retask.me/tos")
+                    .version("My API version")
+                    .build();
         }
     }
 
@@ -48,11 +59,7 @@ public class App {
         @ApiResponses({
                 @ApiResponse(code = 201, message = "Message for 'created'", response = PersonDTO.class),
                 @ApiResponse(code = 400, message = "Message for 'bad request'", response = BadRequestDTO.class)
-
-                // WTF: there's an extra status 200 - why?
         })
-        // WTF: there's no special handling for ResponseEntity<T>, it just gets described as is
-        // WTF: can't play with it using Swagger UI
         public ResponseEntity<Object> createPerson(@RequestBody CreatePersonDTO createPersonDTO) {
             return new ResponseEntity<Object>("hello there", HttpStatus.CREATED);
         }
@@ -74,7 +81,6 @@ public class App {
         }
     }
 
-    // WTF: @ApiModel's value doesn't seem to be used anywhere
     @ApiModel("Create Person DTO")
     public static class CreatePersonDTO {
         @ApiModelProperty(value = "person name", required = true)
@@ -84,7 +90,6 @@ public class App {
         public int age;
     }
 
-    // WTF: @ApiModel's value doesn't seem to be used anywhere
     @ApiModel("Person DTO")
     public static class PersonDTO {
         @ApiModelProperty(value = "A unique person identifier", required = true)
@@ -97,7 +102,6 @@ public class App {
         public int age;
     }
 
-    // WTF: @ApiModel's value doesn't seem to be used anywhere
     @ApiModel("Bad request DTO")
     public static class BadRequestDTO {
         public int dummyBadRequestField;
