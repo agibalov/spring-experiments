@@ -1,5 +1,7 @@
 package me.loki2302;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,11 +12,15 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.Serializable;
@@ -25,6 +31,24 @@ import java.io.Serializable;
 public class CustomPermissionEvaluatorTest {
     @Autowired
     private NoteService noteService;
+
+    // ********************************************
+    // TODO: can I live without authentication?
+    @Before
+    public void setUpAuthentication() {
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
+                "hello",
+                "hello",
+                AuthorityUtils.NO_AUTHORITIES);
+
+        SecurityContextHolder.getContext().setAuthentication(token);
+    }
+
+    @After
+    public void unsetAuthentication() {
+        SecurityContextHolder.clearContext();
+    }
+    // ********************************************
 
     @Test
     public void canViewNoteByInstance() {
@@ -55,7 +79,7 @@ public class CustomPermissionEvaluatorTest {
         }
 
         @Bean(name = "expressionHandler")
-        DefaultMethodSecurityExpressionHandler expressionHandler() {
+        MethodSecurityExpressionHandler expressionHandler() {
             DefaultMethodSecurityExpressionHandler handler = new DefaultMethodSecurityExpressionHandler();
             handler.setPermissionEvaluator(permissionEvaluator());
             return handler;
@@ -67,7 +91,7 @@ public class CustomPermissionEvaluatorTest {
         }
 
         @Bean
-        NoteService dummyService() {
+        NoteService noteService() {
             return new NoteService();
         }
     }
