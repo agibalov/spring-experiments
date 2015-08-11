@@ -1,6 +1,6 @@
 apply plugin: 'java'
 
-sourceCompatibility = 1.5
+sourceCompatibility = 1.7
 version = '1.0'
 
 repositories {
@@ -8,8 +8,12 @@ repositories {
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.11'
-    testCompile("org.springframework.boot:spring-boot-starter-test:1.0.2.RELEASE")
-    compile "org.springframework.boot:spring-boot-starter-web:1.0.2.RELEASE"
-    compile group: "org.hibernate", name: "hibernate-validator", version: "4.3.0.Final"
+    testCompile 'junit:junit:4.11'
+    testCompile 'org.springframework.boot:spring-boot-starter-test:1.2.5.RELEASE'
+    compile 'org.springframework.boot:spring-boot-starter-web:1.2.5.RELEASE'
+    compile 'org.hibernate:hibernate-validator:5.2.1.Final'
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.6'
 }
