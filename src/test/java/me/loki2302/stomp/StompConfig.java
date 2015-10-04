@@ -27,4 +27,9 @@ public class StompConfig extends AbstractWebSocketMessageBrokerConfigurer {
     public GreetingController greetingController() {
         return new GreetingController();
     }
+
+    @Bean
+    public TheEventListener presenceEventListener() {
+        return new TheEventListener();
+    }
 }
