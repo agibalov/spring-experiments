@@ -6,11 +6,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.simp.stomp.*;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.WebSocketClient;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
@@ -19,6 +23,7 @@ import java.lang.reflect.Type;
 import java.util.concurrent.Exchanger;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @IntegrationTest
@@ -26,8 +31,18 @@ import static org.junit.Assert.assertEquals;
 @SpringApplicationConfiguration(classes = StompConfig.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 public class StompTests {
+    private static final Logger logger = LoggerFactory.getLogger(StompTests.class);
+
     @Test
     public void canUseStomp() throws InterruptedException {
+        // This request is only needed to get a JSESSIONID cookie
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity responseEntity = restTemplate.getForEntity(
+                "http://localhost:8080/auth", Object.class);
+        HttpHeaders headers = responseEntity.getHeaders();
+        logger.info("Backend sent me these cookies: {}", headers);
+        assertTrue(headers.containsKey("Set-Cookie"));
+
         WebSocketClient webSocketClient = new StandardWebSocketClient();
         WebSocketStompClient webSocketStompClient = new WebSocketStompClient(webSocketClient);
         webSocketStompClient.setMessageConverter(new MappingJackson2MessageConverter());
@@ -35,10 +50,22 @@ public class StompTests {
         Exchanger<String> receivedMessageExchanger = new Exchanger<String>();
         GreetingsFrameHandler greetingsFrameHandler = new GreetingsFrameHandler(receivedMessageExchanger);
         AppStompSessionHandler stompSessionHandler = new AppStompSessionHandler(greetingsFrameHandler);
-        webSocketStompClient.connect("ws://localhost:8080/hello", stompSessionHandler);
+
+        WebSocketHttpHeaders webSocketHttpHeaders = new WebSocketHttpHeaders();
+
+        // TODO: clean up ASAP
+        // really sorry for this
+        String jSessionIdCookieValue = headers.get("Set-Cookie").get(0).split(";")[0].split("=")[1];
+        webSocketHttpHeaders.add("Cookie", "JSESSIONID=" + jSessionIdCookieValue);
+        logger.info("Got these cookies: {}", webSocketHttpHeaders);
+
+        webSocketStompClient.connect(
+                "ws://localhost:8080/hello",
+                webSocketHttpHeaders,
+                stompSessionHandler);
 
         String receivedMessage = receivedMessageExchanger.exchange(null);
-        assertEquals("Hello, qwerty!", receivedMessage);
+        assertEquals("Hello, qwerty! (demouser)", receivedMessage);
     }
 
     public static class GreetingsFrameHandler implements StompFrameHandler {
