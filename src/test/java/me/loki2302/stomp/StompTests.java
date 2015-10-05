@@ -59,7 +59,6 @@ public class StompTests {
         logger.info("Backend sent me these cookies: {}", headers);
         assertTrue(headers.containsKey("Set-Cookie"));
 
-        // Travis won't let me use the real WebSockets, so I'm using the SockJS client
         WebSocketClient webSocketClient = new StandardWebSocketClient();
         WebSocketStompClient webSocketStompClient = new WebSocketStompClient(webSocketClient);
         webSocketStompClient.setMessageConverter(new MappingJackson2MessageConverter());
