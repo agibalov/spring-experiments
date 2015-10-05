@@ -60,8 +60,7 @@ public class StompTests {
         assertTrue(headers.containsKey("Set-Cookie"));
 
         // Travis won't let me use the real WebSockets, so I'm using the SockJS client
-        // WebSocketClient webSocketClient = new StandardWebSocketClient();
-        WebSocketClient webSocketClient = new SockJsClient(Arrays.asList(new RestTemplateXhrTransport(restTemplate)));
+        WebSocketClient webSocketClient = new StandardWebSocketClient();
         WebSocketStompClient webSocketStompClient = new WebSocketStompClient(webSocketClient);
         webSocketStompClient.setMessageConverter(new MappingJackson2MessageConverter());
 
