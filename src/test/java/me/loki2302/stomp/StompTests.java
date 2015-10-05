@@ -1,5 +1,10 @@
 package me.loki2302.stomp;
 
+import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.BasicCookieStore;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -8,6 +13,7 @@ import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.simp.stomp.*;
 import org.springframework.test.annotation.DirtiesContext;
@@ -36,7 +42,13 @@ public class StompTests {
     @Test
     public void canUseStomp() throws InterruptedException {
         // This request is only needed to get a JSESSIONID cookie
-        RestTemplate restTemplate = new RestTemplate();
+        BasicCookieStore cookieStore = new BasicCookieStore();
+        CloseableHttpClient httpClient = HttpClientBuilder.create()
+                .setDefaultCookieStore(cookieStore)
+                .build();
+
+        HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
+        RestTemplate restTemplate = new RestTemplate(requestFactory);
         ResponseEntity responseEntity = restTemplate.getForEntity(
                 "http://localhost:8080/auth", Object.class);
         HttpHeaders headers = responseEntity.getHeaders();
@@ -51,11 +63,11 @@ public class StompTests {
         GreetingsFrameHandler greetingsFrameHandler = new GreetingsFrameHandler(receivedMessageExchanger);
         AppStompSessionHandler stompSessionHandler = new AppStompSessionHandler(greetingsFrameHandler);
 
-        WebSocketHttpHeaders webSocketHttpHeaders = new WebSocketHttpHeaders();
+        String jSessionIdCookieValue = cookieStore.getCookies().stream()
+                .filter(c -> c.getName().equals("JSESSIONID"))
+                .findFirst().get().getValue();
 
-        // TODO: clean up ASAP
-        // really sorry for this
-        String jSessionIdCookieValue = headers.get("Set-Cookie").get(0).split(";")[0].split("=")[1];
+        WebSocketHttpHeaders webSocketHttpHeaders = new WebSocketHttpHeaders();
         webSocketHttpHeaders.add("Cookie", "JSESSIONID=" + jSessionIdCookieValue);
         logger.info("Got these cookies: {}", webSocketHttpHeaders);
 
