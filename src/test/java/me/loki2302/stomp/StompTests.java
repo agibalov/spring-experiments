@@ -24,9 +24,13 @@ import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.WebSocketClient;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
+import org.springframework.web.socket.sockjs.client.RestTemplateXhrTransport;
+import org.springframework.web.socket.sockjs.client.SockJsClient;
 
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.concurrent.Exchanger;
+import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -40,7 +44,7 @@ public class StompTests {
     private static final Logger logger = LoggerFactory.getLogger(StompTests.class);
 
     @Test
-    public void canUseStomp() throws InterruptedException {
+    public void canUseStomp() throws InterruptedException, ExecutionException {
         // This request is only needed to get a JSESSIONID cookie
         BasicCookieStore cookieStore = new BasicCookieStore();
         CloseableHttpClient httpClient = HttpClientBuilder.create()
@@ -55,7 +59,9 @@ public class StompTests {
         logger.info("Backend sent me these cookies: {}", headers);
         assertTrue(headers.containsKey("Set-Cookie"));
 
-        WebSocketClient webSocketClient = new StandardWebSocketClient();
+        // Travis won't let me use the real WebSockets, so I'm using the SockJS client
+        // WebSocketClient webSocketClient = new StandardWebSocketClient();
+        WebSocketClient webSocketClient = new SockJsClient(Arrays.asList(new RestTemplateXhrTransport(restTemplate)));
         WebSocketStompClient webSocketStompClient = new WebSocketStompClient(webSocketClient);
         webSocketStompClient.setMessageConverter(new MappingJackson2MessageConverter());
 
@@ -71,13 +77,15 @@ public class StompTests {
         webSocketHttpHeaders.add("Cookie", "JSESSIONID=" + jSessionIdCookieValue);
         logger.info("Got these cookies: {}", webSocketHttpHeaders);
 
-        webSocketStompClient.connect(
+        StompSession stompSession = webSocketStompClient.connect(
                 "ws://localhost:8080/hello",
                 webSocketHttpHeaders,
-                stompSessionHandler);
+                stompSessionHandler).get();
 
         String receivedMessage = receivedMessageExchanger.exchange(null);
         assertEquals("Hello, qwerty! (demouser)", receivedMessage);
+
+        stompSession.disconnect();
     }
 
     public static class GreetingsFrameHandler implements StompFrameHandler {
