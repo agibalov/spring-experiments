@@ -1,39 +1,27 @@
 package me.loki2302.stomp;
 
-import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.BasicCookieStore;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.commons.codec.binary.Base64;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.simp.stomp.*;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.WebSocketClient;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
-import org.springframework.web.socket.sockjs.client.RestTemplateXhrTransport;
-import org.springframework.web.socket.sockjs.client.SockJsClient;
 
 import java.lang.reflect.Type;
-import java.util.Arrays;
 import java.util.concurrent.Exchanger;
 import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @IntegrationTest
@@ -45,35 +33,16 @@ public class StompTests {
 
     @Test
     public void canUseStomp() throws InterruptedException, ExecutionException {
-        // This request is only needed to get a JSESSIONID cookie
-        BasicCookieStore cookieStore = new BasicCookieStore();
-        CloseableHttpClient httpClient = HttpClientBuilder.create()
-                .setDefaultCookieStore(cookieStore)
-                .build();
-
-        HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
-        RestTemplate restTemplate = new RestTemplate(requestFactory);
-        ResponseEntity responseEntity = restTemplate.getForEntity(
-                "http://localhost:8080/auth", Object.class);
-        HttpHeaders headers = responseEntity.getHeaders();
-        logger.info("Backend sent me these cookies: {}", headers);
-        assertTrue(headers.containsKey("Set-Cookie"));
-
         WebSocketClient webSocketClient = new StandardWebSocketClient();
         WebSocketStompClient webSocketStompClient = new WebSocketStompClient(webSocketClient);
         webSocketStompClient.setMessageConverter(new MappingJackson2MessageConverter());
 
-        Exchanger<String> receivedMessageExchanger = new Exchanger<String>();
+        Exchanger<String> receivedMessageExchanger = new Exchanger<>();
         GreetingsFrameHandler greetingsFrameHandler = new GreetingsFrameHandler(receivedMessageExchanger);
         AppStompSessionHandler stompSessionHandler = new AppStompSessionHandler(greetingsFrameHandler);
 
-        String jSessionIdCookieValue = cookieStore.getCookies().stream()
-                .filter(c -> c.getName().equals("JSESSIONID"))
-                .findFirst().get().getValue();
-
         WebSocketHttpHeaders webSocketHttpHeaders = new WebSocketHttpHeaders();
-        webSocketHttpHeaders.add("Cookie", "JSESSIONID=" + jSessionIdCookieValue);
-        logger.info("Got these cookies: {}", webSocketHttpHeaders);
+        webSocketHttpHeaders.add("Authorization", makeBasicHttpAuthorizationToken("testuser", "testpassword"));
 
         StompSession stompSession = webSocketStompClient.connect(
                 "ws://localhost:8080/hello",
@@ -81,9 +50,16 @@ public class StompTests {
                 stompSessionHandler).get();
 
         String receivedMessage = receivedMessageExchanger.exchange(null);
-        assertEquals("Hello, qwerty! (demouser)", receivedMessage);
+        assertEquals("Hello, qwerty! (testuser)", receivedMessage);
 
         stompSession.disconnect();
+    }
+
+    private static String makeBasicHttpAuthorizationToken(String username, String password) {
+        String usernameColonPasswordString = String.format("%s:%s", username, password);
+        String base64EncodedUsernameColonPasswordString = Base64.encodeBase64String(usernameColonPasswordString.getBytes());
+        String tokenString = String.format("Basic %s", base64EncodedUsernameColonPasswordString);
+        return tokenString;
     }
 
     public static class GreetingsFrameHandler implements StompFrameHandler {
