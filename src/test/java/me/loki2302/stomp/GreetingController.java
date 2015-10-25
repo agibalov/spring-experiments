@@ -13,7 +13,7 @@ public class GreetingController {
     private final Logger logger = LoggerFactory.getLogger(GreetingController.class);
 
     @MessageMapping("/hello")
-    @SendTo("/topic/greetings")
+    @SendTo("/out/greetings")
     public GreetingMessage greeting(HelloMessage helloMessage, Principal principal) {
         logger.info("greeting(): {} (principal={})", helloMessage.name, principal);
 

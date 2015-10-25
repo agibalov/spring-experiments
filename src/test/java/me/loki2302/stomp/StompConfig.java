@@ -23,13 +23,12 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 public class StompConfig extends AbstractWebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/topic");
-        config.setApplicationDestinationPrefixes("/app");
+        config.setApplicationDestinationPrefixes("/in");
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/hello");//.withSockJS();
+        registry.addEndpoint("/ws");//.withSockJS();
     }
 
     @Bean

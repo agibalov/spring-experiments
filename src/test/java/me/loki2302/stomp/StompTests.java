@@ -45,7 +45,7 @@ public class StompTests {
         webSocketHttpHeaders.add("Authorization", makeBasicHttpAuthorizationToken("testuser", "testpassword"));
 
         StompSession stompSession = webSocketStompClient.connect(
-                "ws://localhost:8080/hello",
+                "ws://localhost:8080/ws",
                 webSocketHttpHeaders,
                 stompSessionHandler).get();
 
@@ -100,11 +100,11 @@ public class StompTests {
         public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
             logger.info("afterConnected()", session);
 
-            session.subscribe("/topic/greetings", greetingsFrameHandler);
+            session.subscribe("/out/greetings", greetingsFrameHandler);
 
             HelloMessage helloMessage = new HelloMessage();
             helloMessage.name = "qwerty";
-            session.send("/app/hello", helloMessage);
+            session.send("/in/hello", helloMessage);
         }
 
         @Override
