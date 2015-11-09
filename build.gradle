@@ -26,9 +26,9 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
-    testCompile 'org.springframework.boot:spring-boot-starter-test:1.2.4.RELEASE'
-    testCompile 'org.springframework.restdocs:spring-restdocs:1.0.0.M1'
-    compile 'org.springframework.boot:spring-boot-starter-web:1.2.4.RELEASE'
+    testCompile 'org.springframework.boot:spring-boot-starter-test:1.2.7.RELEASE'
+    testCompile 'org.springframework.restdocs:spring-restdocs-mockmvc:1.0.0.RELEASE'
+    compile 'org.springframework.boot:spring-boot-starter-web:1.2.7.RELEASE'
 }
 
 ext {
