@@ -13,7 +13,6 @@ import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger1.annotations.EnableSwagger;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import static com.google.common.base.Predicates.or;
@@ -25,15 +24,15 @@ public class App {
     }
 
     @Configuration
-    @EnableSwagger
     @EnableSwagger2
     @ComponentScan
     @EnableAutoConfiguration
     public static class Config {
         @Bean
         public Docket api() {
-            return new Docket(DocumentationType.SWAGGER_12)
+            return new Docket(DocumentationType.SWAGGER_2)
                     .apiInfo(apiInfo())
+                    .useDefaultResponseMessages(false)
                     .select()
                     .paths(or(ant("/api/*"), ant("/api/**/*")))
                     .build();
