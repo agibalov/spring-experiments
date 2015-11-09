@@ -25,6 +25,9 @@ public class AppTest {
     @Autowired
     private WebApplicationContext context;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     private MockMvc mockMvc;
 
     @Before
@@ -39,8 +42,6 @@ public class AppTest {
         App.CreateNoteRequestDto createNoteRequestDto = new App.CreateNoteRequestDto();
         createNoteRequestDto.title = "my note";
         createNoteRequestDto.description = "my description";
-
-        ObjectMapper objectMapper = new ObjectMapper();
 
         mockMvc.perform(post("/api/notes")
                 .contentType(MediaType.APPLICATION_JSON)
