@@ -8,6 +8,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentation;
+import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -17,7 +18,11 @@ import org.springframework.web.context.WebApplicationContext;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -32,15 +37,12 @@ public class AppTest {
     @Autowired
     private WebApplicationContext context;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
     private MockMvc mockMvc;
 
     @Before
     public void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(context)
-                .apply(documentationConfiguration(this.restDocumentation))
+                .apply(documentationConfiguration(restDocumentation))
                 .build();
     }
 
@@ -52,11 +54,19 @@ public class AppTest {
 
         mockMvc.perform(post("/api/notes")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(createNoteRequestDto)))
+                .content(new ObjectMapper().writeValueAsString(createNoteRequestDto)))
                 .andExpect(status().isOk())
-                .andDo(document("createNote", responseFields(
-                        fieldWithPath("id").description("Note id"),
-                        fieldWithPath("title").description("Note title"),
-                        fieldWithPath("description").description("Note description"))));
+                .andDo(document("createNote",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        responseFields(
+                                fieldWithPath("id").description("Note id"),
+                                fieldWithPath("title").description("Note title"),
+                                fieldWithPath("description").description("Note description")
+                        ),
+                        requestFields(
+                                fieldWithPath("title").description("Note title"),
+                                fieldWithPath("description").description("Note description")
+                        )));
     }
 }
