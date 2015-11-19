@@ -1,0 +1,23 @@
+= API docs
+:toc: left
+
+== Curl request
+
+include::{snippets}/createNote/curl-request.adoc[]
+
+== Http request
+
+include::{snippets}/createNote/http-request.adoc[]
+
+== Http response
+
+include::{snippets}/createNote/http-response.adoc[]
+
+== Request fields
+
+include::{snippets}/createNote/request-fields.adoc[]
+
+== Response fields
+
+include::{snippets}/createNote/response-fields.adoc[]
+
