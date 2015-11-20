@@ -9,15 +9,26 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentation;
+import org.springframework.restdocs.RestDocumentationContext;
 import org.springframework.restdocs.constraints.Constraint;
 import org.springframework.restdocs.constraints.ConstraintDescriptionResolver;
 import org.springframework.restdocs.constraints.ConstraintDescriptions;
+import org.springframework.restdocs.operation.Operation;
+import org.springframework.restdocs.snippet.Snippet;
+import org.springframework.restdocs.snippet.TemplatedSnippet;
+import org.springframework.restdocs.snippet.WriterResolver;
+import org.springframework.restdocs.templates.TemplateEngine;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+
+import java.io.IOException;
+import java.io.Writer;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
@@ -79,6 +90,31 @@ public class AppTest {
                 .andDo(document("createNoteSuccess",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
+                        new Snippet() {
+                            @Override
+                            public void document(Operation operation) throws IOException {
+                                RestDocumentationContext context =
+                                        (RestDocumentationContext)operation.getAttributes().get(RestDocumentationContext.class.getName());
+                                WriterResolver writerResolver =
+                                        (WriterResolver) operation.getAttributes().get(WriterResolver.class.getName());
+                                try(Writer writer = writerResolver.resolve(operation.getName(), "dummy", context)) {
+                                    /*Map<String, Object> model = new HashMap<String, Object>();
+                                    model.put("something", "something value");
+                                    TemplateEngine templateEngine =
+                                            (TemplateEngine)operation.getAttributes().get(TemplateEngine.class.getName());*/
+
+                                    writer.append(String.format(
+                                            "[%%hardbreaks]\n" +
+                                            "my custom snippet\n" +
+                                            "operation name: %s\n" +
+                                            "request uri: %s\n" +
+                                            "response status: %s\n",
+                                    operation.getName(),
+                                    operation.getRequest().getUri(),
+                                    operation.getResponse().getStatus()));
+                                }
+                            }
+                        },
                         responseFields(
                                 fieldWithPath("id").description("Note id"),
                                 fieldWithPath("title").description("Note title"),

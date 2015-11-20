@@ -3,6 +3,10 @@
 
 == Create Note Success
 
+=== Custom snippet
+
+include::{snippets}/createNoteSuccess/dummy.adoc[]
+
 === Http request
 
 include::{snippets}/createNoteSuccess/http-request.adoc[]
