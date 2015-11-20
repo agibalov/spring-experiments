@@ -9,15 +9,11 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentation;
-import org.springframework.restdocs.RestDocumentationContext;
 import org.springframework.restdocs.constraints.Constraint;
 import org.springframework.restdocs.constraints.ConstraintDescriptionResolver;
 import org.springframework.restdocs.constraints.ConstraintDescriptions;
 import org.springframework.restdocs.operation.Operation;
-import org.springframework.restdocs.snippet.Snippet;
 import org.springframework.restdocs.snippet.TemplatedSnippet;
-import org.springframework.restdocs.snippet.WriterResolver;
-import org.springframework.restdocs.templates.TemplateEngine;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -25,19 +21,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.io.IOException;
-import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
-import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.snippet.Attributes.key;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -90,29 +80,14 @@ public class AppTest {
                 .andDo(document("createNoteSuccess",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
-                        new Snippet() {
+                        new TemplatedSnippet("dummy", new HashMap<>()) {
                             @Override
-                            public void document(Operation operation) throws IOException {
-                                RestDocumentationContext context =
-                                        (RestDocumentationContext)operation.getAttributes().get(RestDocumentationContext.class.getName());
-                                WriterResolver writerResolver =
-                                        (WriterResolver) operation.getAttributes().get(WriterResolver.class.getName());
-                                try(Writer writer = writerResolver.resolve(operation.getName(), "dummy", context)) {
-                                    /*Map<String, Object> model = new HashMap<String, Object>();
-                                    model.put("something", "something value");
-                                    TemplateEngine templateEngine =
-                                            (TemplateEngine)operation.getAttributes().get(TemplateEngine.class.getName());*/
-
-                                    writer.append(String.format(
-                                            "[%%hardbreaks]\n" +
-                                            "my custom snippet\n" +
-                                            "operation name: %s\n" +
-                                            "request uri: %s\n" +
-                                            "response status: %s\n",
-                                    operation.getName(),
-                                    operation.getRequest().getUri(),
-                                    operation.getResponse().getStatus()));
-                                }
+                            protected Map<String, Object> createModel(Operation operation) {
+                                Map<String, Object> model = new HashMap<>();
+                                model.put("operationName", operation.getName());
+                                model.put("requestUri", operation.getRequest().getUri());
+                                model.put("responseStatus", operation.getResponse().getStatus());
+                                return model;
                             }
                         },
                         responseFields(
@@ -123,9 +98,7 @@ public class AppTest {
                         requestFields(
                                 fieldWithPath("title")
                                         .description("Note title")
-                                        .attributes(key("constraints").value(titleConstraints))
-                                        /*.attributes(
-                                                key("constraints").value(collectionToDelimitedString(requestConstraints.descriptionsForProperty("title"), ". ")))*/,
+                                        .attributes(key("constraints").value(titleConstraints)),
                                 fieldWithPath("description").description("Note description")
                         )));
     }
