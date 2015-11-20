@@ -19,7 +19,7 @@ version '1.0-SNAPSHOT'
 
 mainClassName = 'me.loki2302.App'
 
-sourceCompatibility = 1.5
+sourceCompatibility = 1.8
 
 repositories {
     mavenLocal()
@@ -32,6 +32,7 @@ dependencies {
     testCompile 'org.springframework.boot:spring-boot-starter-test:1.2.7.RELEASE'
     testCompile 'org.springframework.restdocs:spring-restdocs-mockmvc:1.0.0.RELEASE'
     compile 'org.springframework.boot:spring-boot-starter-web:1.2.7.RELEASE'
+    compile 'org.hibernate:hibernate-validator:5.2.2.Final'
 }
 
 ext {

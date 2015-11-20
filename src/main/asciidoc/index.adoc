@@ -1,23 +1,39 @@
 = API docs
 :toc: left
 
-== Curl request
+== Create Note Success
 
-include::{snippets}/createNote/curl-request.adoc[]
+=== Http request
 
-== Http request
+include::{snippets}/createNoteSuccess/http-request.adoc[]
 
-include::{snippets}/createNote/http-request.adoc[]
+=== Request fields
 
-== Http response
+include::{snippets}/createNoteSuccess/request-fields.adoc[]
 
-include::{snippets}/createNote/http-response.adoc[]
+=== Http response
 
-== Request fields
+include::{snippets}/createNoteSuccess/http-response.adoc[]
 
-include::{snippets}/createNote/request-fields.adoc[]
+=== Response fields
 
-== Response fields
+include::{snippets}/createNoteSuccess/response-fields.adoc[]
 
-include::{snippets}/createNote/response-fields.adoc[]
+== Create Note Validation Error
+
+=== Http request
+
+include::{snippets}/createNoteValidationError/http-request.adoc[]
+
+=== Request fields
+
+include::{snippets}/createNoteValidationError/request-fields.adoc[]
+
+=== Http response
+
+include::{snippets}/createNoteValidationError/http-response.adoc[]
+
+=== Response fields
+
+include::{snippets}/createNoteValidationError/response-fields.adoc[]
 
