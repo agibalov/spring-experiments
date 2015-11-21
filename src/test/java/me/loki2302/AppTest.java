@@ -59,17 +59,7 @@ public class AppTest {
         createNoteRequestDto.description = "my description";
 
         ConstraintDescriptions requestConstraints =
-                new ConstraintDescriptions(App.CreateNoteRequestDto.class, new ConstraintDescriptionResolver() {
-                    @Override
-                    public String resolveDescription(Constraint constraint) {
-                        String constraintName = constraint.getName();
-                        if(constraintName.equals(NotBlank.class.getCanonicalName())) {
-                            return "Should not be blank";
-                        }
-
-                        return constraint.getName();
-                    }
-                });
+                new ConstraintDescriptions(App.CreateNoteRequestDto.class, new MyConstraintDescriptionResolver());
 
         String titleConstraints = collectionToDelimitedString(requestConstraints.descriptionsForProperty("title"), ". ");
 
@@ -78,18 +68,9 @@ public class AppTest {
                 .content(new ObjectMapper().writeValueAsString(createNoteRequestDto)))
                 .andExpect(status().isOk())
                 .andDo(document("createNoteSuccess",
-                        preprocessRequest(prettyPrint()),
-                        preprocessResponse(prettyPrint()),
-                        new TemplatedSnippet("dummy", new HashMap<>()) {
-                            @Override
-                            protected Map<String, Object> createModel(Operation operation) {
-                                Map<String, Object> model = new HashMap<>();
-                                model.put("operationName", operation.getName());
-                                model.put("requestUri", operation.getRequest().getUri());
-                                model.put("responseStatus", operation.getResponse().getStatus());
-                                return model;
-                            }
-                        },
+                        preprocessRequest(prettyPrint(), removeHeaders("Host", "Content-Length")),
+                        preprocessResponse(prettyPrint(), removeHeaders("Content-Length")),
+                        myDummySnippet(),
                         responseFields(
                                 fieldWithPath("id").description("Note id"),
                                 fieldWithPath("title").description("Note title"),
@@ -124,5 +105,36 @@ public class AppTest {
                                 fieldWithPath("title").description("Note title"),
                                 fieldWithPath("description").description("Note description")
                         )));
+    }
+
+    private static class MyConstraintDescriptionResolver implements ConstraintDescriptionResolver {
+        @Override
+        public String resolveDescription(Constraint constraint) {
+            String constraintName = constraint.getName();
+            if(constraintName.equals(NotBlank.class.getCanonicalName())) {
+                return "Should not be blank";
+            }
+
+            return constraint.getName();
+        }
+    }
+
+    private static MyDummySnippet myDummySnippet() {
+        return new MyDummySnippet();
+    }
+
+    private static class MyDummySnippet extends TemplatedSnippet {
+        public MyDummySnippet() {
+            super("dummy", null);
+        }
+
+        @Override
+        protected Map<String, Object> createModel(Operation operation) {
+            Map<String, Object> model = new HashMap<>();
+            model.put("operationName", operation.getName());
+            model.put("requestUri", operation.getRequest().getUri());
+            model.put("responseStatus", operation.getResponse().getStatus());
+            return model;
+        }
     }
 }
