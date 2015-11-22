@@ -69,7 +69,7 @@ public class MetadataTest {
     @Test
     public void canUseSpringToGetMetadata() {
         JpaEntityInformation<Person, ?> jpaEntityInformation =
-                JpaEntityInformationSupport.getMetadata(Person.class, entityManager);
+                JpaEntityInformationSupport.getEntityInformation(Person.class, entityManager);
         SingularAttribute<? super Person, ?> idAttribute = jpaEntityInformation.getIdAttribute();
         assertEquals(Long.class, idAttribute.getJavaType());
         assertEquals("id", idAttribute.getName());
