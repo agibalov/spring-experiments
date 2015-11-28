@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE urlrewrite PUBLIC "-//tuckey.org//DTD UrlRewrite 4.0//EN"
+        "http://www.tuckey.org/res/dtds/urlrewrite4.0.dtd">
+<urlrewrite>
+    <rule>
+        <name>Forward /forward-me to /</name>
+        <note>Forwarding: location remains /forward-me, but content is displayed for /</note>
+        <from>^/forward-me$</from>
+        <to>/</to> <!-- defaults to type="forward" -->
+    </rule>
+    <rule>
+        <name>Redirect /redirect-me to /</name>
+        <note>Real redirect, location becomes /</note>
+        <from>^/redirect-me$</from>
+        <to type="redirect">/</to>
+    </rule>
+</urlrewrite>
