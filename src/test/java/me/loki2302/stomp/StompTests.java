@@ -39,7 +39,31 @@ public class StompTests {
 
         Exchanger<String> receivedMessageExchanger = new Exchanger<>();
         GreetingsFrameHandler greetingsFrameHandler = new GreetingsFrameHandler(receivedMessageExchanger);
-        AppStompSessionHandler stompSessionHandler = new AppStompSessionHandler(greetingsFrameHandler);
+        AppStompSessionHandler stompSessionHandler = new AppStompSessionHandler(greetingsFrameHandler, SubscriptionTarget.PUBLIC);
+
+        WebSocketHttpHeaders webSocketHttpHeaders = new WebSocketHttpHeaders();
+        webSocketHttpHeaders.add("Authorization", makeBasicHttpAuthorizationToken("testuser", "testpassword"));
+
+        StompSession stompSession = webSocketStompClient.connect(
+                "ws://localhost:8080/ws",
+                webSocketHttpHeaders,
+                stompSessionHandler).get();
+
+        String receivedMessage = receivedMessageExchanger.exchange(null);
+        assertEquals("Hello, qwerty! (testuser)", receivedMessage);
+
+        stompSession.disconnect();
+    }
+
+    @Test
+    public void canUseStompWithUserScopedSubscription() throws InterruptedException, ExecutionException {
+        WebSocketClient webSocketClient = new StandardWebSocketClient();
+        WebSocketStompClient webSocketStompClient = new WebSocketStompClient(webSocketClient);
+        webSocketStompClient.setMessageConverter(new MappingJackson2MessageConverter());
+
+        Exchanger<String> receivedMessageExchanger = new Exchanger<>();
+        GreetingsFrameHandler greetingsFrameHandler = new GreetingsFrameHandler(receivedMessageExchanger);
+        AppStompSessionHandler stompSessionHandler = new AppStompSessionHandler(greetingsFrameHandler, SubscriptionTarget.PERSONAL);
 
         WebSocketHttpHeaders webSocketHttpHeaders = new WebSocketHttpHeaders();
         webSocketHttpHeaders.add("Authorization", makeBasicHttpAuthorizationToken("testuser", "testpassword"));
@@ -88,23 +112,45 @@ public class StompTests {
         }
     }
 
+    public enum SubscriptionTarget {
+        PUBLIC,
+        PERSONAL
+    }
+
     public static class AppStompSessionHandler implements StompSessionHandler {
         private static final Logger logger = LoggerFactory.getLogger(AppStompSessionHandler.class);
         private final GreetingsFrameHandler greetingsFrameHandler;
+        private final SubscriptionTarget subscriptionTarget;
 
-        public AppStompSessionHandler(GreetingsFrameHandler greetingsFrameHandler) {
+        public AppStompSessionHandler(GreetingsFrameHandler greetingsFrameHandler, SubscriptionTarget subscriptionTarget) {
             this.greetingsFrameHandler = greetingsFrameHandler;
+            this.subscriptionTarget = subscriptionTarget;
         }
 
         @Override
         public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
             logger.info("afterConnected()", session);
 
-            session.subscribe("/out/greetings", greetingsFrameHandler);
+            if(subscriptionTarget.equals(SubscriptionTarget.PUBLIC)) {
+                // subscribe to public notifications (i.e. sent to all users)
+                session.subscribe("/out/greetings", greetingsFrameHandler);
+            } else if(subscriptionTarget.equals(SubscriptionTarget.PERSONAL)) {
+                // subscribe to private notifications (i.e. sent to this specific user)
+                session.subscribe("/user/testuser/out/greetings", greetingsFrameHandler);
+            } else {
+                throw new RuntimeException();
+            }
 
             HelloMessage helloMessage = new HelloMessage();
             helloMessage.name = "qwerty";
-            session.send("/in/hello", helloMessage);
+
+            if(subscriptionTarget.equals(SubscriptionTarget.PUBLIC)) {
+                session.send("/in/hello", helloMessage);
+            } else if(subscriptionTarget.equals(SubscriptionTarget.PERSONAL)) {
+                session.send("/in/personal-hello", helloMessage);
+            } else {
+                throw new RuntimeException();
+            }
         }
 
         @Override
