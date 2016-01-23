@@ -1,5 +1,5 @@
 dependencies {
-    testCompile 'org.apache.httpcomponents:httpclient:4.3.5'
     compile 'org.springframework.boot:spring-boot-starter-web'
     compile 'org.springframework.boot:spring-boot-starter-security'
+    compile 'io.jsonwebtoken:jjwt:0.6.0'
 }
