@@ -14,10 +14,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -36,6 +38,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
 import java.security.Principal;
+import java.util.Collection;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -137,34 +140,51 @@ public class TokenBasedAuthenticationTest {
                 FilterChain filterChain) throws ServletException, IOException {
 
             String authorizationHeader = request.getHeader("Authorization");
-
-            if(authorizationHeader != null) {
-                if(authorizationHeader.startsWith("Bearer ")) {
-                    String token = authorizationHeader.substring("Bearer ".length());
-                    Authentication authentication = getAuthentication(token);
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                }
+            boolean hasToken = authorizationHeader != null && authorizationHeader.startsWith("Bearer ");
+            if(hasToken) {
+                String token = authorizationHeader.substring("Bearer ".length());
+                Authentication authentication = getAuthentication(token);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
             }
 
             filterChain.doFilter(request, response);
 
-            if(authorizationHeader != null) {
-                if(authorizationHeader.startsWith("Bearer ")) {
-                    SecurityContextHolder.getContext().setAuthentication(null);
-                }
+            if(hasToken) {
+                SecurityContextHolder.getContext().setAuthentication(null);
             }
         }
 
         private Authentication getAuthentication(String token) {
             String subject = jwtService.getSubject(token);
-            return new UsernamePasswordAuthenticationToken(subject, "", AuthorityUtils.NO_AUTHORITIES);
+            return new JwtAuthenticationToken(subject, token, AuthorityUtils.NO_AUTHORITIES);
+        }
+
+        public static class JwtAuthenticationToken extends AbstractAuthenticationToken {
+            private final String username;
+            private final String token;
+
+            public JwtAuthenticationToken(String username, String token, Collection<? extends GrantedAuthority> authorities) {
+                super(authorities);
+                this.username = username;
+                this.token = token;
+            }
+
+            @Override
+            public Object getCredentials() {
+                return token;
+            }
+
+            @Override
+            public Object getPrincipal() {
+                return username;
+            }
         }
     }
 
     @RestController
     public static class ApiController {
         @Autowired
-        private JwtService jwtService;
+        private TokenBasedAuthenticationTest.JwtService jwtService;
 
         @RequestMapping(method = RequestMethod.POST, value = "/api/token")
         public TokenDto makeToken(@RequestBody NameDto nameDto) {
