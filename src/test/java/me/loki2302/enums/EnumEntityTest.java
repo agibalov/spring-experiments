@@ -1,11 +1,11 @@
 package me.loki2302.enums;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.Arrays;
@@ -16,14 +16,10 @@ import static org.junit.Assert.assertNotNull;
 @IntegrationTest
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Config.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class EnumEntityTest {
     @Autowired
     private TicketRepository ticketRepository;
-
-    @Before
-    public void cleanUp() {
-        ticketRepository.deleteAll();
-    }
 
     @Test
     public void canSaveAnEntityWithEnumProperty() {

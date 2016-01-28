@@ -6,6 +6,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.junit.Assert.assertEquals;
@@ -13,18 +14,13 @@ import static org.junit.Assert.assertEquals;
 @IntegrationTest
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Config.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class OneToManyTest {
     @Autowired
     private BlogRepository blogRepository;
 
     @Autowired
     private PostRepository postRepository;
-
-    @Before
-    public void cleanUp() {
-        postRepository.deleteAll();
-        blogRepository.deleteAll();
-    }
 
     @Test
     public void canHaveOneToMany() {
