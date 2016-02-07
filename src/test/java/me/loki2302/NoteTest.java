@@ -15,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.web.client.RestTemplate;
@@ -30,6 +31,7 @@ import static org.junit.Assert.assertNotNull;
 @SpringApplicationConfiguration(classes = App.Config.class)
 @WebAppConfiguration
 @IntegrationTest
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class NoteTest {
     @Autowired
     private PersonRepository personRepository;
@@ -63,9 +65,6 @@ public class NoteTest {
 
         restTemplate = new RestTemplate();
         restTemplate.setMessageConverters(Arrays.<HttpMessageConverter<?>>asList(mappingJackson2HttpMessageConverter));
-
-        noteRepository.deleteAll();
-        personRepository.deleteAll();
     }
 
     @Test

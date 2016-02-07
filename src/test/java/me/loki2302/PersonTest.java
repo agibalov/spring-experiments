@@ -15,6 +15,7 @@ import org.springframework.hateoas.hal.Jackson2HalModule;
 import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.web.client.HttpClientErrorException;
@@ -28,6 +29,7 @@ import static org.junit.Assert.*;
 @SpringApplicationConfiguration(classes = App.Config.class)
 @WebAppConfiguration
 @IntegrationTest
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class PersonTest {
     @Autowired
     private PersonRepository personRepository;
@@ -49,9 +51,6 @@ public class PersonTest {
 
         restTemplate = new RestTemplate();
         restTemplate.setMessageConverters(Arrays.<HttpMessageConverter<?>>asList(mappingJackson2HttpMessageConverter));
-
-        noteRepository.deleteAll();
-        personRepository.deleteAll();
     }
 
     @Test
@@ -61,7 +60,7 @@ public class PersonTest {
 
         assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
         assertNotNull(responseEntity.getHeaders().getLocation());
-        assertFalse(responseEntity.hasBody());
+        assertTrue(responseEntity.hasBody());
     }
 
     @Test
@@ -76,7 +75,7 @@ public class PersonTest {
         assertEquals(HttpStatus.OK, personResponseEntity.getStatusCode());
 
         Resource<Person> personResource = personResponseEntity.getBody();
-        assertEquals(2, personResource.getLinks().size());
+        assertEquals(3, personResource.getLinks().size());
         assertTrue(personResource.getLink("self").getHref().startsWith("http://localhost:8080/people/"));
 
         Person person = personResource.getContent();
@@ -92,7 +91,7 @@ public class PersonTest {
 
         ResponseEntity<Object> updateResponseEntity =
                 updatePerson(personUri, person("Andrey"));
-        assertEquals(HttpStatus.NO_CONTENT, updateResponseEntity.getStatusCode());
+        assertEquals(HttpStatus.OK, updateResponseEntity.getStatusCode());
 
         ResponseEntity<Resource<Person>> personResponseEntity =
                 getPerson(personUri);
