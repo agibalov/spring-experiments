@@ -9,6 +9,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.rest.core.event.AbstractRepositoryEventListener;
 import org.springframework.data.rest.core.event.ValidatingRepositoryEventListener;
+import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer;
+import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurerAdapter;
 import org.springframework.data.rest.webmvc.config.RepositoryRestMvcConfiguration;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
@@ -34,12 +36,12 @@ public class App {
     }
 
     @Configuration
-    public static class MyRepositoryRestMvcConfiguration extends RepositoryRestMvcConfiguration {
+    public static class MyRepositoryRestMvcConfiguration extends RepositoryRestConfigurerAdapter {
         @Autowired
         private PersonValidator personValidator;
 
         @Override
-        protected void configureValidatingRepositoryEventListener(ValidatingRepositoryEventListener validatingListener) {
+        public void configureValidatingRepositoryEventListener(ValidatingRepositoryEventListener validatingListener) {
             validatingListener.addValidator("beforeCreate", personValidator);
         }
     }
