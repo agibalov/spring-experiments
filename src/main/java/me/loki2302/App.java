@@ -7,11 +7,16 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.data.rest.core.annotation.HandleAfterCreate;
+import org.springframework.data.rest.core.annotation.HandleBeforeCreate;
+import org.springframework.data.rest.core.annotation.RepositoryEventHandler;
+import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
 import org.springframework.data.rest.core.event.AbstractRepositoryEventListener;
 import org.springframework.data.rest.core.event.ValidatingRepositoryEventListener;
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer;
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurerAdapter;
 import org.springframework.data.rest.webmvc.config.RepositoryRestMvcConfiguration;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
@@ -61,16 +66,17 @@ public class App {
         }
     }
 
-    @Service
-    public static class MyEventListener extends AbstractRepositoryEventListener<Person> {
-        @Override
-        protected void onBeforeCreate(Person entity) {
-            System.out.printf("Before create %s\n", entity);
+    @Component
+    @RepositoryEventHandler
+    public static class MyEntityEventHandler {
+        @HandleBeforeCreate
+        public void handleBeforeEntityCreate(Object e) {
+            System.out.printf("Before create %s\n", e);
         }
 
-        @Override
-        protected void onAfterCreate(Person entity) {
-            System.out.printf("After create %s\n", entity);
+        @HandleAfterCreate
+        public void handleAfterEntityCreate(Object e) {
+            System.out.printf("After create %s\n", e);
         }
     }
 }
