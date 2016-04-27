@@ -19,7 +19,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import static org.junit.Assert.assertEquals;
 
 @IntegrationTest
-@SpringApplicationConfiguration(classes = DummyTest.Config.class)
+@SpringApplicationConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
 public class DummyTest {
     @Autowired
@@ -38,8 +38,8 @@ public class DummyTest {
         IntegrationFlow upperCaseFlow() {
             return new IntegrationFlow() {
                 @Override
-                public void accept(IntegrationFlowDefinition<?> integrationFlowDefinition) {
-                    integrationFlowDefinition.transform(new GenericTransformer<String, String>() {
+                public void configure(IntegrationFlowDefinition<?> flow) {
+                    flow.transform(new GenericTransformer<String, String>() {
                         @Override
                         public String transform(String source) {
                             return source.toUpperCase();

@@ -31,8 +31,8 @@ public class App {
         IntegrationFlow upperCaseFlow() {
             return new IntegrationFlow() {
                 @Override
-                public void accept(IntegrationFlowDefinition<?> integrationFlowDefinition) {
-                    integrationFlowDefinition.transform(new GenericTransformer<String, String>() {
+                public void configure(IntegrationFlowDefinition<?> flow) {
+                    flow.transform(new GenericTransformer<String, String>() {
                         @Override
                         public String transform(String source) {
                             return source.toUpperCase();
