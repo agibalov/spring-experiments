@@ -7,15 +7,18 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.WebIntegrationTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.format.FormatterRegistry;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-
-import java.beans.PropertyEditorSupport;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import static org.junit.Assert.assertEquals;
 
@@ -23,7 +26,7 @@ import static org.junit.Assert.assertEquals;
 @WebIntegrationTest
 @SpringApplicationConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
-public class EnumPathVariableViaCustomPropertyEditor {
+public class EnumPathVariableViaCustomConverterTest {
     @Test
     public void checkCurrencies() {
         RestTemplate restTemplate = new RestTemplate();
@@ -39,7 +42,12 @@ public class EnumPathVariableViaCustomPropertyEditor {
 
     @Configuration
     @EnableAutoConfiguration
-    public static class Config {
+    public static class Config extends WebMvcConfigurerAdapter {
+        @Override
+        public void addFormatters(FormatterRegistry registry) {
+            registry.addConverter(new StringToCurrencyConverter());
+        }
+
         @Bean
         public CurrencyController dummyController() {
             return new CurrencyController();
@@ -48,11 +56,6 @@ public class EnumPathVariableViaCustomPropertyEditor {
 
     @RestController
     public static class CurrencyController {
-        @InitBinder
-        public void registerCurrencyEnumPropertyEditor(WebDataBinder webDataBinder) {
-            webDataBinder.registerCustomEditor(Currency.class, new CurrencyEnumPropertyEditor());
-        }
-
         @RequestMapping(value = "/{currency}", method = RequestMethod.GET)
         public String index(@PathVariable("currency") Currency currency) {
             if(currency.equals(Currency.USD)) {
@@ -65,13 +68,13 @@ public class EnumPathVariableViaCustomPropertyEditor {
         }
     }
 
-    public static class CurrencyEnumPropertyEditor extends PropertyEditorSupport {
+    public static class StringToCurrencyConverter implements Converter<String, Currency> {
         @Override
-        public void setAsText(String s) throws IllegalArgumentException {
-            if(s.equals("usd")) {
-                setValue(Currency.USD);
-            } else if(s.equals("eur")) {
-                setValue(Currency.EUR);
+        public Currency convert(String source) {
+            if(source.equals("usd")) {
+                return Currency.USD;
+            } else if(source.equals("eur")) {
+                return Currency.EUR;
             } else {
                 throw new IllegalArgumentException();
             }

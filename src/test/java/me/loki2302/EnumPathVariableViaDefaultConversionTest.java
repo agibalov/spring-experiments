@@ -23,7 +23,7 @@ import static org.junit.Assert.assertEquals;
 @WebIntegrationTest
 @SpringApplicationConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
-public class EnumPathVariableViaDefaultConversion {
+public class EnumPathVariableViaDefaultConversionTest {
     @Test
     public void checkCurrencies() {
         RestTemplate restTemplate = new RestTemplate();

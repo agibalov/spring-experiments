@@ -20,7 +20,7 @@ import static org.junit.Assert.assertEquals;
 @WebIntegrationTest("custom.mapping.path=/omg/wtf/bbq/")
 @SpringApplicationConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
-public class ConfigurableControllerMappingPathViaProperties {
+public class ConfigurableControllerMappingPathViaPropertiesTest {
     @Test
     public void ping() {
         RestTemplate restTemplate = new RestTemplate();
