@@ -8,13 +8,15 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.WebIntegrationTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.http.*;
+import org.springframework.http.converter.*;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.yaml.snakeyaml.Yaml;
@@ -28,23 +30,47 @@ import static org.junit.Assert.assertEquals;
 @WebIntegrationTest
 @SpringApplicationConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
-public class CustomHttpMessageConverterTest {
+public class ContentNegotiationTest {
     @Test
-    public void getAsString() {
+    public void canGetContentAsJson() {
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.getMessageConverters().clear();
         restTemplate.setMessageConverters(Collections.singletonList(new StringHttpMessageConverter()));
-        String result = restTemplate.getForObject("http://localhost:8080/", String.class);
-        assertEquals("message: hello there\n", result);
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setAccept(Collections.singletonList(new MediaType("application", "json")));
+        HttpEntity httpEntity = new HttpEntity(httpHeaders);
+        ResponseEntity<String> responseEntity = restTemplate.exchange("http://localhost:8080", HttpMethod.GET, httpEntity, String.class);
+        assertEquals("{\"message\":\"hello there\"}", responseEntity.getBody());
     }
 
     @Test
-    public void getAsObject() {
+    public void canGetContentAsYaml() {
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.getMessageConverters().clear();
-        restTemplate.setMessageConverters(Collections.singletonList(new YamlHttpMessageConverter(new Yaml())));
-        DummyDto result = restTemplate.getForObject("http://localhost:8080/", DummyDto.class);
-        assertEquals("hello there", result.message);
+        restTemplate.setMessageConverters(Collections.singletonList(new StringHttpMessageConverter()));
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setAccept(Collections.singletonList(new MediaType("application", "yaml")));
+        HttpEntity httpEntity = new HttpEntity(httpHeaders);
+        ResponseEntity<String> responseEntity = restTemplate.exchange("http://localhost:8080", HttpMethod.GET, httpEntity, String.class);
+        assertEquals("message: hello there\n", responseEntity.getBody());
+    }
+
+    @Test
+    public void canGet406WhenRequestingOmg() {
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.getMessageConverters().clear();
+        restTemplate.setMessageConverters(Collections.singletonList(new StringHttpMessageConverter()));
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setAccept(Collections.singletonList(new MediaType("application", "omg")));
+        HttpEntity httpEntity = new HttpEntity(httpHeaders);
+        try {
+            restTemplate.exchange("http://localhost:8080", HttpMethod.GET, httpEntity, String.class);
+        } catch (HttpClientErrorException e) {
+            assertEquals(HttpStatus.NOT_ACCEPTABLE, e.getStatusCode());
+        }
     }
 
     @Configuration
@@ -58,6 +84,7 @@ public class CustomHttpMessageConverterTest {
         @Override
         public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
             converters.add(new YamlHttpMessageConverter(new Yaml()));
+            converters.add(new MappingJackson2HttpMessageConverter());
         }
     }
 
