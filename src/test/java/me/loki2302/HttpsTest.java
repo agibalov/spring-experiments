@@ -9,13 +9,12 @@ import org.apache.http.ssl.SSLContextBuilder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.boot.test.WebIntegrationTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,13 +32,12 @@ import java.security.cert.CertificateException;
 import static org.junit.Assert.*;
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@WebIntegrationTest({
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, properties = {
         "server.port=8443",
         "server.ssl.key-store=classpath:keystore.jks",
         "server.ssl.key-store-password=mykeystorepassword",
         "server.ssl.key-password=mykeypassword"})
-@SpringApplicationConfiguration
-@RunWith(SpringJUnit4ClassRunner.class)
+@RunWith(SpringRunner.class)
 public class HttpsTest {
     @Test
     public void requestShouldFailWhenUsingDefaultClientConfiguration() {
