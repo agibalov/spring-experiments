@@ -22,4 +22,5 @@ dependencies {
     compile 'org.hibernate:hibernate-validator:5.2.4.Final'
     compile 'org.hsqldb:hsqldb:2.3.4'
     compile 'org.apache.httpcomponents:httpclient:4.5.2'
+    compile group: 'org.apache.tomcat', name: 'tomcat-dbcp', version: '8.5.3'
 }

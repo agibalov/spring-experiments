@@ -121,7 +121,7 @@ public class EmbeddedTomcatCustomJndiResourceTest {
         private DummyContextResource dummyContextResource;
 
         @RequestMapping(value = "/", method = RequestMethod.GET)
-        public String index(HttpSession session) { // inject session to start it
+        public String index() {
             return "dummyContextResource says: " + dummyContextResource.message;
         }
     }
