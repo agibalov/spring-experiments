@@ -25,7 +25,7 @@ import static org.junit.Assert.assertEquals;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @RunWith(SpringRunner.class)
-public class HandlerInterceptorTest {
+public class DummyHandlerInterceptorTest {
     @Test
     public void ping() {
         RestTemplate restTemplate = new RestTemplate();
