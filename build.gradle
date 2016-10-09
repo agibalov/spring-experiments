@@ -1,28 +1,45 @@
-apply plugin: 'application'
-
-mainClassName = "me.loki2302.app.App"
-
-version = '1.0'
-
-repositories {
-    mavenCentral()
-    maven {
-    	url 'http://m2.neo4j.org/content/repositories/releases'
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.4.1.RELEASE")
     }
 }
 
-dependencies {
-    testCompile 'junit:junit:4.11'
-    testCompile 'org.springframework.boot:spring-boot-starter-test:1.2.4.RELEASE'
-    compile 'org.springframework.boot:spring-boot-starter:1.2.4.RELEASE'
-    compile 'org.hibernate:hibernate-validator:5.1.3.Final'
-    compile 'com.google.guava:guava:18.0'
-    compile 'org.springframework.data:spring-data-neo4j:3.3.1.RELEASE'
-    compile 'org.springframework.data:spring-data-neo4j:3.3.1.RELEASE:tests'
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.6.0'
-    compile 'javax.el:javax.el-api:3.0.0'
-}
+group 'me.loki2320'
+version '1.0-SNAPSHOT'
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.4'
+  gradleVersion = '2.13'
+  distributionUrl = "https://services.gradle.org/distributions/gradle-$gradleVersion-all.zip"
+}
+
+apply plugin: 'java'
+apply plugin: 'spring-boot'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile("org.springframework.boot:spring-boot-starter-data-neo4j")
+    compile("org.springframework.boot:spring-boot-starter-test")
+
+
+    compile group: 'commons-io', name: 'commons-io', version: '2.5'
+
+    compile("org.neo4j:neo4j-ogm-embedded-driver:2.0.5")
+
+    // https://github.com/spring-projects/spring-boot/issues/7012
+    compile group: 'org.neo4j', name: 'neo4j-ogm-bolt-driver', version: '2.0.5'
+
+    compile group: 'org.neo4j.app', name: 'neo4j-server', version: '2.3.6'
+}
+
+test {
+    testLogging.showStandardStreams = true
 }
