@@ -47,7 +47,7 @@ public abstract class AbstractNeo4jTest {
         ));
     }
 
-    @Ignore("Why does it not work? Why does canGetProjectedResultUsingNeo4jOperationsAsResult work?")
+    @Ignore("http://stackoverflow.com/questions/39967609/should-i-expect-neo4joperationsqueryforobjects-to-work-with-queryresult-pojos")
     @Test
     public void canGetProjectedResultUsingNeo4jOperationsAsQueryResult() {
         codeReader.readCode(new File("src/main/java/me/loki2302/dummy"));
