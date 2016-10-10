@@ -10,10 +10,14 @@ import me.loki2302.entities.ClassNodeRepository;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.neo4j.template.Neo4jOperations;
+import org.springframework.data.neo4j.util.IterableUtils;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -26,10 +30,30 @@ public abstract class AbstractNeo4jTest {
     @Autowired
     private ClassNodeRepository classNodeRepository;
 
+    @Autowired
+    private Neo4jOperations neo4jOperations;
+
     @Test
-    public void canGetProjectedResult() {
+    public void canGetProjectedResultUsingRepository() {
         codeReader.readCode(new File("src/main/java/me/loki2302/dummy"));
         List<ClassNodeIdAndName> classNodeIdsAndNames = classNodeRepository.getAllIdsAndNames();
+        assertThat(classNodeIdsAndNames, hasOnly(
+                c -> c.name.equals(Adder.class.getName()),
+                c -> c.name.equals(Negator.class.getName()),
+                c -> c.name.equals(Subtractor.class.getName()),
+                c -> c.name.equals(Calculator.class.getName())
+        ));
+    }
+
+    @Ignore("Why does it not work?")
+    @Test
+    public void canGetProjectedResultUsingNeo4jOperations() {
+        codeReader.readCode(new File("src/main/java/me/loki2302/dummy"));
+        Iterable<ClassNodeIdAndName> classNodeIdsAndNamesIterable = neo4jOperations.queryForObjects(
+                ClassNodeIdAndName.class,
+                "MATCH (c:ClassNode) RETURN ID(c) AS id, c.name AS name",
+                new HashMap<>());
+        List<ClassNodeIdAndName> classNodeIdsAndNames = IterableUtils.toList(classNodeIdsAndNamesIterable);
         assertThat(classNodeIdsAndNames, hasOnly(
                 c -> c.name.equals(Adder.class.getName()),
                 c -> c.name.equals(Negator.class.getName()),
