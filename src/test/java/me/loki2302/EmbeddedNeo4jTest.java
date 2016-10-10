@@ -1,14 +1,23 @@
 package me.loki2302;
 
+import me.loki2302.dummy.Adder;
+import me.loki2302.dummy.Calculator;
+import me.loki2302.dummy.Subtractor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import static org.junit.Assert.assertEquals;
+import java.io.File;
+import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+@ActiveProfiles("embedded,test")
 @SpringBootTest(properties = {
         "spring.data.neo4j.driver=org.neo4j.ogm.drivers.embedded.driver.EmbeddedDriver"
 })
@@ -16,33 +25,18 @@ import static org.junit.Assert.assertEquals;
 @RunWith(SpringRunner.class)
 public class EmbeddedNeo4jTest {
     @Autowired
-    private TodoRepository todoRepository;
+    private CodeReader codeReader;
+
+    @Autowired
+    private ClassNodeRepository classNodeRepository;
 
     @Test
     public void dummy() {
-        if(true) {
-            Todo todo1 = new Todo();
-            todo1.text = "todo1";
-            todo1 = todoRepository.save(todo1);
-
-            Todo todo2 = new Todo();
-            todo2.text = "todo2";
-            todo2 = todoRepository.save(todo2);
-
-            Todo todo3 = new Todo();
-            todo3.text = "todo3";
-            todo3 = todoRepository.save(todo3);
-
-            todo1.relatedTodos.add(todo2);
-            todo1.relatedTodos.add(todo3);
-
-            todo1 = todoRepository.save(todo1);
-        }
-
-        if(true) {
-            Todo todo2 = todoRepository.findByText("todo2");
-            assertEquals("todo2", todo2.text);
-            assertEquals(1, todo2.relatedTodos.size());
-        }
+        codeReader.readCode(new File("src/main/java/me/loki2302/dummy"));
+        List<ClassNodeIdAndName> classNodeIdsAndNames = classNodeRepository.getAllIdsAndNames();
+        assertEquals(3, classNodeIdsAndNames.size());
+        assertTrue((classNodeIdsAndNames.stream().anyMatch(c -> c.name.equals(Adder.class.getSimpleName()))));
+        assertTrue((classNodeIdsAndNames.stream().anyMatch(c -> c.name.equals(Subtractor.class.getSimpleName()))));
+        assertTrue((classNodeIdsAndNames.stream().anyMatch(c -> c.name.equals(Calculator.class.getSimpleName()))));
     }
 }

@@ -8,11 +8,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 @NodeEntity
-public class Todo {
+public class ClassNode {
     @GraphId
     public Long id;
-    public String text;
+    public String name;
 
-    @Relationship(type = "RELATED_TO", direction = Relationship.UNDIRECTED)
-    public Set<Todo> relatedTodos = new HashSet<>();
+    @Relationship(type = "USES", direction = Relationship.OUTGOING)
+    public Set<ClassNode> usedClasses = new HashSet<>();
 }

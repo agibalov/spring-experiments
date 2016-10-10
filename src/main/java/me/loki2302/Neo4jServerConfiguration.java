@@ -13,7 +13,7 @@ import java.io.IOException;
 @Configuration
 public class Neo4jServerConfiguration {
     @Bean(destroyMethod = "stop")
-    public CommunityBootstrapper communityBootstrapper() throws IOException {
+    public CommunityBootstrapper communityBootstrapper() throws IOException, InterruptedException {
         // Neo4j browser: http://localhost:7474/browser/
 
         FileUtils.deleteDirectory(new File("./neo4j-home"));
