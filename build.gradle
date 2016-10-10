@@ -22,13 +22,14 @@ sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
+    maven { url 'http://spoon.gforge.inria.fr/repositories/releases' }
 }
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     compile("org.springframework.boot:spring-boot-starter-data-neo4j")
     compile("org.springframework.boot:spring-boot-starter-test")
-    compile group: 'com.thoughtworks.qdox', name: 'qdox', version: '2.0-M4'
+    compile 'fr.inria.gforge.spoon:spoon-core:5.3.0'
 
 
     compile group: 'commons-io', name: 'commons-io', version: '2.5'
@@ -39,6 +40,8 @@ dependencies {
     compile group: 'org.neo4j', name: 'neo4j-ogm-bolt-driver', version: '2.0.5'
 
     compile group: 'org.neo4j.app', name: 'neo4j-server', version: '2.3.6'
+
+    compileOnly "org.projectlombok:lombok:1.16.10"
 }
 
 test {
