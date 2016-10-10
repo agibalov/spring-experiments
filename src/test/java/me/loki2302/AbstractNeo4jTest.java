@@ -12,6 +12,7 @@ import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.neo4j.ogm.model.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.neo4j.template.Neo4jOperations;
 import org.springframework.data.neo4j.util.IterableUtils;
@@ -19,6 +20,7 @@ import org.springframework.data.neo4j.util.IterableUtils;
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 
 import static org.junit.Assert.assertThat;
@@ -45,9 +47,9 @@ public abstract class AbstractNeo4jTest {
         ));
     }
 
-    @Ignore("Why does it not work?")
+    @Ignore("Why does it not work? Why does canGetProjectedResultUsingNeo4jOperationsAsResult work?")
     @Test
-    public void canGetProjectedResultUsingNeo4jOperations() {
+    public void canGetProjectedResultUsingNeo4jOperationsAsQueryResult() {
         codeReader.readCode(new File("src/main/java/me/loki2302/dummy"));
         Iterable<ClassNodeIdAndName> classNodeIdsAndNamesIterable = neo4jOperations.queryForObjects(
                 ClassNodeIdAndName.class,
@@ -59,6 +61,21 @@ public abstract class AbstractNeo4jTest {
                 c -> c.name.equals(Negator.class.getName()),
                 c -> c.name.equals(Subtractor.class.getName()),
                 c -> c.name.equals(Calculator.class.getName())
+        ));
+    }
+
+    @Test
+    public void canGetProjectedResultUsingNeo4jOperationsAsResult() {
+        codeReader.readCode(new File("src/main/java/me/loki2302/dummy"));
+        Result result = neo4jOperations.query(
+                "MATCH (c:ClassNode) RETURN ID(c) AS id, c.name AS name",
+                new HashMap<>());
+        List<Map<String, Object>> maps = IterableUtils.toList(result);
+        assertThat(maps, hasOnly(
+                m -> m.get("name").equals(Adder.class.getName()),
+                m -> m.get("name").equals(Negator.class.getName()),
+                m -> m.get("name").equals(Subtractor.class.getName()),
+                m -> m.get("name").equals(Calculator.class.getName())
         ));
     }
 
