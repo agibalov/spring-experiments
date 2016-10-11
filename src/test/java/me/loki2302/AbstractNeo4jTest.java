@@ -4,9 +4,7 @@ import me.loki2302.dummy.Adder;
 import me.loki2302.dummy.Calculator;
 import me.loki2302.dummy.Negator;
 import me.loki2302.dummy.Subtractor;
-import me.loki2302.entities.ClassNode;
-import me.loki2302.entities.ClassNodeIdAndName;
-import me.loki2302.entities.ClassNodeRepository;
+import me.loki2302.entities.*;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
@@ -31,6 +29,9 @@ public abstract class AbstractNeo4jTest {
 
     @Autowired
     private ClassNodeRepository classNodeRepository;
+
+    @Autowired
+    private MethodNodeRepository methodNodeRepository;
 
     @Autowired
     private Neo4jOperations neo4jOperations;
@@ -94,6 +95,36 @@ public abstract class AbstractNeo4jTest {
                 c -> c.name.equals(Subtractor.class.getName()),
                 c -> c.name.equals(Adder.class.getName()),
                 c -> c.name.equals(Negator.class.getName())
+        ));
+    }
+
+    @Test
+    public void canGetSingleClassDependencies() {
+        codeReader.readCode(new File("src/main/java/me/loki2302/dummy"));
+        List<ClassNode> dependenciesOfCalculator = classNodeRepository.findAllDependencyClasses(Calculator.class.getName());
+        assertThat(dependenciesOfCalculator, hasOnly(
+                c -> c.name.equals(Adder.class.getName()),
+                c -> c.name.equals(Subtractor.class.getName())
+        ));
+    }
+
+    @Test
+    public void canGetSingleClassDependents() {
+        codeReader.readCode(new File("src/main/java/me/loki2302/dummy"));
+        List<ClassNode> dependentsOfCalculator = classNodeRepository.findAllDependentClasses(Adder.class.getName());
+        assertThat(dependentsOfCalculator, hasOnly(
+                c -> c.name.equals(Calculator.class.getName()),
+                c -> c.name.equals(Subtractor.class.getName())
+        ));
+    }
+
+    @Test
+    public void canGetSingleClassMethods() {
+        codeReader.readCode(new File("src/main/java/me/loki2302/dummy"));
+        List<MethodNode> methods = methodNodeRepository.findByClass(Calculator.class.getName());
+        assertThat(methods, hasOnly(
+                m -> m.name.equals(Calculator.class.getName() + "#add"),
+                m -> m.name.equals(Calculator.class.getName() + "#subtract")
         ));
     }
 
