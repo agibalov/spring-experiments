@@ -9,6 +9,6 @@ import java.util.List;
 public interface MethodNodeRepository extends GraphRepository<MethodNode> {
     MethodNode findByName(String name);
 
-    @Query("match (class:ClassNode {name: {className}})-[r:HAS_METHOD]->(method:MethodNode) return method")
+    @Query("match (class:Class {name: {className}})-[r:HAS_METHOD]->(method:Method) return method")
     List<MethodNode> findByClass(@Param("className") String className);
 }

@@ -38,12 +38,14 @@ public class CodeReader {
 
             ClassNode classNode = new ClassNode();
             classNode.name = className;
+            classNode.shortName = type.getSimpleName();
 
             for(CtMethod<?> method : type.getMethods()) {
                 String methodName = String.format("%s#%s", className, method.getSimpleName());
 
                 MethodNode methodNode = new MethodNode();
                 methodNode.name = methodName;
+                methodNode.shortName = method.getSimpleName();
                 methodNode = methodNodeRepository.save(methodNode);
 
                 classNode.ownedMethods.add(methodNode);

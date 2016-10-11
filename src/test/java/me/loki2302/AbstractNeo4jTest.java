@@ -54,7 +54,7 @@ public abstract class AbstractNeo4jTest {
         codeReader.readCode(new File("src/main/java/me/loki2302/dummy"));
         Iterable<ClassNodeIdAndName> classNodeIdsAndNamesIterable = neo4jOperations.queryForObjects(
                 ClassNodeIdAndName.class,
-                "MATCH (c:ClassNode) RETURN ID(c) AS id, c.name AS name",
+                "MATCH (c:Class) RETURN ID(c) AS id, c.name AS name",
                 new HashMap<>());
         List<ClassNodeIdAndName> classNodeIdsAndNames = IterableUtils.toList(classNodeIdsAndNamesIterable);
         assertThat(classNodeIdsAndNames, hasOnly(
@@ -69,7 +69,7 @@ public abstract class AbstractNeo4jTest {
     public void canGetProjectedResultUsingNeo4jOperationsAsResult() {
         codeReader.readCode(new File("src/main/java/me/loki2302/dummy"));
         Result result = neo4jOperations.query(
-                "MATCH (c:ClassNode) RETURN ID(c) AS id, c.name AS name",
+                "MATCH (c:Class) RETURN ID(c) AS id, c.name AS name",
                 new HashMap<>());
         List<Map<String, Object>> maps = IterableUtils.toList(result);
         assertThat(maps, hasOnly(

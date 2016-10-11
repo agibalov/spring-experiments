@@ -9,18 +9,18 @@ import java.util.List;
 public interface ClassNodeRepository extends GraphRepository<ClassNode> {
     ClassNode findByName(String name);
 
-    @Query("MATCH (c:ClassNode) RETURN ID(c) AS id, c.name AS name")
+    @Query("MATCH (c:Class) RETURN ID(c) AS id, c.name AS name")
     List<ClassNodeIdAndName> getAllIdsAndNames();
 
-    @Query("MATCH (a:ClassNode)-[r:USES]->(b:ClassNode) RETURN a")
+    @Query("MATCH (a:Class)-[r:USES]->(b:Class) RETURN a")
     List<ClassNode> findAllClassesThatDependOnOtherClasses();
 
-    @Query("MATCH (a:ClassNode)-[r:USES]->(b:ClassNode) RETURN b")
+    @Query("MATCH (a:Class)-[r:USES]->(b:Class) RETURN b")
     List<ClassNode> findAllClassesThatOtherClassesDependOn();
 
-    @Query("MATCH (dependent:ClassNode {name: {dependentName}})-[r:USES]->(dependency:ClassNode) RETURN dependency")
+    @Query("MATCH (dependent:Class {name: {dependentName}})-[r:USES]->(dependency:Class) RETURN dependency")
     List<ClassNode> findAllDependencyClasses(@Param("dependentName") String dependentName);
 
-    @Query("MATCH (dependent:ClassNode)-[r:USES]->(dependency:ClassNode {name: {dependencyName}}) RETURN dependent")
+    @Query("MATCH (dependent:Class)-[r:USES]->(dependency:Class {name: {dependencyName}}) RETURN dependent")
     List<ClassNode> findAllDependentClasses(@Param("dependencyName") String dependencyName);
 }

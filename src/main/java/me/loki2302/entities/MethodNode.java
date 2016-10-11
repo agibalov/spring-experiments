@@ -9,11 +9,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 @ToString
-@NodeEntity
+@NodeEntity(label = "Method")
 public class MethodNode {
     @GraphId
     public Long id;
     public String name;
+    public String shortName;
 
     @Relationship(type = "USES", direction = Relationship.OUTGOING)
     public Set<MethodNode> usedMethods = new HashSet<>();
