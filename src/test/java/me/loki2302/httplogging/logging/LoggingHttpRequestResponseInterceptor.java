@@ -1,4 +1,4 @@
-package me.loki2302;
+package me.loki2302.httplogging.logging;
 
 import org.apache.http.*;
 import org.apache.http.entity.BufferedHttpEntity;

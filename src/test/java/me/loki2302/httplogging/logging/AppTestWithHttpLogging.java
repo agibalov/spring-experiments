@@ -1,5 +1,6 @@
-package me.loki2302;
+package me.loki2302.httplogging.logging;
 
+import me.loki2302.httplogging.app.AppConfig;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestExecutionListeners;
 
@@ -7,7 +8,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 @SpringBootTest(
-        classes = { App.class, Config.class },
+        classes = { AppConfig.class, LoggingRestTemplateConfiguration.class },
         webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT
 )
 @TestExecutionListeners(
@@ -15,5 +16,5 @@ import java.lang.annotation.RetentionPolicy;
         mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS
 )
 @Retention(RetentionPolicy.RUNTIME)
-public @interface MyAppTest {
+public @interface AppTestWithHttpLogging {
 }

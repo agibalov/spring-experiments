@@ -1,4 +1,4 @@
-package me.loki2302;
+package me.loki2302.httplogging.logging;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

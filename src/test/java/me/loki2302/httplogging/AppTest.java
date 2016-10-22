@@ -1,5 +1,8 @@
-package me.loki2302;
+package me.loki2302.httplogging;
 
+import me.loki2302.httplogging.app.ResultDto;
+import me.loki2302.httplogging.app.TwoNumbersDto;
+import me.loki2302.httplogging.logging.AppTestWithHttpLogging;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -10,16 +13,16 @@ import org.springframework.web.client.RestTemplate;
 
 import static org.junit.Assert.assertEquals;
 
-@MyAppTest
+@AppTestWithHttpLogging
 @RunWith(SpringRunner.class)
-public class DummyTest {
-    private final static Logger LOGGER = LoggerFactory.getLogger(DummyTest.class);
+public class AppTest {
+    private final static Logger LOGGER = LoggerFactory.getLogger(AppTest.class);
 
     @Autowired
     private RestTemplate restTemplate;
 
     @Test
-    public void dummy() {
+    public void canAddTwoNumbers() {
         TwoNumbersDto twoNumbersDto = new TwoNumbersDto();
         twoNumbersDto.a = 2;
         twoNumbersDto.b = 3;

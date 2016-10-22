@@ -1,4 +1,4 @@
-package me.loki2302;
+package me.loki2302.httplogging.logging;
 
 import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.HttpResponseInterceptor;
@@ -10,7 +10,7 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
 @Configuration
-public class Config {
+public class LoggingRestTemplateConfiguration {
     @Bean
     public LoggingHttpRequestResponseInterceptor loggingHttpRequestResponseInterceptor() {
         return new LoggingHttpRequestResponseInterceptor();
