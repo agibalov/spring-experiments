@@ -4,7 +4,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.annotation.DirtiesContext;
@@ -40,9 +39,8 @@ public class ServletFilterTest {
         }
 
         @Bean
-        public FilterRegistrationBean filterRegistrationBean() {
-            FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean(new MyFilter());
-            return filterRegistrationBean;
+        public MyFilter myFilter() {
+            return new MyFilter();
         }
     }
 
