@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.rest.core.annotation.HandleAfterCreate;
 import org.springframework.data.rest.core.annotation.HandleBeforeCreate;
 import org.springframework.data.rest.core.annotation.RepositoryEventHandler;
+import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
 import org.springframework.data.rest.core.event.ValidatingRepositoryEventListener;
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurerAdapter;
 import org.springframework.stereotype.Component;
@@ -25,13 +26,18 @@ public class App {
     }
 
     @Configuration
-    public static class MyRepositoryRestMvcConfiguration extends RepositoryRestConfigurerAdapter {
+    public static class MyRepositoryRestConfigurer extends RepositoryRestConfigurerAdapter {
         @Autowired
         private PersonValidator personValidator;
 
         @Override
         public void configureValidatingRepositoryEventListener(ValidatingRepositoryEventListener validatingListener) {
             validatingListener.addValidator("beforeCreate", personValidator);
+        }
+
+        @Override
+        public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config) {
+            config.setBasePath("/api");
         }
     }
 

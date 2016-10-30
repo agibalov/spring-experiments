@@ -74,7 +74,7 @@ public class PersonTest {
 
         Resource<Person> personResource = personResponseEntity.getBody();
         assertEquals(3, personResource.getLinks().size());
-        assertTrue(personResource.getLink("self").getHref().startsWith("http://localhost:8080/people/"));
+        assertTrue(personResource.getLink("self").getHref().startsWith("http://localhost:8080/api/people/"));
 
         Person person = personResource.getContent();
         assertEquals("loki2302", person.name);
@@ -116,7 +116,7 @@ public class PersonTest {
     @Test
     public void thereAreNoPeopleByDefault() {
         ResponseEntity<PagedResources<Person>> peopleResponseEntity = restTemplate.exchange(
-                "http://localhost:8080/people",
+                "http://localhost:8080/api/people",
                 HttpMethod.GET,
                 null,
                 new ParameterizedTypeReference<PagedResources<Person>>() {});
@@ -132,7 +132,7 @@ public class PersonTest {
         }
 
         ResponseEntity<PagedResources<Person>> peopleResponseEntity = restTemplate.exchange(
-                "http://localhost:8080/people/?size=4&page=1",
+                "http://localhost:8080/api/people/?size=4&page=1",
                 HttpMethod.GET,
                 null,
                 new ParameterizedTypeReference<PagedResources<Person>>() {});
@@ -154,7 +154,7 @@ public class PersonTest {
     @Test
     public void cantGetPersonThatDoesNotExist() {
         try {
-            getPerson("http://localhost:8080/people/123");
+            getPerson("http://localhost:8080/api/people/123");
             fail();
         } catch(HttpClientErrorException e) {
             assertEquals(HttpStatus.NOT_FOUND, e.getStatusCode());
@@ -164,7 +164,7 @@ public class PersonTest {
     @Test
     public void cantUpdatePersonThatDoesNotExist() {
         try {
-            updatePerson("http://localhost:8080/people/123", person("Andrey"));
+            updatePerson("http://localhost:8080/api/people/123", person("Andrey"));
         } catch(HttpClientErrorException e) {
             assertEquals(HttpStatus.NOT_FOUND, e.getStatusCode());
         }
@@ -173,7 +173,7 @@ public class PersonTest {
     @Test
     public void cantDeletePersonThatDoesNotExist() {
         try {
-            restTemplate.delete("http://localhost:8080/people/123");
+            restTemplate.delete("http://localhost:8080/api/people/123");
         } catch(HttpClientErrorException e) {
             assertEquals(HttpStatus.NOT_FOUND, e.getStatusCode());
         }
@@ -181,7 +181,7 @@ public class PersonTest {
 
     private ResponseEntity<Object> createPerson(Person person) {
         ResponseEntity<Object> responseEntity = restTemplate.postForEntity(
-                "http://localhost:8080/people",
+                "http://localhost:8080/api/people",
                 person,
                 Object.class);
 

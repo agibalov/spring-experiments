@@ -63,7 +63,7 @@ public class NoteTest {
         note.put("person", personUrl);
 
         ResponseEntity<Object> responseEntity = restTemplate.postForEntity(
-                "http://localhost:8080/notes",
+                "http://localhost:8080/api/notes",
                 note,
                 Object.class);
 
@@ -78,7 +78,7 @@ public class NoteTest {
 
     private ResponseEntity<Object> createPerson(Person person) {
         ResponseEntity<Object> responseEntity = restTemplate.postForEntity(
-                "http://localhost:8080/people",
+                "http://localhost:8080/api/people",
                 person,
                 Object.class);
 
