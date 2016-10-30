@@ -28,7 +28,7 @@ import static org.junit.Assert.assertNotNull;
 @RunWith(SpringRunner.class)
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
-        classes = App.Config.class)
+        classes = App.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class NoteTest {
     @Autowired
@@ -44,18 +44,6 @@ public class NoteTest {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         objectMapper.registerModule(new Jackson2HalModule());
-
-        /*OrderAwarePluginRegistry<RelProvider, Class<?>> relProviderPluginRegistry =
-                OrderAwarePluginRegistry.create(Arrays.asList(
-                        new DefaultRelProvider(),
-                        new AnnotationRelProvider()));
-
-        DelegatingRelProvider delegatingRelProvider =
-                new DelegatingRelProvider(relProviderPluginRegistry);
-
-        objectMapper.setHandlerInstantiator(
-                new Jackson2HalModule.HalHandlerInstantiator(
-                        delegatingRelProvider, null));*/
 
         MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter();
         mappingJackson2HttpMessageConverter.setSupportedMediaTypes(MediaType.parseMediaTypes("application/hal+json"));
