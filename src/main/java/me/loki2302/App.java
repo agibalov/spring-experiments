@@ -1,10 +1,9 @@
 package me.loki2302;
 
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.annotation.Gateway;
 import org.springframework.integration.annotation.IntegrationComponentScan;
 import org.springframework.integration.annotation.MessagingGateway;
@@ -12,9 +11,11 @@ import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlowDefinition;
 import org.springframework.integration.transformer.GenericTransformer;
 
+@SpringBootApplication
+@IntegrationComponentScan
 public class App {
     public static void main(String[] args) {
-        ConfigurableApplicationContext context = SpringApplication.run(Config.class, args);
+        ConfigurableApplicationContext context = SpringApplication.run(App.class, args);
         try {
             UpperCaseGateway upperCaseGateway = context.getBean(UpperCaseGateway.class);
             System.out.println(upperCaseGateway.uppercase("hello"));
@@ -23,24 +24,19 @@ public class App {
         }
     }
 
-    @Configuration
-    @EnableAutoConfiguration
-    @IntegrationComponentScan
-    public static class Config {
-        @Bean
-        IntegrationFlow upperCaseFlow() {
-            return new IntegrationFlow() {
-                @Override
-                public void configure(IntegrationFlowDefinition<?> flow) {
-                    flow.transform(new GenericTransformer<String, String>() {
-                        @Override
-                        public String transform(String source) {
-                            return source.toUpperCase();
-                        }
-                    });
-                }
-            };
-        }
+    @Bean
+    public IntegrationFlow upperCaseFlow() {
+        return new IntegrationFlow() {
+            @Override
+            public void configure(IntegrationFlowDefinition<?> flow) {
+                flow.transform(new GenericTransformer<String, String>() {
+                    @Override
+                    public String transform(String source) {
+                        return source.toUpperCase();
+                    }
+                });
+            }
+        };
     }
 
     @MessagingGateway

@@ -3,56 +3,19 @@ package me.loki2302;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.test.IntegrationTest;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.integration.annotation.Gateway;
-import org.springframework.integration.annotation.IntegrationComponentScan;
-import org.springframework.integration.annotation.MessagingGateway;
-import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.integration.dsl.IntegrationFlowDefinition;
-import org.springframework.integration.transformer.GenericTransformer;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.junit.Assert.assertEquals;
 
-@IntegrationTest
-@SpringApplicationConfiguration
-@RunWith(SpringJUnit4ClassRunner.class)
+@SpringBootTest(classes = App.class)
+@RunWith(SpringRunner.class)
 public class DummyTest {
     @Autowired
-    private UpperCaseGateway upperCaseGateway;
+    private App.UpperCaseGateway upperCaseGateway;
 
     @Test
     public void dummy() {
         assertEquals("HELLO", upperCaseGateway.uppercase("hello"));
-    }
-
-    @Configuration
-    @EnableAutoConfiguration
-    @IntegrationComponentScan
-    public static class Config {
-        @Bean
-        IntegrationFlow upperCaseFlow() {
-            return new IntegrationFlow() {
-                @Override
-                public void configure(IntegrationFlowDefinition<?> flow) {
-                    flow.transform(new GenericTransformer<String, String>() {
-                        @Override
-                        public String transform(String source) {
-                            return source.toUpperCase();
-                        }
-                    });
-                }
-            };
-        }
-    }
-
-    @MessagingGateway
-    public static interface UpperCaseGateway {
-        @Gateway(requestChannel = "upperCaseFlow.input")
-        String uppercase(String source);
     }
 }
