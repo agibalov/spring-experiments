@@ -1,9 +1,12 @@
 package me.loki2302;
 
+import lombok.ToString;
+
 import javax.persistence.*;
 import java.util.List;
 
 @Entity
+@ToString
 public class Person {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -12,9 +15,4 @@ public class Person {
 
     @OneToMany(mappedBy = "person")
     public List<Note> notes;
-
-    @Override
-    public String toString() {
-        return String.format("Person{id=%s, name=%s}", id, name);
-    }
 }

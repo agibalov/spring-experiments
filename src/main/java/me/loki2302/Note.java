@@ -1,8 +1,11 @@
 package me.loki2302;
 
+import lombok.ToString;
+
 import javax.persistence.*;
 
 @Entity
+@ToString
 public class Note {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

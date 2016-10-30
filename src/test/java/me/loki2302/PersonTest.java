@@ -12,7 +12,6 @@ import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.hal.Jackson2HalModule;
 import org.springframework.http.*;
-import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -48,7 +47,7 @@ public class PersonTest {
         mappingJackson2HttpMessageConverter.setObjectMapper(objectMapper);
 
         restTemplate = new RestTemplate();
-        restTemplate.setMessageConverters(Arrays.<HttpMessageConverter<?>>asList(mappingJackson2HttpMessageConverter));
+        restTemplate.setMessageConverters(Arrays.asList(mappingJackson2HttpMessageConverter));
     }
 
     @Test
@@ -192,7 +191,7 @@ public class PersonTest {
         return restTemplate.exchange(
                 personUri,
                 HttpMethod.PUT,
-                new HttpEntity<Person>(person),
+                new HttpEntity<>(person),
                 Object.class);
     }
 

@@ -12,7 +12,6 @@ import org.springframework.hateoas.hal.Jackson2HalModule;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -50,7 +49,7 @@ public class NoteTest {
         mappingJackson2HttpMessageConverter.setObjectMapper(objectMapper);
 
         restTemplate = new RestTemplate();
-        restTemplate.setMessageConverters(Arrays.<HttpMessageConverter<?>>asList(mappingJackson2HttpMessageConverter));
+        restTemplate.setMessageConverters(Arrays.asList(mappingJackson2HttpMessageConverter));
     }
 
     @Test

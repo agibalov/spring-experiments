@@ -1,5 +1,7 @@
 package me.loki2302;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -11,7 +13,6 @@ import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
 import org.springframework.data.rest.core.event.ValidatingRepositoryEventListener;
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurerAdapter;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
@@ -41,32 +42,36 @@ public class App {
         }
     }
 
-    @Service
+    @Component
     public static class PersonValidator implements Validator {
+        private final static Logger LOGGER = LoggerFactory.getLogger(PersonValidator.class);
+
         @Override
         public boolean supports(Class<?> clazz) {
-            System.out.println("xxx");
+            LOGGER.info("{}", clazz);
             return clazz == Person.class;
         }
 
         @Override
         public void validate(Object target, Errors errors) {
-            System.out.println("yyy");
+            LOGGER.info("{}", target);
             ValidationUtils.rejectIfEmpty(errors, "name", "NAME_IS_EMPTY", "name should not be empty");
         }
     }
 
     @Component
     @RepositoryEventHandler
-    public static class MyEntityEventHandler {
+    public static class MyRepositoryEventHandler {
+        private final static Logger LOGGER = LoggerFactory.getLogger(MyRepositoryEventHandler.class);
+
         @HandleBeforeCreate
         public void handleBeforeEntityCreate(Object e) {
-            System.out.printf("Before create %s\n", e);
+            LOGGER.info("Before create {}", e);
         }
 
         @HandleAfterCreate
         public void handleAfterEntityCreate(Object e) {
-            System.out.printf("After create %s\n", e);
+            LOGGER.info("After create {}", e);
         }
     }
 }
