@@ -12,8 +12,6 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.IntegrationTest;
-import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,7 +21,6 @@ import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.lang.annotation.Retention;
@@ -74,7 +71,7 @@ public class AopSpELTest {
 
     @Aspect
     public static class CheckSecurityBeforeCallAspect implements BeanFactoryAware {
-        private final static Logger logger = LoggerFactory.getLogger(CheckSecurityBeforeCallAspect.class);
+        private final static Logger LOGGER = LoggerFactory.getLogger(CheckSecurityBeforeCallAspect.class);
 
         private BeanFactory beanFactory;
 
@@ -101,7 +98,7 @@ public class AopSpELTest {
 
             Expression expression = expressionParser.parseExpression(secureMeAnnotation.value());
 
-            logger.info("Checking if it's OK to call {} {}", pjp.getTarget(), method.getName());
+            LOGGER.info("Checking if it's OK to call {} {}", pjp.getTarget(), method.getName());
 
             Boolean allowOrNull = expression.getValue(evaluationContext, Boolean.class);
             if(allowOrNull == null) {
@@ -110,11 +107,11 @@ public class AopSpELTest {
 
             boolean allow = allowOrNull;
             if(!allow) {
-                logger.info("They say it's not OK to call {} {}", pjp.getTarget(), method.getName());
+                LOGGER.info("They say it's not OK to call {} {}", pjp.getTarget(), method.getName());
                 throw new SecurityException();
             }
 
-            logger.info("They say it's OK to call {} {}", pjp.getTarget(), method.getName());
+            LOGGER.info("They say it's OK to call {} {}", pjp.getTarget(), method.getName());
             Object result = pjp.proceed();
 
             return result;
@@ -127,24 +124,24 @@ public class AopSpELTest {
     }
 
     public static class DummyService {
-        private final static Logger logger = LoggerFactory.getLogger(DummyService.class);
+        private final static Logger LOGGER = LoggerFactory.getLogger(DummyService.class);
 
         @SecureMe("@securityService.canSayHello(#name)")
         public void hello(String name) {
-            logger.info("Hello, {}!", name);
+            LOGGER.info("Hello, {}!", name);
         }
     }
 
     public static class SecurityService {
-        private final static Logger logger = LoggerFactory.getLogger(SecurityService.class);
+        private final static Logger LOGGER = LoggerFactory.getLogger(SecurityService.class);
 
         public boolean canSayHello(String name) {
-            logger.info("Someone asks if it's OK to say 'hello' to '{}'", name);
+            LOGGER.info("Someone asks if it's OK to say 'hello' to '{}'", name);
             boolean canSayHello = name != null && name.equals("loki2302");
             if(canSayHello) {
-                logger.info("It's indeed OK");
+                LOGGER.info("It's indeed OK");
             } else {
-                logger.info("No, it's not OK");
+                LOGGER.info("No, it's not OK");
             }
 
             return canSayHello;
