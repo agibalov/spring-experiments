@@ -1,0 +1,6 @@
+rootProject.name = 'spring-boot-experiment'
+include 'profiles-experiment'
+include 'configuration-properties-experiment'
+include 'banner-experiment'
+include 'ssh-experiment'
+

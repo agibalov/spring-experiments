@@ -1,0 +1,5 @@
+# Connect with
+# ssh -p 2000 user1@localhost
+# use password password1
+management.shell.auth.simple.user.name: user1
+management.shell.auth.simple.user.password: password1
