@@ -12,4 +12,5 @@ apply plugin: 'spring-boot'
 
 dependencies {
     compile 'org.springframework.boot:spring-boot-starter-remote-shell:1.4.2.RELEASE'
+    testCompile 'com.hierynomus:sshj:0.19.0'
 }
