@@ -1,0 +1,38 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'org.springframework.boot:spring-boot-gradle-plugin:1.4.3.RELEASE'
+    }
+}
+
+group 'me.loki2302'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'org.springframework.boot'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile "org.springframework.boot:spring-boot-starter-test"
+    compile "org.springframework.boot:spring-boot-starter-logging"
+    compile "org.springframework:spring-web"
+    compile 'org.springframework.cloud:spring-cloud-starter-zookeeper-discovery:1.0.3.RELEASE'
+    compile group: 'io.reactivex', name: 'rxjava', version: '1.2.4'
+    compile "org.junit.vintage:junit-vintage-engine:4.12.0-M3"
+    compile "org.junit.platform:junit-platform-console:1.0.0-M3"
+    compile "commons-logging:commons-logging:1.2"
+    compile project(':add-service-api')
+    compile project(':sub-service-api')
+    compile project(':calc-service-api')
+}
+
+bootRepackage {
+    mainClass = 'org.junit.platform.console.ConsoleLauncher'
+}

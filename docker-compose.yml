@@ -1,0 +1,67 @@
+version: "2"
+
+services:
+  add1:
+    build: ./add-service
+    container_name: add1
+    environment:
+      SPRING_CLOUD_ZOOKEEPER_CONNECT_STRING: 172.25.0.44:2181
+    networks:
+      test:
+        ipv4_address: 172.25.0.11
+
+  add2:
+    build: ./add-service
+    container_name: add2
+    environment:
+      SPRING_CLOUD_ZOOKEEPER_CONNECT_STRING: 172.25.0.44:2181
+    networks:
+      test:
+        ipv4_address: 172.25.0.12
+
+  add3:
+    build: ./add-service
+    container_name: add3
+    environment:
+      SPRING_CLOUD_ZOOKEEPER_CONNECT_STRING: 172.25.0.44:2181
+    networks:
+      test:
+        ipv4_address: 172.25.0.13
+
+  sub:
+    build: ./sub-service
+    container_name: sub
+    environment:
+      SPRING_CLOUD_ZOOKEEPER_CONNECT_STRING: 172.25.0.44:2181
+    networks:
+      test:
+        ipv4_address: 172.25.0.22
+
+  calc:
+    build: ./calc-service
+    container_name: calc
+    environment:
+      SPRING_CLOUD_ZOOKEEPER_CONNECT_STRING: 172.25.0.44:2181
+    networks:
+      test:
+        ipv4_address: 172.25.0.33
+
+  zk:
+    image: jplock/zookeeper:3.4.9
+    container_name: zk
+    networks:
+      test:
+        ipv4_address: 172.25.0.44
+
+  tester:
+    build: ./integration-test
+    container_name: tester
+    environment:
+      SPRING_CLOUD_ZOOKEEPER_CONNECT_STRING: 172.25.0.44:2181
+    networks:
+      test:
+        ipv4_address: 172.25.0.55
+
+networks:
+  test:
+    external: true

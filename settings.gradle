@@ -1,0 +1,9 @@
+rootProject.name = 'spring-cloud-zookeeper-experiment2'
+include 'add-service'
+include 'add-service-api'
+include 'sub-service'
+include 'sub-service-api'
+include 'calc-service'
+include 'calc-service-api'
+include 'integration-test'
+
