@@ -32,10 +32,10 @@ public class BeanPostProcessorTest {
 
     @Test
     public void canConfigureABeanBasedOnOtherBeans() {
-        Integer sum = theHandlerRepository.<AddNumbersRequest, Integer>handle(new AddNumbersRequest(2, 3));
+        Integer sum = theHandlerRepository.handle(new AddNumbersRequest(2, 3));
         assertEquals(5, (int) sum);
 
-        Integer difference = theHandlerRepository.<SubNumbersRequest, Integer>handle(new SubNumbersRequest(2, 3));
+        Integer difference = theHandlerRepository.handle(new SubNumbersRequest(2, 3));
         assertEquals(-1, (int) difference);
     }
 
@@ -98,13 +98,13 @@ public class BeanPostProcessorTest {
             this.handlersByRequestTypes.putAll(handlersByRequestTypes);
         }
 
-        public <TRequest, TResponse> TResponse handle(TRequest request) {
+        public <TRequest extends Request<TResponse>, TResponse> TResponse handle(TRequest request) {
             TheHandler theHandler = handlersByRequestTypes.get(request.getClass());
             return (TResponse)theHandler.handle(request);
         }
     }
 
-    public interface TheHandler<TRequest, TResponse> {
+    public interface TheHandler<TRequest extends Request<TResponse>, TResponse> {
         Class<TRequest> getRequestClass();
         TResponse handle(TRequest request);
     }
@@ -135,7 +135,10 @@ public class BeanPostProcessorTest {
         }
     }
 
-    public static class AddNumbersRequest {
+    interface Request<TResponse> {
+    }
+
+    public static class AddNumbersRequest implements Request<Integer> {
         public final int a;
         public final int b;
 
@@ -145,7 +148,7 @@ public class BeanPostProcessorTest {
         }
     }
 
-    public static class SubNumbersRequest {
+    public static class SubNumbersRequest implements Request<Integer> {
         public final int a;
         public final int b;
 
