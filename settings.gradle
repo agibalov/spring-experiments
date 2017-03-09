@@ -3,4 +3,5 @@ include 'profiles-experiment'
 include 'configuration-properties-experiment'
 include 'banner-experiment'
 include 'ssh-experiment'
+include 'property-sources-experiment'
 

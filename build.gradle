@@ -17,7 +17,7 @@ subprojects {
 
     dependencies {
         testCompile group: 'junit', name: 'junit', version: '4.12'
-        testCompile 'org.springframework.boot:spring-boot-starter-test:1.4.2.RELEASE'
-        compile 'org.springframework.boot:spring-boot-starter:1.4.2.RELEASE'
+        testCompile 'org.springframework.boot:spring-boot-starter-test:1.5.2.RELEASE'
+        compile 'org.springframework.boot:spring-boot-starter:1.5.2.RELEASE'
     }
 }

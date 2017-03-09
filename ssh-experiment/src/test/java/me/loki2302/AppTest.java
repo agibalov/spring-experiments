@@ -27,7 +27,7 @@ public class AppTest {
         try {
             sshClient.authPassword("user1", "password1");
             try(Session session = sshClient.startSession()) {
-                Session.Command helloCommand = session.exec("hello");
+                Session.Command helloCommand = session.exec("hello main");
                 String response = IOUtils.readFully(helloCommand.getInputStream()).toString();
                 LOGGER.info("Server says: {}", response);
                 assertTrue(response.startsWith("Hello! Time is"));
