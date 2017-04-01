@@ -21,4 +21,6 @@ dependencies {
     compile 'de.codecentric:spring-boot-admin-server:1.4.3'
     compile 'de.codecentric:spring-boot-admin-server-ui:1.4.3'
     compile group: 'de.codecentric', name: 'spring-boot-admin-starter-client', version: '1.4.3'
+    compile group: 'de.codecentric', name: 'spring-boot-admin-server-ui-hystrix', version: '1.4.6'
+    compile project(':spring-boot-admin-server-ui-experiment')
 }
