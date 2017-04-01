@@ -2,7 +2,7 @@ group 'me.loki2302'
 version '1.0-SNAPSHOT'
 
 task wrapper(type: Wrapper) {
-  gradleVersion = '2.13'
+  gradleVersion = '3.4.1'
   distributionUrl = "https://services.gradle.org/distributions/gradle-$gradleVersion-all.zip"
 }
 
@@ -17,10 +17,9 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '1.4.0.RELEASE'
-    compile 'de.codecentric:spring-boot-admin-server:1.4.3'
-    compile 'de.codecentric:spring-boot-admin-server-ui:1.4.3'
-    compile group: 'de.codecentric', name: 'spring-boot-admin-starter-client', version: '1.4.3'
-    compile group: 'de.codecentric', name: 'spring-boot-admin-server-ui-hystrix', version: '1.4.6'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '1.5.2.RELEASE'
+    compile 'de.codecentric:spring-boot-admin-server:1.4.6'
+    compile 'de.codecentric:spring-boot-admin-server-ui:1.4.6'
+    compile group: 'de.codecentric', name: 'spring-boot-admin-starter-client', version: '1.4.6'
     compile project(':spring-boot-admin-server-ui-experiment')
 }
