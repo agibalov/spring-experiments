@@ -2,7 +2,5 @@ spring-swagger-experiment
 =========================
 
 `gradlew clean run`, then:
-* go to http://localhost:8080/swagger-ui.html for Swagger UI
-* go to http://localhost:8080/ for ReDoc UI
-
-
+* go to http://localhost:8080/swagger.html for Swagger UI
+* go to http://localhost:8080/redoc.html for ReDoc UI
