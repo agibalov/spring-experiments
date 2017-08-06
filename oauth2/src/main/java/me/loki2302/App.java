@@ -26,8 +26,6 @@ import org.springframework.security.oauth2.provider.token.store.InMemoryTokenSto
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.Collections;
@@ -41,7 +39,7 @@ public class App {
     }
 
     @RestController
-    public static class HomeControlle {
+    public static class HomeController {
         @GetMapping("/")
         public Map<String, String> hello(Principal principal) throws IOException {
             String responseText;
