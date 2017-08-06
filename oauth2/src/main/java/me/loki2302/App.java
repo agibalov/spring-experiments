@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
+import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -25,9 +26,12 @@ import org.springframework.security.oauth2.provider.token.store.InMemoryTokenSto
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
 
 @SpringBootApplication
@@ -61,6 +65,15 @@ public class App {
 
             return Collections.singletonMap("message", responseText);
         }
+    }
+
+    @Bean
+    public ServletContextInitializer servletContextInitializer() {
+        return servletContext -> {
+            // this disables sessions completely,
+            // JSESSIONID is never sent
+            servletContext.setSessionTrackingModes(new HashSet<>());
+        };
     }
 
     @Configuration
