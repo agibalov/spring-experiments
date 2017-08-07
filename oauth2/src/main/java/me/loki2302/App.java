@@ -8,8 +8,10 @@ import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -20,6 +22,7 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
+import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
@@ -63,6 +66,12 @@ public class App {
 
             return Collections.singletonMap("message", responseText);
         }
+
+        @PreAuthorize("#oauth2.isUser() && #oauth2.hasScope('cats')")
+        @GetMapping("/cats")
+        public String readCats() {
+            return "meow";
+        }
     }
 
     @Bean
@@ -76,6 +85,7 @@ public class App {
 
     @Configuration
     @EnableWebSecurity
+    @EnableGlobalMethodSecurity(prePostEnabled = true)
     @Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
     public static class SecurityConfig extends WebSecurityConfigurerAdapter {
         @Override
@@ -108,7 +118,7 @@ public class App {
                     .secret("MyClientId1Secret")
                     .authorizedGrantTypes("client_credentials", "password", "refresh_token", "authorization_code")
                     .authorities("ROLE_CLIENT")
-                    .scopes("read");
+                    .scopes("read", "cats", "beer");
         }
 
         @Override
