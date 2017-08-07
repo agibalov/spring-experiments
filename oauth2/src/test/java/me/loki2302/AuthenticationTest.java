@@ -125,7 +125,9 @@ public class AuthenticationTest {
                 new ParameterizedTypeReference<Map<String, String>>() {});
         System.out.println(testResponseEntity.getBody());
 
-        assertEquals("PRINCIPAL is user 'user1' ([ROLE_USER])", testResponseEntity.getBody().get("message"));
+        assertEquals(
+                "PRINCIPAL is user 'user1' ([ROLE_USER]) [clientId=MyClientId1]",
+                testResponseEntity.getBody().get("message"));
     }
 
     @Test

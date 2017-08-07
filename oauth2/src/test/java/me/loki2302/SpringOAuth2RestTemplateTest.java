@@ -11,6 +11,7 @@ import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Arrays;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -30,8 +31,10 @@ public class SpringOAuth2RestTemplateTest {
         resource.setScope(Arrays.asList("read"));
 
         OAuth2RestTemplate oAuth2RestTemplate = new OAuth2RestTemplate(resource);
-        String responseBody = oAuth2RestTemplate.getForObject("http://localhost:8080/", String.class);
-        assertEquals("{\"message\":\"PRINCIPAL is user 'user1' ([ROLE_USER])\"}", responseBody);
+        Map<String, String> responseBody = oAuth2RestTemplate.getForObject("http://localhost:8080/", Map.class);
+        assertEquals(
+                "PRINCIPAL is user 'user1' ([ROLE_USER]) [clientId=MyClientId1]",
+                responseBody.get("message"));
     }
 
     @Test

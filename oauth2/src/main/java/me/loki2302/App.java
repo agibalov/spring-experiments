@@ -55,8 +55,10 @@ public class App {
                     String clientId = (String)innerPrincipal;
                     responseText = String.format("PRINCIPAL is client '%s' (%s)", clientId, oAuth2Authentication.getAuthorities());
                 } else if(innerPrincipal instanceof User) {
+                    String clientId = oAuth2Authentication.getOAuth2Request().getClientId();
                     User user = (User)innerPrincipal;
-                    responseText = String.format("PRINCIPAL is user '%s' (%s)", user.getUsername(), oAuth2Authentication.getAuthorities());
+                    responseText = String.format("PRINCIPAL is user '%s' (%s) [clientId=%s]",
+                            user.getUsername(), oAuth2Authentication.getAuthorities(), clientId);
                 } else {
                     responseText = String.format("PRINCIPAL is OAuth2??? (%s)", oAuth2Authentication.getAuthorities());
                 }
