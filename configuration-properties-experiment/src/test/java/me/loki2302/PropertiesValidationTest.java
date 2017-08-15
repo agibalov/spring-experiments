@@ -53,7 +53,7 @@ public class PropertiesValidationTest {
 
         // TODO: what if I want to have many validators? what if they all come from different modules?
         @Bean(name = "configurationPropertiesValidator")
-        public static Validator myValidator() {
+        public Validator myValidator() {
             return new DummyPropertiesValidator();
         }
     }
