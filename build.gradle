@@ -1,13 +1,15 @@
-group 'me.loki2302.App'
+plugins {
+    id 'org.springframework.boot' version '1.5.6.RELEASE'
+}
+
+group 'me.loki2302'
 version '1.0-SNAPSHOT'
 
 task wrapper(type: Wrapper) {
-  gradleVersion = '2.5'
+  gradleVersion = '4.1'
   distributionUrl = "https://services.gradle.org/distributions/gradle-$gradleVersion-all.zip"
 }
 
-apply plugin: 'application'
-mainClassName = 'org.springframework.shell.Bootstrap'
 sourceCompatibility = 1.8
 
 repositories {
@@ -19,10 +21,18 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
-    compile 'org.springframework.shell:spring-shell:1.2.0.M1'
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter', version: '1.4.0.RELEASE'
+    compile 'org.springframework.shell:spring-shell:1.2.0.RELEASE'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter', version: '1.5.6.RELEASE'
 }
 
-run {
-    standardInput = System.in
+bootRepackage {
+    mainClass = 'org.springframework.shell.Bootstrap'
+    executable = true
+}
+
+task tool(type: Copy) {
+    dependsOn bootRepackage
+    from fileTree(dir: "$buildDir/libs", include: '*.jar')
+    into rootDir
+    rename '.+', 'tool'
 }
