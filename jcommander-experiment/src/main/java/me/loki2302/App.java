@@ -13,6 +13,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+import org.zeroturnaround.exec.ProcessExecutor;
+import org.zeroturnaround.exec.stream.slf4j.Slf4jStream;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -138,6 +140,34 @@ public class App {
 
         public void undeploy() {
             LOGGER.info("Undeploying...");
+        }
+    }
+
+    @Component
+    @Parameters(commandNames = "ping", commandDescription = "Ping hosts using the standard 'ping' utility.")
+    public static class PingArguments implements Runnable {
+        private final static Logger LOGGER = LoggerFactory.getLogger(PingArguments.class);
+
+        @Parameter(names = "--host", description = "The host to ping", required = true)
+        public String host;
+
+        @Parameter(names = "--repetitions", description = "The number of times to ping it", required = false)
+        public int repetitions = 5;
+
+        @Override
+        public void run() {
+            int code;
+            try {
+                code = new ProcessExecutor()
+                        .command("ping", host, "-c", String.valueOf(repetitions))
+                        .readOutput(true)
+                        .redirectOutputAlsoTo(Slf4jStream.of(LOGGER).asInfo())
+                        .execute().getExitValue();
+            } catch(Throwable throwable) {
+                throw new RuntimeException(throwable);
+            }
+
+            LOGGER.info("ping exited with code {}", code);
         }
     }
 }
