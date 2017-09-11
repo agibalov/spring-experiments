@@ -1,0 +1,4 @@
+dependencies {
+    testCompile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.1'
+    testCompile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.9.1'
+}
