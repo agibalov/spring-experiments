@@ -14,7 +14,8 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(properties = {
-        "dummy.message=hi there"
+        "dummy.message=hi there",
+        "DUMMY_USER_NAME=qwerty"
 })
 public class DummyPropertiesTest {
     @Autowired
@@ -23,6 +24,7 @@ public class DummyPropertiesTest {
     @Test
     public void dummy() {
         assertEquals("hi there", dummyProperties.getMessage());
+        assertEquals("qwerty", dummyProperties.getUserName());
     }
 
     @Configuration
@@ -37,6 +39,7 @@ public class DummyPropertiesTest {
     @ConfigurationProperties("dummy")
     public static class DummyProperties {
         private String message;
+        private String userName;
 
         public String getMessage() {
             return message;
@@ -44,6 +47,14 @@ public class DummyPropertiesTest {
 
         public void setMessage(String message) {
             this.message = message;
+        }
+
+        public String getUserName() {
+            return userName;
+        }
+
+        public void setUserName(String userName) {
+            this.userName = userName;
         }
     }
 }
