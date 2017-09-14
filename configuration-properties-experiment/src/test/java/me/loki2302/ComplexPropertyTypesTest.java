@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.sun.istack.internal.NotNull;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +15,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.validation.annotation.Validated;
 
 import java.io.IOException;
 import java.util.List;
@@ -67,9 +65,7 @@ public class ComplexPropertyTypesTest {
     }
 
     @ConfigurationProperties("dummy")
-    @Validated
     public static class DummyProperties {
-        @NotNull
         private Operation operation;
 
         public Operation getOperation() {
