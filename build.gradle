@@ -12,12 +12,27 @@ dependencies {
     testCompile 'org.springframework.boot:spring-boot-starter-test:1.5.6.RELEASE'
     compile 'org.springframework.boot:spring-boot-starter-aop:1.5.6.RELEASE'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.1'
+    testCompile group: 'org.springframework.retry', name: 'spring-retry', version: '1.2.1.RELEASE'
 }
 
 test {
+    logging.captureStandardOutput LogLevel.DEBUG
+
     testLogging {
-        showStandardStreams = true
-        events 'failed', 'passed', 'skipped'
+        showExceptions = true
+        showCauses = true
+        showStackTraces = true
+        exceptionFormat = 'full'
+        events 'failed', 'passed', 'skipped', 'started'
+    }
+
+    beforeTest {
+        logger.lifecycle('*' * 60)
+    }
+
+    onOutput { descriptor, event ->
+        String message = event.message
+        logger.lifecycle(message.substring(0, message.length()-1))
     }
 }
 
