@@ -4,13 +4,13 @@ buildscript {
     }
 
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.4.2.RELEASE")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.7.RELEASE")
     }
 }
 
-apply plugin: 'spring-boot'
+apply plugin: 'org.springframework.boot'
 
 dependencies {
-    compile 'org.springframework.boot:spring-boot-starter-remote-shell:1.4.2.RELEASE'
+    compile 'org.springframework.boot:spring-boot-starter-remote-shell:1.5.7.RELEASE'
     testCompile 'com.hierynomus:sshj:0.19.0'
 }
