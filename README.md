@@ -1,2 +1,2 @@
-spring-aop-experiment
+spring-ioc-experiment
 =====================
