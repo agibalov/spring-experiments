@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.service.ApiInfo;
+import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
@@ -42,7 +43,10 @@ public class App {
         public ApiInfo apiInfo() {
             return new ApiInfoBuilder()
                     .title("My API title")
-                    .contact("My API contact")
+                    .contact(new Contact(
+                            "loki2302",
+                            "http://loki2302.me",
+                            "loki2302@loki2302.me"))
                     .description("My API description")
                     .license("My API license")
                     .licenseUrl("http://retask.me/license")
