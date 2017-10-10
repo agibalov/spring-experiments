@@ -1,6 +1,5 @@
 package me.loki2302;
 
-import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.tomcat.util.descriptor.web.ContextResource;
 import org.junit.Test;
@@ -9,11 +8,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.context.embedded.EmbeddedServletContainerFactory;
-import org.springframework.boot.context.embedded.tomcat.TomcatContextCustomizer;
-import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainer;
-import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.embedded.tomcat.TomcatContextCustomizer;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.boot.web.embedded.tomcat.TomcatWebServer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jndi.JndiTemplate;
@@ -29,9 +27,10 @@ import javax.naming.NamingException;
 import javax.naming.RefAddr;
 import javax.naming.Reference;
 import javax.naming.spi.ObjectFactory;
-import javax.servlet.http.HttpSession;
-
-import java.util.*;
+import java.util.Collections;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
@@ -61,29 +60,26 @@ public class EmbeddedTomcatCustomJndiResourceTest {
         }
 
         @Bean
-        public EmbeddedServletContainerFactory embeddedServletContainerFactory() {
-            TomcatEmbeddedServletContainerFactory tomcatEmbeddedServletContainerFactory = new TomcatEmbeddedServletContainerFactory() {
+        public TomcatServletWebServerFactory tomcatServletWebServerFactory() {
+            TomcatServletWebServerFactory tomcatServletWebServerFactory = new TomcatServletWebServerFactory() {
                 @Override
-                protected TomcatEmbeddedServletContainer getTomcatEmbeddedServletContainer(Tomcat tomcat) {
+                protected TomcatWebServer getTomcatWebServer(Tomcat tomcat) {
                     tomcat.enableNaming();
-                    return super.getTomcatEmbeddedServletContainer(tomcat);
+                    return super.getTomcatWebServer(tomcat);
                 }
             };
 
-            tomcatEmbeddedServletContainerFactory.addContextCustomizers(new TomcatContextCustomizer() {
-                @Override
-                public void customize(Context context) {
-                    ContextResource dummyContextResource = new ContextResource();
-                    dummyContextResource.setName("dummy");
-                    dummyContextResource.setType(DummyContextResource.class.getName());
-                    dummyContextResource.setProperty("message", "Hello JNDI!");
-                    dummyContextResource.setProperty("factory", DummyContextResourceFactory.class.getName());
+            tomcatServletWebServerFactory.addContextCustomizers((TomcatContextCustomizer) context -> {
+                ContextResource dummyContextResource = new ContextResource();
+                dummyContextResource.setName("dummy");
+                dummyContextResource.setType(DummyContextResource.class.getName());
+                dummyContextResource.setProperty("message", "Hello JNDI!");
+                dummyContextResource.setProperty("factory", DummyContextResourceFactory.class.getName());
 
-                    context.getNamingResources().addResource(dummyContextResource);
-                }
+                context.getNamingResources().addResource(dummyContextResource);
             });
 
-            return tomcatEmbeddedServletContainerFactory;
+            return tomcatServletWebServerFactory;
         }
     }
 

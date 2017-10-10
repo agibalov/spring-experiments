@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.yaml.snakeyaml.Yaml;
 
 import java.util.Collections;
@@ -47,7 +47,7 @@ public class CustomHttpMessageConverterTest {
 
     @Configuration
     @EnableAutoConfiguration
-    public static class Config extends WebMvcConfigurerAdapter {
+    public static class Config implements WebMvcConfigurer {
         @Bean
         public DummyController dummyController() {
             return new DummyController();

@@ -3,7 +3,7 @@ package me.loki2302;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.web.WebMvcRegistrationsAdapter;
+import org.springframework.boot.autoconfigure.web.servlet.WebMvcRegistrations;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -94,7 +94,7 @@ public class RequestConditionTest {
         }
     }
 
-    public static class MyWebMvcRegistrationsAdapter extends WebMvcRegistrationsAdapter {
+    public static class MyWebMvcRegistrationsAdapter implements WebMvcRegistrations {
         @Override
         public RequestMappingHandlerMapping getRequestMappingHandlerMapping() {
             return new DummyRequestMappingHandlerMapping();

@@ -16,13 +16,16 @@ import org.springframework.web.client.RestTemplate;
 import static org.junit.Assert.assertEquals;
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, properties = "custom.mapping.path=/omg/wtf/bbq/")
+@SpringBootTest(
+        webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
+        properties = "custom.mapping.path=/omg/wtf/bbq/")
 @RunWith(SpringRunner.class)
 public class ConfigurableControllerMappingPathViaPropertiesTest {
     @Test
     public void ping() {
         RestTemplate restTemplate = new RestTemplate();
-        assertEquals("hello there", restTemplate.getForObject("http://localhost:8080/omg/wtf/bbq/something", String.class));
+        assertEquals("hello there",
+                restTemplate.getForObject("http://localhost:8080/omg/wtf/bbq/something", String.class));
     }
 
     @Configuration

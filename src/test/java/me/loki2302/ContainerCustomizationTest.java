@@ -1,13 +1,11 @@
 package me.loki2302;
 
-import org.apache.catalina.Context;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.context.embedded.EmbeddedServletContainerFactory;
-import org.springframework.boot.context.embedded.tomcat.TomcatContextCustomizer;
-import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.embedded.tomcat.TomcatContextCustomizer;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.ResponseEntity;
@@ -43,15 +41,11 @@ public class ContainerCustomizationTest {
         }
 
         @Bean
-        public EmbeddedServletContainerFactory embeddedServletContainerFactory() {
-            TomcatEmbeddedServletContainerFactory tomcatEmbeddedServletContainerFactory = new TomcatEmbeddedServletContainerFactory();
-            tomcatEmbeddedServletContainerFactory.addContextCustomizers(new TomcatContextCustomizer() {
-                @Override
-                public void customize(Context context) {
-                    context.setSessionCookieName("MYCUSTOMSESSIONCOOKIE");
-                }
-            });
-            return tomcatEmbeddedServletContainerFactory;
+        public TomcatServletWebServerFactory tomcatServletWebServerFactory() {
+            TomcatServletWebServerFactory tomcatServletWebServerFactory = new TomcatServletWebServerFactory();
+            tomcatServletWebServerFactory.addContextCustomizers((TomcatContextCustomizer) context ->
+                    context.setSessionCookieName("MYCUSTOMSESSIONCOOKIE"));
+            return tomcatServletWebServerFactory;
         }
     }
 

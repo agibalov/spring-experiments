@@ -1,8 +1,8 @@
 package me.loki2302;
 
-import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.tomcat.util.descriptor.web.ContextResource;
+import org.hsqldb.jdbc.JDBCDriver;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,11 +11,10 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
-import org.springframework.boot.context.embedded.EmbeddedServletContainerFactory;
-import org.springframework.boot.context.embedded.tomcat.TomcatContextCustomizer;
-import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainer;
-import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.embedded.tomcat.TomcatContextCustomizer;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.boot.web.embedded.tomcat.TomcatWebServer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -82,37 +81,34 @@ public class EmbeddedTomcatJndiDataSourceTest {
         }
 
         @Bean
-        public EmbeddedServletContainerFactory embeddedServletContainerFactory() {
-            TomcatEmbeddedServletContainerFactory tomcatEmbeddedServletContainerFactory = new TomcatEmbeddedServletContainerFactory() {
+        public TomcatServletWebServerFactory tomcatServletWebServerFactory() {
+            TomcatServletWebServerFactory tomcatServletWebServerFactory = new TomcatServletWebServerFactory() {
                 @Override
-                protected TomcatEmbeddedServletContainer getTomcatEmbeddedServletContainer(Tomcat tomcat) {
+                protected TomcatWebServer getTomcatWebServer(Tomcat tomcat) {
                     tomcat.enableNaming();
-                    return super.getTomcatEmbeddedServletContainer(tomcat);
+                    return super.getTomcatWebServer(tomcat);
                 }
             };
 
-            tomcatEmbeddedServletContainerFactory.addContextCustomizers(new TomcatContextCustomizer() {
-                @Override
-                public void customize(Context context) {
-                    ContextResource dataSourceOneContextResource = new ContextResource();
-                    dataSourceOneContextResource.setName("dataSourceOne");
-                    dataSourceOneContextResource.setType(DataSource.class.getName());
-                    dataSourceOneContextResource.setProperty("driverClassName", org.hsqldb.jdbc.JDBCDriver.class.getName());
-                    dataSourceOneContextResource.setProperty("url", "jdbc:hsqldb:mem:databaseOne");
-                    dataSourceOneContextResource.setProperty("username", "sa");
-                    context.getNamingResources().addResource(dataSourceOneContextResource);
+            tomcatServletWebServerFactory.addContextCustomizers((TomcatContextCustomizer) context -> {
+                ContextResource dataSourceOneContextResource = new ContextResource();
+                dataSourceOneContextResource.setName("dataSourceOne");
+                dataSourceOneContextResource.setType(DataSource.class.getName());
+                dataSourceOneContextResource.setProperty("driverClassName", JDBCDriver.class.getName());
+                dataSourceOneContextResource.setProperty("url", "jdbc:hsqldb:mem:databaseOne");
+                dataSourceOneContextResource.setProperty("username", "sa");
+                context.getNamingResources().addResource(dataSourceOneContextResource);
 
-                    ContextResource dataSourceTwoContextResource = new ContextResource();
-                    dataSourceTwoContextResource.setName("dataSourceTwo");
-                    dataSourceTwoContextResource.setType(DataSource.class.getName());
-                    dataSourceTwoContextResource.setProperty("driverClassName", org.hsqldb.jdbc.JDBCDriver.class.getName());
-                    dataSourceTwoContextResource.setProperty("url", "jdbc:hsqldb:mem:databaseTwo");
-                    dataSourceTwoContextResource.setProperty("username", "sa");
-                    context.getNamingResources().addResource(dataSourceTwoContextResource);
-                }
+                ContextResource dataSourceTwoContextResource = new ContextResource();
+                dataSourceTwoContextResource.setName("dataSourceTwo");
+                dataSourceTwoContextResource.setType(DataSource.class.getName());
+                dataSourceTwoContextResource.setProperty("driverClassName", JDBCDriver.class.getName());
+                dataSourceTwoContextResource.setProperty("url", "jdbc:hsqldb:mem:databaseTwo");
+                dataSourceTwoContextResource.setProperty("username", "sa");
+                context.getNamingResources().addResource(dataSourceTwoContextResource);
             });
 
-            return tomcatEmbeddedServletContainerFactory;
+            return tomcatServletWebServerFactory;
         }
     }
 

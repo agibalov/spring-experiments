@@ -16,6 +16,7 @@ import org.springframework.http.*;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
+import org.springframework.lang.Nullable;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.validation.BindException;
@@ -30,10 +31,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.context.request.async.AsyncRequestTimeoutException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import org.springframework.web.servlet.mvc.multiaction.NoSuchRequestHandlingMethodException;
 
 import javax.validation.Valid;
 import java.io.IOException;
@@ -236,17 +237,18 @@ public class ResponseEntityExceptionHandlerTest {
             return super.handleExceptionInternal(ex, body, headers, status, request);
         }
 
+        @Nullable
         @Override
-        protected ResponseEntity<Object> handleNoSuchRequestHandlingMethod(
-                NoSuchRequestHandlingMethodException ex,
+        protected ResponseEntity<Object> handleAsyncRequestTimeoutException(
+                AsyncRequestTimeoutException ex,
                 HttpHeaders headers,
                 HttpStatus status,
-                WebRequest request) {
+                WebRequest webRequest) {
 
             // ?
 
-            LOGGER.info("handleNoSuchRequestHandlingMethod");
-            return super.handleNoSuchRequestHandlingMethod(ex, headers, status, request);
+            LOGGER.info("handleAsyncRequestTimeoutException");
+            return new ResponseEntity<>(new ErrorDto("handleAsyncRequestTimeoutException"), HttpStatus.SERVICE_UNAVAILABLE);
         }
 
         @Override

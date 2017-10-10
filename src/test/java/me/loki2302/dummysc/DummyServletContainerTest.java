@@ -6,11 +6,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.embedded.EmbeddedServletContainer;
-import org.springframework.boot.context.embedded.EmbeddedServletContainerException;
-import org.springframework.boot.context.embedded.EmbeddedServletContainerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.WebServer;
+import org.springframework.boot.web.server.WebServerException;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
+import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -47,7 +47,7 @@ public class DummyServletContainerTest {
     @SpringBootApplication
     public static class Config {
         @Bean
-        public EmbeddedServletContainerFactory embeddedServletContainerFactory() {
+        public ServletWebServerFactory servletWebServerFactory() {
             return new DummyEmbeddedServletContainerFactory();
         }
 
@@ -65,11 +65,11 @@ public class DummyServletContainerTest {
         }
     }
 
-    public static class DummyEmbeddedServletContainerFactory implements EmbeddedServletContainerFactory {
+    public static class DummyEmbeddedServletContainerFactory implements ServletWebServerFactory {
         private final static Logger LOGGER = LoggerFactory.getLogger(DummyEmbeddedServletContainerFactory.class);
 
         @Override
-        public EmbeddedServletContainer getEmbeddedServletContainer(ServletContextInitializer... initializers) {
+        public WebServer getWebServer(ServletContextInitializer... initializers) {
             LOGGER.info("getEmbeddedServletContainer(), initializers={}", initializers.length);
 
             DummyServletContext servletContext = new DummyServletContext();
@@ -105,16 +105,16 @@ public class DummyServletContainerTest {
         }
     }
 
-    public static class DummyEmbeddedServletContainer implements EmbeddedServletContainer {
+    public static class DummyEmbeddedServletContainer implements WebServer {
         private final static Logger LOGGER = LoggerFactory.getLogger(DummyEmbeddedServletContainer.class);
 
         @Override
-        public void start() throws EmbeddedServletContainerException {
+        public void start() throws WebServerException {
             LOGGER.info("start()");
         }
 
         @Override
-        public void stop() throws EmbeddedServletContainerException {
+        public void stop() throws WebServerException {
             LOGGER.info("stop()");
         }
 
