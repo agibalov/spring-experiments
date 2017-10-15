@@ -2,30 +2,15 @@ group 'me.loki2302'
 version '1.0-SNAPSHOT'
 
 task wrapper(type: Wrapper) {
-  gradleVersion = '4.2.1'
-  distributionUrl = "https://services.gradle.org/distributions/gradle-$gradleVersion-all.zip"
+    gradleVersion = '4.2.1'
+    distributionUrl = "https://services.gradle.org/distributions/gradle-$gradleVersion-all.zip"
 }
 
-apply plugin: 'java'
-
-sourceCompatibility = 1.8
-
-repositories {
-    mavenCentral()
-    maven {
-        url 'http://repo.spring.io/milestone/'
+subprojects {
+    repositories {
+        mavenCentral()
+        maven {
+            url 'http://repo.spring.io/milestone/'
+        }
     }
-}
-
-dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.11'
-    testCompile 'org.springframework.boot:spring-boot-starter-test:2.0.0.M4'
-    compile 'org.springframework.boot:spring-boot-starter-web:2.0.0.M4'
-    compile 'org.springframework.boot:spring-boot-starter-data-jpa:2.0.0.M4'
-    compile 'org.hibernate:hibernate-validator:5.2.4.Final'
-    compile 'org.hsqldb:hsqldb:2.3.4'
-    compile 'org.apache.httpcomponents:httpclient:4.5.2'
-    compile group: 'org.apache.tomcat', name: 'tomcat-dbcp', version: '8.5.20'
-    compile group: 'io.github.openfeign', name: 'feign-core', version: '9.5.0'
-    compile group: 'io.github.openfeign', name: 'feign-jackson', version: '9.5.0'
 }
