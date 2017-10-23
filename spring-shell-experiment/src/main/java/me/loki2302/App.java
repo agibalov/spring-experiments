@@ -1,18 +1,21 @@
 package me.loki2302;
 
 import org.jline.reader.LineReader;
+import org.jline.reader.Parser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.shell.Input;
 import org.springframework.shell.InputProvider;
 import org.springframework.shell.Shell;
 import org.springframework.shell.jline.DefaultShellApplicationRunner;
+import org.springframework.shell.jline.FileInputProvider;
 import org.springframework.shell.jline.PromptProvider;
 
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
@@ -27,9 +30,10 @@ public class App {
     public ApplicationRunner applicationRunner(
             LineReader lineReader,
             PromptProvider promptProvider,
+            Parser parser,
             Shell shell) {
 
-        return new MyApplicationRunner(lineReader, promptProvider, shell);
+        return new MyApplicationRunner(lineReader, promptProvider, parser, shell);
     }
 
     /**
@@ -38,46 +42,42 @@ public class App {
     public static class MyApplicationRunner implements ApplicationRunner {
         private final LineReader lineReader;
         private final PromptProvider promptProvider;
+        private final Parser parser;
         private final Shell shell;
 
-        public MyApplicationRunner(LineReader lineReader, PromptProvider promptProvider, Shell shell) {
+        public MyApplicationRunner(
+                LineReader lineReader,
+                PromptProvider promptProvider,
+                Parser parser,
+                Shell shell) {
+
             this.lineReader = lineReader;
             this.promptProvider = promptProvider;
+            this.parser = parser;
             this.shell = shell;
         }
 
         @Override
         public void run(ApplicationArguments args) throws Exception {
-            if(args.getSourceArgs().length > 0) {
-                // TODO: this approach doesn't work for scenarios like 'say "hello world"'
+            boolean hasCommandLineArgs = args.getSourceArgs().length > 0;
+            if(hasCommandLineArgs) {
                 String command = Arrays.stream(args.getSourceArgs())
+                        .map(s -> s.contains(" ") ? "\"" + s + "\"" : s)
                         .collect(Collectors.joining(" "));
-                shell.run(new SingleCommandInputProvider(command));
-            } else {
-                InputProvider inputProvider = new DefaultShellApplicationRunner.JLineInputProvider(
-                        lineReader,
-                        promptProvider);
-                shell.run(inputProvider);
-            }
-        }
 
-        public static class SingleCommandInputProvider implements InputProvider {
-            private final String command;
-            private boolean shouldExit = false;
+                try(Reader reader = new StringReader(command);
+                    FileInputProvider inputProvider = new FileInputProvider(reader, parser)) {
 
-            public SingleCommandInputProvider(String command) {
-                this.command = command;
-            }
-
-            @Override
-            public Input readInput() {
-                if(!shouldExit) {
-                    shouldExit = true;
-                    return () -> command;
+                    shell.run(inputProvider);
                 }
 
-                return null;
+                return;
             }
+
+            InputProvider inputProvider = new DefaultShellApplicationRunner.JLineInputProvider(
+                    lineReader,
+                    promptProvider);
+            shell.run(inputProvider);
         }
     }
 }
