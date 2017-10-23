@@ -21,12 +21,12 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
-    compile 'org.springframework.shell:spring-shell:1.2.0.RELEASE'
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter', version: '1.5.6.RELEASE'
+    compile 'org.springframework.shell:spring-shell-starter:2.0.0.M2'
+    compile group: 'org.hibernate.validator', name: 'hibernate-validator', version: '6.0.3.Final'
+    compile group: 'javax.validation', name: 'validation-api', version: '2.0.0.Final'
 }
 
 bootRepackage {
-    mainClass = 'org.springframework.shell.Bootstrap'
     executable = true
 }
 

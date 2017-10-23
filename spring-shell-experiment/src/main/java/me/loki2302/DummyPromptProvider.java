@@ -1,19 +1,14 @@
 package me.loki2302;
 
-import org.springframework.core.annotation.Order;
-import org.springframework.shell.plugin.PromptProvider;
+import org.jline.utils.AttributedString;
+import org.jline.utils.AttributedStyle;
+import org.springframework.shell.jline.PromptProvider;
 import org.springframework.stereotype.Component;
 
 @Component
-@Order(Integer.MIN_VALUE)
 public class DummyPromptProvider implements PromptProvider {
     @Override
-    public String getPrompt() {
-        return ":-)";
-    }
-
-    @Override
-    public String getProviderName() {
-        return DummyPromptProvider.class.getName();
+    public AttributedString getPrompt() {
+        return new AttributedString(":-)", AttributedStyle.DEFAULT.foreground(AttributedStyle.CYAN));
     }
 }
