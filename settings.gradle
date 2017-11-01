@@ -5,4 +5,5 @@ include 'banner-experiment'
 include 'ssh-experiment'
 include 'property-sources-experiment'
 include 'spring-cloud-context-experiment'
+include 'method-validation-experiment'
 
