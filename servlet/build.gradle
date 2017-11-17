@@ -5,9 +5,10 @@ sourceCompatibility = 1.8
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
     testCompile "org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
+    testCompileOnly group: 'org.projectlombok', name: 'lombok', version: '1.16.18'
     compile "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"
     compile "org.springframework.boot:spring-boot-starter-data-jpa:${springBootVersion}"
-    compile 'org.hibernate:hibernate-validator:5.2.4.Final'
+    compile group: 'org.hibernate.validator', name: 'hibernate-validator', version: '6.0.4.Final'
     compile 'org.hsqldb:hsqldb:2.3.4'
     compile 'org.apache.httpcomponents:httpclient:4.5.2'
     compile group: 'org.apache.tomcat', name: 'tomcat-dbcp', version: '8.5.20'
