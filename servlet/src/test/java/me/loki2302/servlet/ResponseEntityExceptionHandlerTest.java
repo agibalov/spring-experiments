@@ -1,5 +1,6 @@
 package me.loki2302.servlet;
 
+import me.loki2302.servlet.shared.SilentResponseErrorHandler;
 import org.hibernate.validator.constraints.Range;
 import org.junit.Assert;
 import org.junit.Test;
@@ -14,7 +15,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.*;
-import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.lang.Nullable;
@@ -29,7 +29,6 @@ import org.springframework.web.bind.MissingPathVariableException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.context.request.async.AsyncRequestTimeoutException;
@@ -40,7 +39,6 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
-import java.io.IOException;
 import java.net.URI;
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -472,17 +470,6 @@ public class ResponseEntityExceptionHandlerTest {
         @Override
         public ResponseEntity<?> makeResponseEntity() {
             return new ResponseEntity<>(new ErrorDto("something not found"), HttpStatus.NOT_FOUND);
-        }
-    }
-
-    public static class SilentResponseErrorHandler implements ResponseErrorHandler {
-        @Override
-        public boolean hasError(ClientHttpResponse response) throws IOException {
-            return false;
-        }
-
-        @Override
-        public void handleError(ClientHttpResponse response) throws IOException {
         }
     }
 }
