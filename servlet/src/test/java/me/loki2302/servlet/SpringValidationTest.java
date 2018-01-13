@@ -1,5 +1,6 @@
 package me.loki2302.servlet;
 
+import lombok.Data;
 import me.loki2302.servlet.shared.SilentResponseErrorHandler;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,12 +17,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
-
-import javax.validation.Valid;
 
 import static org.junit.Assert.assertEquals;
 
@@ -94,7 +94,7 @@ public class SpringValidationTest {
         @RequestMapping(value = "/", method = RequestMethod.POST)
         @ResponseBody
         @ResponseStatus(HttpStatus.OK)
-        public String hello(@Valid @RequestBody UserNameDto userNameDto) {
+        public String hello(@Validated @RequestBody UserNameDto userNameDto) {
             return "hello there!";
         }
 
@@ -106,16 +106,9 @@ public class SpringValidationTest {
         }
     }
 
+    @Data
     public static class UserNameDto {
         private String username;
-
-        public String getUsername() {
-            return username;
-        }
-
-        public void setUsername(String username) {
-            this.username = username;
-        }
     }
 
     public static class UserNameDtoValidator implements Validator {

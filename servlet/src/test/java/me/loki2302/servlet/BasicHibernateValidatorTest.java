@@ -13,12 +13,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
-import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 
 import static org.junit.Assert.assertEquals;
@@ -26,7 +25,7 @@ import static org.junit.Assert.assertEquals;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @RunWith(SpringRunner.class)
-public class BeanValidationTest {
+public class BasicHibernateValidatorTest {
     @Autowired
     private RestTemplate restTemplate;
 
@@ -62,11 +61,6 @@ public class BeanValidationTest {
     @EnableAutoConfiguration
     public static class Config {
         @Bean
-        public LocalValidatorFactoryBean validator() {
-            return new LocalValidatorFactoryBean();
-        }
-
-        @Bean
         public HomeController homeController() {
             return new HomeController();
         }
@@ -84,7 +78,7 @@ public class BeanValidationTest {
         @RequestMapping(value = "/", method = RequestMethod.POST)
         @ResponseBody
         @ResponseStatus(HttpStatus.OK)
-        public String hello(@Valid @RequestBody UserNameDto userNameDto) {
+        public String hello(@Validated @RequestBody UserNameDto userNameDto) {
             return "hello there!";
         }
 
