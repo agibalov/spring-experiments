@@ -2,7 +2,7 @@ group 'me.loki2302'
 version '1.0-SNAPSHOT'
 
 task wrapper(type: Wrapper) {
-  gradleVersion = '2.13'
+  gradleVersion = '4.4.1'
   distributionUrl = "https://services.gradle.org/distributions/gradle-$gradleVersion-all.zip"
 }
 
@@ -16,6 +16,7 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
-    testCompile 'org.springframework.boot:spring-boot-starter-test:1.4.1.RELEASE'
-    compile 'org.springframework.boot:spring-boot-starter-integration:1.4.1.RELEASE'
+    testCompile 'org.springframework.boot:spring-boot-starter-test:1.5.9.RELEASE'
+    testCompile 'org.springframework.boot:spring-boot-starter-integration:1.5.9.RELEASE'
+    testCompile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.3'
 }
