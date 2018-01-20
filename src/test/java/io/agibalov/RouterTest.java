@@ -1,4 +1,4 @@
-package me.loki2302.transformation;
+package io.agibalov;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,39 +13,35 @@ import org.springframework.integration.config.EnableIntegration;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.dsl.channel.MessageChannels;
-import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
-public class FilterTest {
+public class RouterTest {
     @Autowired
     @Qualifier("input")
     private DirectChannel input;
 
     @Autowired
-    @Qualifier("output")
-    private QueueChannel output;
+    @Qualifier("outputA")
+    private QueueChannel outputA;
 
     @Autowired
-    @Qualifier("discard")
-    private QueueChannel discard;
+    @Qualifier("outputB")
+    private QueueChannel outputB;
 
     @Test
-    public void filterShouldFilter() {
-        Message<String> helloMessage = MessageBuilder.withPayload("hello").build();
-        input.send(helloMessage);
-        assertEquals(helloMessage, output.receive(0));
-        assertNull(discard.receive(0));
+    public void routerShouldRoute() {
+        input.send(MessageBuilder.withPayload("hi 1").build());
+        input.send(MessageBuilder.withPayload("hi 2").build());
+        input.send(MessageBuilder.withPayload("bye 1").build());
 
-        Message<String> byeMessage = MessageBuilder.withPayload("bye").build();
-        input.send(byeMessage);
-        assertNull(output.receive(0));
-        assertEquals(byeMessage, discard.receive(0));
+        assertEquals("hi 1", outputA.receive(0).getPayload());
+        assertEquals("hi 2", outputA.receive(0).getPayload());
+        assertEquals("bye 1", outputB.receive(0).getPayload());
     }
 
     @Configuration
@@ -56,21 +52,22 @@ public class FilterTest {
             return MessageChannels.direct("input").get();
         }
 
-        @Bean(name = "output")
-        public QueueChannel outputChannel() {
-            return MessageChannels.queue("output").get();
+        @Bean(name = "outputA")
+        public QueueChannel outputAChannel() {
+            return MessageChannels.queue("outputA").get();
         }
 
-        @Bean(name = "discard")
-        public QueueChannel discardChannel() {
-            return MessageChannels.queue("discard").get();
+        @Bean(name = "outputB")
+        public QueueChannel outputBChannel() {
+            return MessageChannels.queue("outputB").get();
         }
 
         @Bean
         public IntegrationFlow integrationFlow() {
             return IntegrationFlows.from(inputChannel())
-                    .filter(String.class, s -> s.equals("hello"), f -> f.discardChannel(discardChannel()))
-                    .channel(outputChannel())
+                    .routeToRecipients(r -> r
+                            .recipient(outputAChannel(), (String s) -> s.contains("hi"))
+                            .recipient(outputBChannel(), (String s) -> s.contains("bye")))
                     .get();
         }
     }

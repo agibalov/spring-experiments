@@ -1,4 +1,4 @@
-package me.loki2302.transformation;
+package io.agibalov;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,28 +20,23 @@ import static org.junit.Assert.assertEquals;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
-public class RouterTest {
+public class SplitterTest {
     @Autowired
     @Qualifier("input")
     private DirectChannel input;
 
     @Autowired
-    @Qualifier("outputA")
-    private QueueChannel outputA;
-
-    @Autowired
-    @Qualifier("outputB")
-    private QueueChannel outputB;
+    @Qualifier("output")
+    private QueueChannel output;
 
     @Test
-    public void routerShouldRoute() {
-        input.send(MessageBuilder.withPayload("hi 1").build());
-        input.send(MessageBuilder.withPayload("hi 2").build());
-        input.send(MessageBuilder.withPayload("bye 1").build());
-
-        assertEquals("hi 1", outputA.receive(0).getPayload());
-        assertEquals("hi 2", outputA.receive(0).getPayload());
-        assertEquals("bye 1", outputB.receive(0).getPayload());
+    public void splitterShouldSplit() {
+        input.send(MessageBuilder.withPayload("hello").build());
+        assertEquals("h", output.receive(0).getPayload());
+        assertEquals("e", output.receive(0).getPayload());
+        assertEquals("l", output.receive(0).getPayload());
+        assertEquals("l", output.receive(0).getPayload());
+        assertEquals("o", output.receive(0).getPayload());
     }
 
     @Configuration
@@ -52,22 +47,16 @@ public class RouterTest {
             return MessageChannels.direct("input").get();
         }
 
-        @Bean(name = "outputA")
-        public QueueChannel outputAChannel() {
-            return MessageChannels.queue("outputA").get();
-        }
-
-        @Bean(name = "outputB")
-        public QueueChannel outputBChannel() {
-            return MessageChannels.queue("outputB").get();
+        @Bean(name = "output")
+        public QueueChannel outputChannel() {
+            return MessageChannels.queue("output").get();
         }
 
         @Bean
         public IntegrationFlow integrationFlow() {
             return IntegrationFlows.from(inputChannel())
-                    .routeToRecipients(r -> r
-                            .recipient(outputAChannel(), (String s) -> s.contains("hi"))
-                            .recipient(outputBChannel(), (String s) -> s.contains("bye")))
+                    .split(String.class, s -> s.split(""))
+                    .channel(outputChannel())
                     .get();
         }
     }

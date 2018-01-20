@@ -1,4 +1,4 @@
-package me.loki2302.transformation;
+package io.agibalov;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;

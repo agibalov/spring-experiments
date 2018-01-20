@@ -1,4 +1,4 @@
-package me.loki2302.transformation;
+package io.agibalov;
 
 import org.junit.Test;
 import org.springframework.integration.channel.QueueChannel;
