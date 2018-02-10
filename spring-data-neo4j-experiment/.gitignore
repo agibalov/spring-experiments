@@ -1,0 +1,6 @@
+.idea
+.gradle
+build
+*.iml
+neo4j-home
+data

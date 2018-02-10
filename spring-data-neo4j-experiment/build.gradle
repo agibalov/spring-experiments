@@ -1,0 +1,49 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.4.1.RELEASE")
+    }
+}
+
+group 'me.loki2320'
+version '1.0-SNAPSHOT'
+
+task wrapper(type: Wrapper) {
+  gradleVersion = '2.13'
+  distributionUrl = "https://services.gradle.org/distributions/gradle-$gradleVersion-all.zip"
+}
+
+apply plugin: 'java'
+apply plugin: 'spring-boot'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    maven { url 'http://spoon.gforge.inria.fr/repositories/releases' }
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile("org.springframework.boot:spring-boot-starter-data-neo4j")
+    compile("org.springframework.boot:spring-boot-starter-test")
+    compile 'fr.inria.gforge.spoon:spoon-core:5.3.0'
+
+
+    compile group: 'commons-io', name: 'commons-io', version: '2.5'
+
+    compile("org.neo4j:neo4j-ogm-embedded-driver:2.0.5")
+
+    // https://github.com/spring-projects/spring-boot/issues/7012
+    compile group: 'org.neo4j', name: 'neo4j-ogm-bolt-driver', version: '2.0.5'
+
+    compile group: 'org.neo4j.app', name: 'neo4j-server', version: '2.3.6'
+
+    compileOnly "org.projectlombok:lombok:1.16.10"
+}
+
+test {
+    testLogging.showStandardStreams = true
+}
