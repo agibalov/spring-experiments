@@ -1,0 +1,39 @@
+apply plugin: 'java'
+apply plugin: 'groovy'
+apply plugin: 'application'
+
+mainClassName = 'me.loki2302.App'
+
+sourceCompatibility = 1.5
+version = '1.0'
+
+repositories {
+    mavenCentral()
+    maven {
+        url 'https://raw.github.com/loki2302/charlatan/mvn-repo/'
+    }
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+    testCompile 'org.springframework.boot:spring-boot-starter-test:1.2.5.RELEASE'
+    compile 'org.codehaus.groovy:groovy-all:2.4.3'
+    compile 'org.springframework.boot:spring-boot-starter-data-jpa:1.2.5.RELEASE'
+    compile 'org.hsqldb:hsqldb:2.3.3'
+    compile 'org.hibernate:hibernate-validator:5.0.3.Final'
+    compile 'org.postgresql:postgresql:9.3-1102-jdbc41'
+    compile 'me.loki2302:charlatan:0.0.1-SNAPSHOT'
+    compile 'io.dropwizard.metrics:metrics-core:3.1.2'
+    compile 'com.zaxxer:HikariCP-java6:2.3.9'
+}
+
+test {
+    testLogging {
+        showStandardStreams = true
+        events 'failed', 'passed', 'skipped'
+    }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.4'
+}
