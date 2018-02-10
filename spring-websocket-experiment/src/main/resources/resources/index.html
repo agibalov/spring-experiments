@@ -1,0 +1,77 @@
+<!doctype html>
+<html ng-app="app">
+    <head>
+        <title>Hello SockJS</title>
+        <link rel="stylesheet" href="webjars/bootstrap/3.3.1/css/bootstrap.min.css">
+    </head>
+    <body>
+        <div class="container" ng-controller="TimeController">
+            <h1>Hello SockJS</h1>
+            <h2>{{time}}</h2>
+            <form class="form-inline" ng-submit="sendMessage()">
+                <div class="form-group">
+                    <input type="text" class="form-control" ng-model="newMessage">
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-default">Send</button>
+                </div>
+                <ul>
+                    <li ng-repeat="message in messages">{{message.text}}</li>
+                </ul>
+            </form>
+        </div>
+        <script type="text/javascript" src="webjars/sockjs-client/0.3.4/sockjs.min.js"></script>
+        <script type="text/javascript" src="webjars/angularjs/1.3.4-1/angular.min.js"></script>
+        <script type="text/javascript">
+            angular.module('app', []).controller('TimeController', ['$scope', function($scope) {
+                $scope.time = 'no time';
+                $scope.newMessage = '';
+                $scope.messages = [];
+
+                var sock = new SockJS('http://localhost:8080/time');
+                sock.onopen = function() {
+                    console.log('onopen()');
+                };
+                sock.onmessage = function(m) {
+                    console.log('onmessage() %s', m.data);
+
+                    var message = JSON.parse(m.data);
+                    console.log(message);
+
+                    if(message.type === 'currentTimeUpdate') {
+                        $scope.time = message.time;
+                        $scope.$apply();
+                    } else if(message.type === 'newChatMessage') {
+                        $scope.messages.push({text: message.text});
+                        $scope.messages = $scope.messages.slice(-10);
+                        $scope.$apply();
+                    } else {
+                        console.warn("Don't know how to handle message of type %s", message.type);
+                    }
+                };
+                sock.onerror = function(e) {
+                    console.error(e);
+                };
+                sock.onclose = function() {
+                    console.log('onclose()');
+                };
+
+                $scope.sendMessage = function() {
+                    var text = $scope.newMessage;
+                    if(!text) {
+                        return;
+                    }
+
+                    $scope.newMessage = '';
+                    var message = {
+                        'type': 'postChatMessage',
+                        'text': text
+                    };
+                    sock.send(JSON.stringify(message));
+                };
+
+                // sock.close();
+            }]);
+        </script>
+    </body>
+</html>
