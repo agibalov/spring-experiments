@@ -1,0 +1,40 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath('org.springframework.boot:spring-boot-gradle-plugin:1.4.1.RELEASE')
+    }
+}
+apply plugin: 'spring-boot'
+apply plugin: 'java'
+apply plugin: 'application'
+
+mainClassName = 'me.loki2302.App'
+
+sourceCompatibility = 1.8
+version = '1.0'
+
+repositories {
+    mavenCentral()
+    maven {
+        url "http://repo.spring.io/libs-release"
+    }
+}
+
+dependencies {
+    compile 'org.springframework.boot:spring-boot-starter-data-rest'
+    compile 'org.springframework.boot:spring-boot-starter-data-jpa'
+    compile 'org.springframework.data:spring-data-rest-hal-browser'
+    compile 'com.h2database:h2:1.4.192'
+    compile group: 'org.projectlombok', name: 'lombok', version: '1.16.10'
+
+    testCompile 'org.springframework.boot:spring-boot-starter-test'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '3.1'
+    distributionUrl = "https://services.gradle.org/distributions/gradle-$gradleVersion-all.zip"
+}
