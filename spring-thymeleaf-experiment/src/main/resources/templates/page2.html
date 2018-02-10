@@ -1,0 +1,26 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      th:include="layout :: page">
+    <head>
+        <title>Hello World</title>
+    </head>
+    <body>
+        <div th:fragment="content">
+            <h2>Page 2</h2>
+            <ul th:remove="all-but-first">
+                <li th:each="person : ${people}"
+                    th:text="|id=${person.id}, name=${person.name}|">Dummy text here</li>
+                <li>Dummy 1</li>
+                <li>Dummy 2</li>
+            </ul>
+            <ul data-th-remove="all-but-first">
+                <li data-th-each="person,it : ${people}"
+                    data-th-text="|id=${person.id}, name=${person.name}|"
+                    data-th-style="${it.odd} ? 'color: red': 'color: green'">Dummy text here</li>
+                <li>Dummy 1</li>
+                <li>Dummy 2</li>
+            </ul>
+        </div>
+    </body>
+</html>

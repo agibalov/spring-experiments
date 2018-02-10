@@ -1,0 +1,17 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      th:fragment="page">
+    <head>
+        <title>Hello World</title>
+    </head>
+    <body>
+        <h1>HEADER</h1>
+        <ul>
+            <li><a href="http://www.google.com" th:href="@{/}">Index</a></li>
+            <li><a href="http://www.github.com" th:href="@{/page2}">Page 2</a></li>
+        </ul>
+        <div th:include="this :: content"></div>
+        <h1>FOOTER</h1>
+    </body>
+</html>
