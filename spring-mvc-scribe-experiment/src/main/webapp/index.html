@@ -1,0 +1,13 @@
+@args AuthenticationResult result
+
+@extends(layout.html)
+
+@section("content") {
+	@if(result != null) {
+		<h3>@result.Provider</h3>
+		<p>@result.Message</p>
+		@if(result.UserDetailsJson != null) {
+			<pre>@result.UserDetailsJson</pre>
+		}
+	}
+}
