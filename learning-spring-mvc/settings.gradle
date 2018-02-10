@@ -1,0 +1,4 @@
+rootProject.name = 'learning-spring-mvc'
+include 'servlet'
+include 'reactive'
+
