@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+<head>
+	<title>Spring MVC file upload</title>
+	<link rel="stylesheet" type="text/css" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" />
+	<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+	<script type="text/javascript" src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>	
+</head>
+<body>
+	<div class="container">
+		<h1>File upload</h1>
+		
+		<form method="post" enctype="multipart/form-data" action="/upload">
+			<div class="form-group">
+				<label for="file">File to upload</label>
+				<input type="file" name="file" id="file" placeholder="File here" />
+			</div>
+			<button type="submit" class="btn btn-default">Upload</button>
+		</form>
+		<p>There are <span data-th-text="${files.size()}">100</span> files.</p>
+		<ul data-th-remove="all-but-first">
+            <li data-th-each="file : ${files}">
+                <span data-th-text="${file.Name}">1.png</span><br/>
+                <a href="http://www.google.com" data-th-href="@{'/download/' + ${file.Id}}">download</a><br/>
+                <a href="http://www.google.com" data-th-href="@{'/download-mc/' + ${file.Id}}">download mc</a>
+            </li>
+		</ul>
+		
+		<hr/>
+		&copy; 2013-2014 <a href="http://loki2302.me" target="_blank">loki2302</a>
+	</div>
+</body>
+</html>
