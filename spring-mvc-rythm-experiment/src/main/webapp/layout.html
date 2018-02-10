@@ -1,0 +1,38 @@
+@args String area
+
+<html>
+<head>
+	<title>Spring Rythm - @render("title")</title>
+	<link rel="stylesheet" type="text/css" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" />
+	<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+	<script type="text/javascript" src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>	
+</head>
+<body>
+	<div class="container">
+		<nav class="navbar navbar-default">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".my-navbar-collapse">
+					<span class="sr-only">Toggle navigation</span>
+			      	<span class="icon-bar"></span>
+			      	<span class="icon-bar"></span>
+			      	<span class="icon-bar"></span>
+				</button>
+				<a href="/" class="navbar-brand">Rythm Test</a>
+			</div>
+			<div class="collapse navbar-collapse my-navbar-collapse">
+				<ul class="nav navbar-nav">
+					<li class="@if(area == "index") { active }"><a href="/">Index</a></li>
+					<li class="@if(area == "time") { active }"><a href="/time">Time</a></li>
+					<li class="@if(area == "person") { active }"><a href="/person">People</a></li>
+				</ul>
+			</div>
+		</nav>		
+		<div class="page-header">
+			<h2>@render("title")</h2>
+		</div>
+		@render("content")
+		<hr>
+		&copy; 2013 <a href="http://loki2302.me" target="_blank">loki2302</a>
+	</div>
+</body>
+</html>

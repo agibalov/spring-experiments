@@ -1,0 +1,8 @@
+@args Person person;
+@extends(layout.html, area: "person")
+
+@section("title") {Person #@person.id}
+@section("content") {  
+  <p>First name: @person.firstName</p>
+  <p>Last name: @person.lastName</p>
+}

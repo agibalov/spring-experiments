@@ -1,0 +1,26 @@
+@extends(layout.html, area: "index")
+
+@section("title") {Static content}
+@section("content") {
+  <h3>Static page</h3>
+  <p>Static content goes here</p>  
+   
+  <h4>Partial view</h4>
+  @repeat("using partial view", 3)
+  
+  <h4>Using helper</h4>
+  @sayHello("loki2302")
+  
+  <h4>Markdown</h4>
+  <div class="well">
+  @markdown() {# Title here
+## Title here
+### Title here
+*Some* _text_ `goes` here.
+  }
+  </div>
+}
+
+@def sayHello(String name) {
+	Hello @name!
+}

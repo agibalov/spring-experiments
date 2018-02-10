@@ -1,0 +1,10 @@
+@args Date currentTime
+@extends(layout.html, area: "time")
+
+@section("title") {Time}
+@section("content") {
+  <p>Current time is @currentTime</p>
+  <h3>Custom tags</h3>
+  <p>Fancy date: @fancyDate(currentTime)</p>
+  <p>Fancy time: @fancyTime(currentTime)</p>
+}
