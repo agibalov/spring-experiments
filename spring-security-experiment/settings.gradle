@@ -1,0 +1,6 @@
+rootProject.name = 'spring-security-experiment'
+include 'general'
+include 'web'
+include 'web-stateless'
+include 'oauth2'
+
