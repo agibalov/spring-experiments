@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Hello</title>
+    </head>
+    <body>
+        <ul>
+            <li><a href="http://www.google.com" data-th-href="@{/google}">Sign In with Google</a></li>
+            <li><a href="http://www.facebook.com" data-th-href="@{/facebook}">Sign In with Facebook</a></li>
+            <li><a href="http://www.twitter.com" data-th-href="@{/twitter}">Sign In with Twitter</a></li>
+        </ul>
+        <p data-th-text="${name}" data-th-if="${name}">John Smith</p>
+        <img data-th-src="@{${imageUrl}}" data-th-if="${imageUrl}" src="#" />
+        <a data-th-href="@{${profileUrl}}" data-th-if="${profileUrl}" href="#">Profile</a>
+        <p data-th-text="${email}" data-th-if="${email}">Email here</p>
+        <p data-th-text="${error}" data-th-if="${error}">Error</p>
+        <p data-th-text="${errorDescription}" data-th-if="${errorDescription}">Error</p>
+        <p data-th-text="${errorUri}" data-th-if="${errorDescription}">Error</p>
+    </body>
+</html>
