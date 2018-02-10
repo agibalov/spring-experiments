@@ -1,0 +1,23 @@
+group 'me.loki2302'
+version '1.0-SNAPSHOT'
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.1'
+    distributionUrl = "https://services.gradle.org/distributions/gradle-$gradleVersion-all.zip"
+}
+
+subprojects {
+    apply plugin: 'java'
+
+    sourceCompatibility = 1.8
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        testCompile group: 'junit', name: 'junit', version: '4.12'
+        testCompile 'org.springframework.boot:spring-boot-starter-test:1.5.7.RELEASE'
+        compile 'org.springframework.boot:spring-boot-starter:1.5.7.RELEASE'
+    }
+}

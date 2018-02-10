@@ -1,0 +1,13 @@
+dummy.operation: |
+  type: sequence
+  operations:
+  - type: if
+    condition:
+      type: starts-with
+      prefix: ca
+    yes:
+      type: uppercase
+    no:
+      type: lowercase
+  - type: append
+    suffix: '!!!'

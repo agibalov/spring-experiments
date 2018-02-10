@@ -1,0 +1,15 @@
+   ____                           _    __ _     _
+  / __ \                         | |  / _| |   | |
+ | |  | |_ __ ___   __ ___      _| |_| |_| |__ | |__   __ _
+ | |  | | '_ ` _ \ / _` \ \ /\ / / __|  _| '_ \| '_ \ / _` |
+ | |__| | | | | | | (_| |\ V  V /| |_| | | |_) | |_) | (_| |
+  \____/|_| |_| |_|\__, | \_/\_/  \__|_| |_.__/|_.__/ \__, |
+                    __/ |                                | |
+                   |___/                                 |_|
+
+super 31337 by loki2302
+
+Application version: ${application.version} (only available when running a package)
+Application formatted version: ${application.formatted-version} (only available when running a package)
+Spring Boot version: ${spring-boot.version}
+Spring Boot formatted version: ${spring-boot.formatted-version}

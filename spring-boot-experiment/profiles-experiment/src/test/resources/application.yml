@@ -1,0 +1,10 @@
+message: hi there
+service.url: ${env.url}/my-service
+---
+spring:
+  profiles: dev
+env.url: http://dev
+---
+spring:
+  profiles: qa
+env.url: http://qa

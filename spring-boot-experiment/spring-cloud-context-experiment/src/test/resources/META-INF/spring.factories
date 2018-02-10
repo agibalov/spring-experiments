@@ -1,0 +1,2 @@
+org.springframework.cloud.bootstrap.BootstrapConfiguration=\
+me.loki2302.DummyTest.MyCloudConfigBootstrapConfiguration
