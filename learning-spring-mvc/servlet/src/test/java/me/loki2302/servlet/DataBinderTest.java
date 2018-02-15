@@ -1,6 +1,7 @@
 package me.loki2302.servlet;
 
 import lombok.Data;
+import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 import org.junit.Test;
 import org.springframework.beans.MutablePropertyValues;
@@ -11,6 +12,10 @@ import org.springframework.validation.*;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 import javax.validation.constraints.NotEmpty;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -32,6 +37,7 @@ public class DataBinderTest {
     public void shouldAllowMeToValidateDataUsingHibernateValidator() {
         MutablePropertyValues propertyValues = new MutablePropertyValues();
         propertyValues.add("something", "");
+        propertyValues.add("todos", Arrays.asList("a", "b"));
 
         MyBean myBean = new MyBean();
         DataBinder dataBinder = new DataBinder(myBean);
@@ -45,12 +51,20 @@ public class DataBinderTest {
         BindingResult bindingResult = dataBinder.getBindingResult();
         assertTrue(bindingResult.hasErrors());
 
-        FieldError fieldError = bindingResult.getFieldErrors().stream()
-                .filter(e -> e.getField().equals("something"))
-                .findAny()
-                .get();
-        assertEquals("NotEmpty", fieldError.getCode());
-        assertEquals("must not be empty", fieldError.getDefaultMessage());
+        List<FieldError> fieldErrors = bindingResult.getFieldErrors().stream().collect(Collectors.toList());
+        assertEquals(3, fieldErrors.size());
+
+        FieldError todosErrorA = fieldErrors.stream().filter(e -> e.getRejectedValue().equals("a")).findFirst().get();
+        assertEquals("length must be between 5 and 2147483647", todosErrorA.getDefaultMessage());
+        assertEquals("todos[]", todosErrorA.getField());
+
+        FieldError todosErrorB = fieldErrors.stream().filter(e -> e.getRejectedValue().equals("b")).findFirst().get();
+        assertEquals("length must be between 5 and 2147483647", todosErrorB.getDefaultMessage());
+        assertEquals("todos[]", todosErrorB.getField());
+
+        FieldError somethingError = fieldErrors.stream().filter(e -> e.getField().equals("something")).findFirst().get();
+        assertEquals("must not be empty", somethingError.getDefaultMessage());
+        assertEquals("", somethingError.getRejectedValue());
     }
 
     @Test
@@ -105,6 +119,7 @@ public class DataBinderTest {
     public static class MyBean {
         @NotEmpty
         private String something;
+        private Set<@Length(min = 5) String> todos;
     }
 
     public static class MyBeanValidator implements Validator {
