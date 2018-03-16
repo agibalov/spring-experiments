@@ -1,3 +1,4 @@
 spring:
   application:
-    name: dummy
+    name: ${app.name}
+    instance_id: ${app.instance}
