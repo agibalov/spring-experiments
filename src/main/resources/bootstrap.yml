@@ -1,0 +1,9 @@
+spring:
+  cloud:
+    consul:
+      host: ${consul.host} #localhost
+      port: ${consul.port} #8500
+      config:
+        enabled: true
+        watch:
+          enabled: true

@@ -1,0 +1,21 @@
+version: "3"
+
+services:
+  consul_server:
+    image: consul:1.0.6
+    environment:
+      CONSUL_BIND_INTERFACE: eth0
+    command: agent -dev -ui -client=0.0.0.0
+    ports:
+    - 8500:8500
+
+  app1:
+    image: openjdk:8-jre
+    volumes:
+    - ./build/libs:/app
+    command: java -jar /app/dummy-consul-app-1.0-SNAPSHOT.jar
+    ports:
+    - 8080:8080
+    environment:
+      CONSUL_HOST: consul_server
+      CONSUL_PORT: 8500
