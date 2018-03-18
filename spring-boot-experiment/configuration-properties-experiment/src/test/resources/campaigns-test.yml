@@ -1,0 +1,8 @@
+something: qwerty
+campaigns:
+  - campaign-A:
+      name: The Campaign One
+      xxx: 222
+  - campaign-b:
+      name: Some other campaign
+      yyy: 555
