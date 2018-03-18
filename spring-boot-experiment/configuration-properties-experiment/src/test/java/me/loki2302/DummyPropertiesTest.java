@@ -15,7 +15,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(SpringRunner.class)
 @SpringBootTest(properties = {
         "dummy.message=hi there",
-        "DUMMY_USER_NAME=qwerty"
+        "dummy.username=qwerty"
 })
 public class DummyPropertiesTest {
     @Autowired

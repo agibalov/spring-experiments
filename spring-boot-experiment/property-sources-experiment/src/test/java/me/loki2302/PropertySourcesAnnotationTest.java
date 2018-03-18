@@ -51,7 +51,8 @@ public class PropertySourcesAnnotationTest {
                 .collect(Collectors.toList());
 
         assertEquals(Arrays.asList(
-                "Inlined Test Properties", // highest priority
+                "configurationProperties", // highest priority
+                "Inlined Test Properties",
                 "systemProperties",
                 "systemEnvironment",
                 "random",

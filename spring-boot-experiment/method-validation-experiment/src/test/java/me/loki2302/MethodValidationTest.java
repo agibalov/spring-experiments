@@ -1,6 +1,5 @@
 package me.loki2302;
 
-import org.hibernate.validator.constraints.NotEmpty;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +13,8 @@ import org.springframework.validation.annotation.Validated;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
+
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
@@ -37,7 +38,7 @@ public class MethodValidationTest {
 
             ConstraintViolation<?> violation = violations.iterator().next();
             assertEquals("process.message.data", violation.getPropertyPath().toString());
-            assertEquals("may not be empty", violation.getMessage());
+            assertEquals("must not be empty", violation.getMessage());
         }
     }
 

@@ -7,10 +7,13 @@ sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
+    maven {
+        url 'https://repo.spring.io/libs-milestone'
+    }
 }
 
 dependencies {
     testCompile 'com.github.tomakehurst:wiremock:2.8.0'
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-web'
-    testCompile group: 'org.springframework.cloud', name: 'spring-cloud-context', version: '1.2.3.RELEASE'
+    testCompile group: 'org.springframework.cloud', name: 'spring-cloud-context', version: '2.0.0.M8'
 }

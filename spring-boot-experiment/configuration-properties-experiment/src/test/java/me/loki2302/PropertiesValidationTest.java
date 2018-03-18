@@ -6,13 +6,13 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.context.properties.bind.BindException;
+import org.springframework.boot.context.properties.bind.validation.BindValidationException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 public class PropertiesValidationTest {
     @Test
@@ -35,8 +35,10 @@ public class PropertiesValidationTest {
             assertEquals("dummyProperties", beanCreationException.getBeanName());
             assertTrue(beanCreationException.getCause() instanceof BindException);
             BindException bindException = (BindException)beanCreationException.getCause();
-            assertEquals(1, bindException.getErrorCount());
-            FieldError fieldError = bindException.getFieldError("message");
+            assertTrue(bindException.getCause() instanceof BindValidationException);
+            BindValidationException bindValidationException = (BindValidationException)bindException.getCause();
+            assertEquals(1, bindValidationException.getValidationErrors().getAllErrors().size());
+            FieldError fieldError = (FieldError)bindValidationException.getValidationErrors().iterator().next();
             assertEquals("message", fieldError.getField());
             assertEquals("dummy", fieldError.getObjectName());
             assertEquals("message.empty", fieldError.getCode());

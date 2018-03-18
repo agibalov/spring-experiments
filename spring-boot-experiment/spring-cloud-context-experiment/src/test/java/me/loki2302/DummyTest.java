@@ -73,7 +73,9 @@ public class DummyTest {
                         }}))));
 
                 {
-                    restTemplate.getForObject("http://localhost:8080/refresh", String.class);
+                    // After upgrading from 1.5.10 to 2.0.0, refresh() hangs if called from controller :-/
+                    // restTemplate.getForObject("http://localhost:8080/refresh", String.class);
+                    context.getBean(ContextRefresher.class).refresh();
 
                     String greeting = restTemplate.getForObject(
                             "http://localhost:8080/?name=Andrey",
