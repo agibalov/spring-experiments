@@ -1,8 +1,17 @@
 <configuration>
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <!--<encoder>
-            <pattern>%h %l %u [%t] "%r" %s %b "%i{Referer}" "%i{User-Agent}"</pattern>
-        </encoder>-->
+        <encoder class="net.logstash.logback.encoder.LogstashAccessEncoder">
+            <fieldNames>
+                <requestHeaders>request_headers</requestHeaders>
+                <responseHeaders>response_headers</responseHeaders>
+            </fieldNames>
+        </encoder>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/access-%d{yyyy-MM-dd-hh-mm-ss}.log</fileNamePattern>
+        </rollingPolicy>
         <encoder class="net.logstash.logback.encoder.LogstashAccessEncoder">
             <fieldNames>
                 <requestHeaders>request_headers</requestHeaders>
@@ -12,4 +21,5 @@
     </appender>
 
     <appender-ref ref="STDOUT" />
+    <appender-ref ref="FILE" />
 </configuration>
