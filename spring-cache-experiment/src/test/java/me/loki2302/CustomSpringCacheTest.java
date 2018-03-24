@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
@@ -71,12 +72,12 @@ public class CustomSpringCacheTest {
         }
     }
 
-    public static interface SlowService {
+    public interface SlowService {
         String getData();
     }
 
     public static class MyCacheManager implements CacheManager {
-        private final Map<String, MyCache> cacheMap = new HashMap<String, MyCache>();
+        private final Map<String, MyCache> cacheMap = new HashMap<>();
 
         @Override
         public Cache getCache(String name) {
@@ -135,6 +136,18 @@ public class CustomSpringCacheTest {
                 Object value = valueMap.get(key);
                 if (type != null && value != null && !type.isInstance(value)) {
                     throw new IllegalStateException();
+                }
+
+                return (T) value;
+            }
+        }
+
+        @Override
+        public <T> T get(Object key, Callable<T> valueLoader) {
+            synchronized (valueMap) {
+                Object value = valueMap.get(key);
+                if(value == null) {
+                    value = valueLoader.getClass();
                 }
 
                 return (T) value;
