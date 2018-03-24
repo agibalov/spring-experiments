@@ -1,0 +1,5 @@
+zuul:
+  routes:
+    api:
+      path: /api/**
+      url: http://localhost:8888/
