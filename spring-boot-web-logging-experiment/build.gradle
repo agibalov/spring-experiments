@@ -1,10 +1,12 @@
+plugins {
+    id 'org.springframework.boot' version '2.0.0.RELEASE'
+    id 'java'
+}
+
 group 'io.agibalov'
 version '1.0-SNAPSHOT'
 
-apply plugin: 'application'
-
 sourceCompatibility = 1.8
-mainClassName = 'io.agibalov.App'
 
 repositories {
     mavenCentral()
@@ -13,7 +15,6 @@ repositories {
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.0.0.RELEASE'
-    compile group: 'ch.qos.logback', name: 'logback-access', version: '1.2.3'
     compile group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '5.0'
-
+    compile 'net.rakugakibox.spring.boot:logback-access-spring-boot-starter:2.7.1'
 }

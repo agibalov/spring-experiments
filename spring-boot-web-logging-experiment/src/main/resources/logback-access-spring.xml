@@ -1,0 +1,25 @@
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>common</pattern>
+        </encoder>
+    </appender>
+
+    <springProfile name="!prod">
+        <appender-ref ref="STDOUT" />
+    </springProfile>
+
+    <springProfile name="prod">
+        <springProperty scope="local" name="appLogDirectory" source="app.log.directory" />
+
+        <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <fileNamePattern>${appLogDirectory}/access-%d{yyyy-MM-dd-hh-mm-ss}.log</fileNamePattern>
+            </rollingPolicy>
+            <encoder class="net.logstash.logback.encoder.LogstashAccessEncoder" />
+        </appender>
+
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="FILE" />
+    </springProfile>
+</configuration>
