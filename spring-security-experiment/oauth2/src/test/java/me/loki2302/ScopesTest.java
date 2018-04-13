@@ -51,7 +51,7 @@ public class ScopesTest {
             fail();
         } catch(OAuth2Exception e) {
             assertEquals(HttpStatus.FORBIDDEN.value(), e.getHttpErrorCode());
-            assertEquals(OAuth2Exception.ACCESS_DENIED, e.getOAuth2ErrorCode());
+            assertEquals(OAuth2Exception.INSUFFICIENT_SCOPE, e.getOAuth2ErrorCode());
         } catch (Throwable t) {
             fail();
         }
