@@ -2,6 +2,8 @@ package me.loki2302;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.ParameterizedTypeReference;
@@ -22,6 +24,8 @@ import static org.junit.Assert.*;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class AuthenticationTest {
+    private final static Logger LOGGER = LoggerFactory.getLogger(AuthenticationTest.class);
+
     @Test
     public void canAuthenticateAsClient() {
         RestTemplate restTemplate = new RestTemplate();
@@ -41,6 +45,7 @@ public class AuthenticationTest {
                         HttpMethod.POST,
                         URI.create("http://localhost:8080/oauth/token")),
                 new ParameterizedTypeReference<Map<String, String>>() {});
+        LOGGER.info("oAuthTokenResponseEntity: {}", oAuthTokenResponseEntity);
 
         /*
         {
@@ -67,7 +72,7 @@ public class AuthenticationTest {
                         HttpMethod.GET,
                         URI.create("http://localhost:8080/")),
                 new ParameterizedTypeReference<Map<String, String>>() {});
-        System.out.println(testResponseEntity.getBody());
+        LOGGER.info("testResponseEntity body: {}", testResponseEntity.getBody());
 
         assertEquals("PRINCIPAL is client 'MyClientId1' ([ROLE_CLIENT])", testResponseEntity.getBody().get("message"));
     }
@@ -123,7 +128,7 @@ public class AuthenticationTest {
                         HttpMethod.GET,
                         URI.create("http://localhost:8080/")),
                 new ParameterizedTypeReference<Map<String, String>>() {});
-        System.out.println(testResponseEntity.getBody());
+        LOGGER.info("testResponseEntity body: {}", testResponseEntity.getBody());
 
         assertEquals(
                 "PRINCIPAL is user 'user1' ([ROLE_USER]) [clientId=MyClientId1]",
@@ -140,7 +145,7 @@ public class AuthenticationTest {
                         HttpMethod.GET,
                         URI.create("http://localhost:8080/")),
                 new ParameterizedTypeReference<Map<String, String>>() {});
-        System.out.println(testResponseEntity.getBody());
+        LOGGER.info("testResponseEntity body: {}", testResponseEntity.getBody());
 
         assertEquals("PRINCIPAL is null", testResponseEntity.getBody().get("message"));
     }

@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,10 +26,15 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
+import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.expression.OAuth2MethodSecurityExpressionHandler;
+import org.springframework.security.oauth2.provider.token.AccessTokenConverter;
+import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
+import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
+import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -53,17 +59,15 @@ public class App {
                 responseText = String.format("PRINCIPAL is null");
             } else if(principal instanceof OAuth2Authentication) {
                 OAuth2Authentication oAuth2Authentication = (OAuth2Authentication)principal;
-                Object innerPrincipal = oAuth2Authentication.getPrincipal();
-                if(innerPrincipal instanceof String) {
-                    String clientId = (String)innerPrincipal;
+                boolean isClient = oAuth2Authentication.isClientOnly();
+                if(isClient) {
+                    String clientId = (String)oAuth2Authentication.getPrincipal();
                     responseText = String.format("PRINCIPAL is client '%s' (%s)", clientId, oAuth2Authentication.getAuthorities());
-                } else if(innerPrincipal instanceof User) {
-                    String clientId = oAuth2Authentication.getOAuth2Request().getClientId();
-                    User user = (User)innerPrincipal;
-                    responseText = String.format("PRINCIPAL is user '%s' (%s) [clientId=%s]",
-                            user.getUsername(), oAuth2Authentication.getAuthorities(), clientId);
                 } else {
-                    responseText = String.format("PRINCIPAL is OAuth2??? (%s)", oAuth2Authentication.getAuthorities());
+                    String username = (String)oAuth2Authentication.getPrincipal();
+                    String clientId = oAuth2Authentication.getOAuth2Request().getClientId();
+                    responseText = String.format("PRINCIPAL is user '%s' (%s) [clientId=%s]",
+                            username, oAuth2Authentication.getAuthorities(), clientId);
                 }
             } else {
                 responseText = String.format("PRINCIPAL is %s???", principal.getClass());
@@ -121,6 +125,18 @@ public class App {
         public AuthenticationManager authenticationManagerBean() throws Exception {
             return super.authenticationManagerBean();
         }
+
+        @Bean
+        public TokenStore tokenStore() {
+            return new JwtTokenStore(jwtAccessTokenConverter());
+        }
+
+        @Bean
+        public JwtAccessTokenConverter jwtAccessTokenConverter() {
+            JwtAccessTokenConverter jwtAccessTokenConverter = new JwtAccessTokenConverter();
+            jwtAccessTokenConverter.setSigningKey("mySecretSigningKey");
+            return jwtAccessTokenConverter;
+        }
     }
 
     @Configuration
@@ -131,6 +147,12 @@ public class App {
 
         @Autowired
         private PasswordEncoder passwordEncoder;
+
+        @Autowired
+        private TokenStore tokenStore;
+
+        @Autowired
+        private AccessTokenConverter accessTokenConverter;
 
         @Override
         public void configure(AuthorizationServerSecurityConfigurer security) {
@@ -151,13 +173,9 @@ public class App {
         @Override
         public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
             endpoints
-                    .tokenStore(tokenStore())
+                    .tokenStore(tokenStore)
+                    .accessTokenConverter(accessTokenConverter)
                     .authenticationManager(authenticationManager);
-        }
-
-        @Bean
-        public TokenStore tokenStore() {
-            return new InMemoryTokenStore();
         }
     }
 
