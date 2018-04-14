@@ -6,17 +6,16 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
@@ -26,15 +25,13 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
-import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.expression.OAuth2MethodSecurityExpressionHandler;
 import org.springframework.security.oauth2.provider.token.AccessTokenConverter;
-import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
-import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -109,15 +106,14 @@ public class App {
             return new BCryptPasswordEncoder();
         }
 
-        @Override
-        protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-            auth
-                    .inMemoryAuthentication()
-                    .withUser(User.builder()
-                            .passwordEncoder(raw -> passwordEncoder().encode(raw))
-                            .username("user1")
-                            .password("user1password")
-                            .roles("USER"));
+        @Bean
+        public UserDetailsService userDetailsService() {
+            return new InMemoryUserDetailsManager(User.builder()
+                    .passwordEncoder(raw -> passwordEncoder().encode(raw))
+                    .username("user1")
+                    .password("user1password")
+                    .roles("USER")
+                    .build());
         }
 
         @Bean
@@ -154,6 +150,9 @@ public class App {
         @Autowired
         private AccessTokenConverter accessTokenConverter;
 
+        @Autowired
+        private UserDetailsService userDetailsService;
+
         @Override
         public void configure(AuthorizationServerSecurityConfigurer security) {
             security.passwordEncoder(passwordEncoder);
@@ -164,17 +163,28 @@ public class App {
             clients
                     .inMemory()
                     .withClient("MyClientId1")
+                    .accessTokenValiditySeconds(10)
                     .secret(passwordEncoder.encode("MyClientId1Secret"))
+                    .authorizedGrantTypes("client_credentials", "password", "refresh_token", "authorization_code")
+                    .authorities("ROLE_CLIENT")
+                    .scopes("read", "cats", "beer")
+
+                    .and()
+
+                    .withClient("MyClientId2")
+                    .accessTokenValiditySeconds(3)
+                    .secret(passwordEncoder.encode("MyClientId2Secret"))
                     .authorizedGrantTypes("client_credentials", "password", "refresh_token", "authorization_code")
                     .authorities("ROLE_CLIENT")
                     .scopes("read", "cats", "beer");
         }
 
         @Override
-        public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+        public void configure(AuthorizationServerEndpointsConfigurer endpoints) {
             endpoints
                     .tokenStore(tokenStore)
                     .accessTokenConverter(accessTokenConverter)
+                    .userDetailsService(userDetailsService)
                     .authenticationManager(authenticationManager);
         }
     }
