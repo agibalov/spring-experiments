@@ -16,7 +16,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
@@ -99,14 +100,20 @@ public class App {
     @Configuration
     @EnableWebSecurity
     public static class SecurityConfig extends WebSecurityConfigurerAdapter {
+        @Bean
+        public PasswordEncoder passwordEncoder() {
+            return new BCryptPasswordEncoder();
+        }
+
         @Override
         protected void configure(AuthenticationManagerBuilder auth) throws Exception {
             auth
                     .inMemoryAuthentication()
-                    .passwordEncoder(NoOpPasswordEncoder.getInstance())
-                    .withUser("user1")
-                    .password("user1password")
-                    .roles("USER");
+                    .withUser(User.builder()
+                            .passwordEncoder(raw -> passwordEncoder().encode(raw))
+                            .username("user1")
+                            .password("user1password")
+                            .roles("USER"));
         }
 
         @Bean
@@ -122,9 +129,12 @@ public class App {
         @Autowired
         private AuthenticationManager authenticationManager;
 
+        @Autowired
+        private PasswordEncoder passwordEncoder;
+
         @Override
-        public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
-            security.passwordEncoder(NoOpPasswordEncoder.getInstance());
+        public void configure(AuthorizationServerSecurityConfigurer security) {
+            security.passwordEncoder(passwordEncoder);
         }
 
         @Override
@@ -132,7 +142,7 @@ public class App {
             clients
                     .inMemory()
                     .withClient("MyClientId1")
-                    .secret("MyClientId1Secret")
+                    .secret(passwordEncoder.encode("MyClientId1Secret"))
                     .authorizedGrantTypes("client_credentials", "password", "refresh_token", "authorization_code")
                     .authorities("ROLE_CLIENT")
                     .scopes("read", "cats", "beer");
