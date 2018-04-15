@@ -11,15 +11,12 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.Base64Utils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
 
@@ -142,16 +139,5 @@ public class RefreshTokenTest {
 
     @Import(App.class)
     public static class Config {
-    }
-
-    private static class NoErrorsResponseErrorHandler implements ResponseErrorHandler {
-        @Override
-        public boolean hasError(ClientHttpResponse response) throws IOException {
-            return false;
-        }
-
-        @Override
-        public void handleError(ClientHttpResponse response) throws IOException {
-        }
     }
 }

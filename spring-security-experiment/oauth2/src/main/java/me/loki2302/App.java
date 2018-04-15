@@ -1,5 +1,7 @@
 package me.loki2302;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -8,16 +10,21 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.common.exceptions.InvalidGrantException;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
@@ -25,9 +32,11 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.security.oauth2.provider.*;
 import org.springframework.security.oauth2.provider.expression.OAuth2MethodSecurityExpressionHandler;
+import org.springframework.security.oauth2.provider.token.AbstractTokenGranter;
 import org.springframework.security.oauth2.provider.token.AccessTokenConverter;
+import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
@@ -37,9 +46,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 
 @SpringBootApplication
 public class App {
@@ -165,7 +172,7 @@ public class App {
                     .withClient("MyClientId1")
                     .accessTokenValiditySeconds(10)
                     .secret(passwordEncoder.encode("MyClientId1Secret"))
-                    .authorizedGrantTypes("client_credentials", "password", "refresh_token", "authorization_code")
+                    .authorizedGrantTypes("client_credentials", "password", "refresh_token", "authorization_code", "social")
                     .authorities("ROLE_CLIENT")
                     .scopes("read", "cats", "beer")
 
@@ -174,18 +181,26 @@ public class App {
                     .withClient("MyClientId2")
                     .accessTokenValiditySeconds(3)
                     .secret(passwordEncoder.encode("MyClientId2Secret"))
-                    .authorizedGrantTypes("client_credentials", "password", "refresh_token", "authorization_code")
+                    .authorizedGrantTypes("client_credentials", "password", "refresh_token", "authorization_code", "social")
                     .authorities("ROLE_CLIENT")
                     .scopes("read", "cats", "beer");
         }
 
         @Override
         public void configure(AuthorizationServerEndpointsConfigurer endpoints) {
+            List<TokenGranter> tokenGranters = new ArrayList<>();
+            tokenGranters.add(endpoints.getTokenGranter());
+            tokenGranters.add(new SocialTokenGranter(
+                    userDetailsService, endpoints.getTokenServices(),
+                    endpoints.getClientDetailsService(),
+                    endpoints.getOAuth2RequestFactory()));
+
             endpoints
                     .tokenStore(tokenStore)
                     .accessTokenConverter(accessTokenConverter)
                     .userDetailsService(userDetailsService)
-                    .authenticationManager(authenticationManager);
+                    .authenticationManager(authenticationManager)
+                    .tokenGranter(new CompositeTokenGranter(tokenGranters));
         }
     }
 
@@ -196,6 +211,84 @@ public class App {
         public void configure(HttpSecurity http) throws Exception {
             // remove this to disallow requests without authentication
             http.authorizeRequests().anyRequest().permitAll();
+        }
+    }
+
+    public static class SocialTokenGranter extends AbstractTokenGranter {
+        public final static String USER1_TOKEN = "theuser1token123";
+        public final static String USER1_USERNAME = "user1";
+
+        private final static Logger LOGGER = LoggerFactory.getLogger(SocialTokenGranter.class);
+        private final static String GRANT_TYPE = "social";
+
+        private final UserDetailsService userDetailsService;
+
+        protected SocialTokenGranter(
+                UserDetailsService userDetailsService,
+                AuthorizationServerTokenServices tokenServices,
+                ClientDetailsService clientDetailsService,
+                OAuth2RequestFactory requestFactory) {
+
+            super(tokenServices, clientDetailsService, requestFactory, GRANT_TYPE);
+
+            this.userDetailsService = userDetailsService;
+        }
+
+        @Override
+        protected OAuth2Authentication getOAuth2Authentication(
+                ClientDetails client,
+                TokenRequest tokenRequest) {
+
+            Map<String, String> requestParameters = tokenRequest.getRequestParameters();
+            LOGGER.info("Request parameters: {}", requestParameters);
+
+            String provider = requestParameters.get("provider");
+            String token = requestParameters.get("token");
+            LOGGER.info("provider={}, token={}", provider, token);
+
+            // ...looks up the user based on the Google/Facebook/Twitter token...
+
+            if(token.equals(USER1_TOKEN)) {
+                UserDetails userDetails = userDetailsService.loadUserByUsername(USER1_USERNAME);
+
+                SocialProviderAuthenticationToken socialProviderAuthenticationToken = new SocialProviderAuthenticationToken(
+                        userDetails.getUsername(),
+                        token,
+                        userDetails.getAuthorities());
+
+                OAuth2Authentication oAuth2Authentication = new OAuth2Authentication(
+                        tokenRequest.createOAuth2Request(client),
+                        socialProviderAuthenticationToken);
+                return oAuth2Authentication;
+            }
+
+            throw new InvalidGrantException("Your social token is not ok");
+        }
+    }
+
+    public static class SocialProviderAuthenticationToken extends AbstractAuthenticationToken {
+        private final String username;
+        private final String socialToken;
+
+        public SocialProviderAuthenticationToken(
+                String username,
+                String socialToken,
+                Collection<? extends GrantedAuthority> authorities) {
+
+            super(authorities);
+
+            this.username = username;
+            this.socialToken = socialToken;
+        }
+
+        @Override
+        public Object getCredentials() {
+            return socialToken;
+        }
+
+        @Override
+        public Object getPrincipal() {
+            return username;
         }
     }
 }
