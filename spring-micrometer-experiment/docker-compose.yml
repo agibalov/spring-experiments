@@ -1,0 +1,34 @@
+version: "3"
+
+services:
+
+  prometheus:
+    image: prom/prometheus:v2.2.1
+    ports:
+    - 9090:9090
+    volumes:
+    - ./prometheus.yml:/etc/prometheus/prometheus.yml
+
+  grafana:
+    image: grafana/grafana:5.0.4
+    ports:
+    - 3000:3000
+    volumes:
+    #- ./grafana-data:/var/lib/grafana
+    - ./datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml
+    - ./dashboard.yaml:/etc/grafana/provisioning/dashboards/dashboard.yaml
+    - ./dashboard.json:/var/lib/grafana/dashboards/dashboard.json
+    environment:
+      GF_SERVER_ROOT_URL: http://localhost:3000
+      GF_SECURITY_ADMIN_PASSWORD: qwerty
+      # Credentials are: admin/qwerty
+
+  app:
+    image: openjdk:8-jre
+    ports:
+    - 8080:8080
+    volumes:
+    - ./build/libs/spring-micrometer-experiment-1.0-SNAPSHOT.jar:/app.jar
+    command: java -jar /app.jar
+    environment:
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: prometheus,metrics
