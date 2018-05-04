@@ -13,7 +13,7 @@ import static org.junit.Assert.assertNull;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Config.class)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@DirtiesContext
 public class LifecycleCallbacksTest {
     @Autowired
     private NoteRepository noteRepository;

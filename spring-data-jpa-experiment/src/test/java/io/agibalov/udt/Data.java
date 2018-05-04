@@ -13,7 +13,6 @@ import javax.persistence.Entity;
 })
 public class Data {
     @Id
-    @GeneratedValue
     public Long id;
 
     @Type(type = "myUdt", parameters = {})

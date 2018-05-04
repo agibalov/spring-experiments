@@ -1,5 +1,6 @@
 package io.agibalov.jdbc;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,7 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Config.class)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@DirtiesContext
 public class JdbcTemplateTest {
     @Autowired
     private NoteRepository noteRepository;
@@ -25,10 +26,15 @@ public class JdbcTemplateTest {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    @Before
+    public void deleteAllNotes() {
+        noteRepository.deleteAll();
+    }
+
     @Test
     public void canQueryForRows() {
-        note("note one");
-        note("note two");
+        note(1, "note one");
+        note(2, "note two");
 
         List<NoteRow> noteRows = jdbcTemplate.query("select * from Note", new RowMapper<NoteRow>() {
             @Override
@@ -49,15 +55,16 @@ public class JdbcTemplateTest {
 
     @Test
     public void canQueryForSingleValue() {
-        note("note one");
-        note("note two");
+        note(1, "note one");
+        note(2, "note two");
 
         long count = jdbcTemplate.queryForObject("select count(*) from Note", Long.class);
         assertEquals(2, count);
     }
 
-    private Note note(String text) {
+    private Note note(long id, String text) {
         Note note = new Note();
+        note.id = id;
         note.text = text;
         return noteRepository.save(note);
     }

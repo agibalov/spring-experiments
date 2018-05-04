@@ -9,7 +9,6 @@ import javax.persistence.Id;
 @Entity
 public class Note {
     @Id
-    @GeneratedValue
     public long id;
     public String text;
 }

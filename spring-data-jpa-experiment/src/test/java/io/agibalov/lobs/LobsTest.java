@@ -23,7 +23,7 @@ import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Config.class)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@DirtiesContext
 public class LobsTest {
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();

@@ -1,5 +1,6 @@
 package io.agibalov.decltransactions;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,13 +13,18 @@ import static org.junit.Assert.fail;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Config.class)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@DirtiesContext
 public class DeclarativeTransactionsTest {
     @Autowired
     private PersonRepository personRepository;
 
     @Autowired
     private PersonService personService;
+
+    @Before
+    public void deleteAllPersons() {
+        personRepository.deleteAll();
+    }
 
     @Test
     public void changesAreNotCommittedWhenTransactionalMethodThrows() {

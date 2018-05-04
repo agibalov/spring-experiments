@@ -1,5 +1,6 @@
 package io.agibalov.version;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,14 +13,20 @@ import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Config.class)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@DirtiesContext
 public class VersionTest {
     @Autowired
     private NoteRepository noteRepository;
 
+    @Before
+    public void deleteAllNotes() {
+        noteRepository.deleteAll();
+    }
+
     @Test
     public void versionGetsSetTo0WhenEntityFirstSaved() {
         Note note = new Note();
+        note.id = 1L;
         assertNull(note.version);
 
         note = noteRepository.save(note);
@@ -29,6 +36,7 @@ public class VersionTest {
     @Test
     public void versionIsNotUpdatedOnSaveIfThereWereNoChangesToEntity() {
         Note note = new Note();
+        note.id = 1L;
         note = noteRepository.save(note);
         assertEquals(0L, (long)note.version);
 
@@ -39,6 +47,7 @@ public class VersionTest {
     @Test
     public void versionIsUpdatedOnSaveIfThereWereChangesToEntity() {
         Note note = new Note();
+        note.id = 1L;
         note = noteRepository.save(note);
         assertEquals(0L, (long)note.version);
 
@@ -50,6 +59,7 @@ public class VersionTest {
     @Test
     public void canGetObjectOptimisticLockingFailureExceptionWhenUpdatingOlderVersion() {
         Note note = new Note();
+        note.id = 1L;
         note = noteRepository.save(note);
 
         note.content = "hello";
