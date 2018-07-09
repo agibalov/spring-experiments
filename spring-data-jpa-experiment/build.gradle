@@ -16,6 +16,7 @@ dependencies {
     testCompile 'org.hsqldb:hsqldb:2.4.0'
     testCompile 'com.fasterxml.jackson.core:jackson-databind:2.9.5'
     testCompile 'commons-io:commons-io:2.6'
+    testCompile group: 'net.ttddyy', name: 'datasource-proxy', version: '1.4.9'
     testCompileOnly group: 'org.projectlombok', name: 'lombok', version: '1.16.20'
 }
 
