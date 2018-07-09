@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -21,6 +22,9 @@ public class TracingTest {
 
     @Autowired
     private BlogRepository blogRepository;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @Test
     public void itShouldInterceptAllQueries() {
@@ -45,5 +49,15 @@ public class TracingTest {
         assertTrue(queries.get(1).matches("^insert into blog \\(title, id\\) values \\(\\?, \\?\\)$"));
         assertTrue(queries.get(2).matches("^select .+ from blog .+ where .+id=\\?$"));
         assertTrue(queries.get(3).matches("^delete from blog where id=\\?$"));
+
+
+        jdbcTemplate.queryForObject("select 2 + 3", Integer.class);
+
+        assertEquals(5, queries.size());
+        assertTrue(queries.get(0).matches("^select .+ from blog .+ where .+id=\\?$"));
+        assertTrue(queries.get(1).matches("^insert into blog \\(title, id\\) values \\(\\?, \\?\\)$"));
+        assertTrue(queries.get(2).matches("^select .+ from blog .+ where .+id=\\?$"));
+        assertTrue(queries.get(3).matches("^delete from blog where id=\\?$"));
+        assertTrue(queries.get(4).matches("^select 2 \\+ 3$"));
     }
 }
