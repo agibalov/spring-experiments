@@ -162,6 +162,16 @@ public class CustomWebServerTest {
             return new LinkedMultiValueMap<>();
         }
 
+        @Override
+        protected SslInfo initSslInfo() {
+            return null;
+        }
+
+        @Override
+        public <T> T getNativeRequest() {
+            return (T)this;
+        }
+
         @Nullable
         @Override
         public InetSocketAddress getRemoteAddress() {
@@ -185,6 +195,11 @@ public class CustomWebServerTest {
 
         public DummyServerHttpResponse(DataBufferFactory dataBufferFactory) {
             super(dataBufferFactory);
+        }
+
+        @Override
+        public <T> T getNativeResponse() {
+            return (T) this;
         }
 
         @Override

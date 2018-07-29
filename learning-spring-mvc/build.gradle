@@ -14,5 +14,5 @@ subprojects {
         }
     }
 
-    ext.springBootVersion='2.0.0.M5'
+    ext.springBootVersion='2.0.0.M7'
 }
