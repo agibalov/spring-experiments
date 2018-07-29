@@ -55,6 +55,7 @@ public class CustomHttpMessageConverterTest {
 
         @Override
         public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+            converters.clear();
             converters.add(new YamlHttpMessageConverter(new Yaml()));
         }
     }

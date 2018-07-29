@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.web.reactive.ReactiveWebServerAutoConfiguration;
+import org.springframework.boot.autoconfigure.web.reactive.ReactiveWebServerFactoryAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.reactive.server.ReactiveWebServerFactory;
 import org.springframework.boot.web.server.WebServer;
@@ -82,7 +82,7 @@ public class CustomWebServerTest {
         assertTrue(response.getBody().contains("{\"message\":\"hello world"));
     }
 
-    @SpringBootApplication(exclude = {ReactiveWebServerAutoConfiguration.class})
+    @SpringBootApplication(exclude = {ReactiveWebServerFactoryAutoConfiguration.class})
     public static class Config {
         @Bean
         public ReactiveWebServerFactory reactiveWebServerFactory() {

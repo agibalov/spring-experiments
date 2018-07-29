@@ -9,10 +9,7 @@ task wrapper(type: Wrapper) {
 subprojects {
     repositories {
         mavenCentral()
-        maven {
-            url 'http://repo.spring.io/milestone/'
-        }
     }
 
-    ext.springBootVersion='2.0.0.M7'
+    ext.springBootVersion='2.0.3.RELEASE'
 }
