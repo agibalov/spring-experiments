@@ -1,0 +1,23 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '2.0.5.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.6.RELEASE'
+}
+
+group 'io.agibalov'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-security'
+    compile group: 'org.springframework.security', name: 'spring-security-oauth2-client'
+    compile 'org.springframework.security:spring-security-oauth2-jose'
+    compileOnly group: 'org.projectlombok', name: 'lombok'
+}
