@@ -1,18 +1,18 @@
 group 'me.loki2302'
 version '1.0-SNAPSHOT'
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '4.2.1'
-    distributionUrl = "https://services.gradle.org/distributions/gradle-$gradleVersion-all.zip"
+wrapper {
+    gradleVersion = '4.9'
 }
 
-subprojects {
+subprojects { subproject ->
+    subproject.apply plugin: 'java'
+
+    sourceCompatibility = 1.8
+
     repositories {
         mavenCentral()
-        maven {
-            url 'http://repo.spring.io/milestone/'
-        }
     }
 
-    ext.springBootVersion='2.0.0.M5'
+    ext.springBootVersion = '2.0.3.RELEASE'
 }
