@@ -20,4 +20,5 @@ dependencies {
     compile group: 'org.springframework.security', name: 'spring-security-oauth2-client'
     compile 'org.springframework.security:spring-security-oauth2-jose'
     compileOnly group: 'org.projectlombok', name: 'lombok'
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.8.1'
 }

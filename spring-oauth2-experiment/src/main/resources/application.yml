@@ -5,7 +5,8 @@ spring:
         registration:
           google:
             client-id: 293281611213-o3e5d2df4nh6s2dke25gck5n5em2mma5.apps.googleusercontent.com
-            client-secret: htvmbOD5l_hON4sVDKj90CdY
+            client-secret: w-LDEQXa632ufEWSm-6xJBbg
+            client-authentication-method: POST # default is 'BASIC' and it doesn't work o_O
           facebook:
             client-id: 1150208065128018
             client-secret: aa4f8e33d6c7b1076d7c2ca2205a2b0b
