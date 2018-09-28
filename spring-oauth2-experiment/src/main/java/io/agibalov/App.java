@@ -13,6 +13,9 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
+import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.util.SerializationUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -47,6 +50,56 @@ public class App {
                         log.info("successHandler: {}", authentication);
                         // TODO: send redirect to /app/entrypoint/{JWT with facebook/google/github token here}
                         // TODO: the app is responsible for using that JWT to authenticate against this BE
+
+                        if(!(authentication instanceof OAuth2AuthenticationToken)) {
+                            throw new RuntimeException("Don't know what to do");
+                        }
+
+                        OAuth2AuthenticationToken oAuth2AuthenticationToken = (OAuth2AuthenticationToken)authentication;
+                        if(oAuth2AuthenticationToken.getAuthorizedClientRegistrationId().equals("google")) {
+                            OAuth2User oAuth2User = oAuth2AuthenticationToken.getPrincipal();
+                            if(!(oAuth2User instanceof DefaultOidcUser)) {
+                                throw new RuntimeException("Don't know what to do");
+                            }
+
+                            DefaultOidcUser defaultOidcUser = (DefaultOidcUser)oAuth2User;
+                            String picture = defaultOidcUser.getPicture();
+                            String name = defaultOidcUser.getFullName();
+                            String email = defaultOidcUser.getEmail();
+                            String id = defaultOidcUser.getSubject();
+
+                            log.info("Google: picture={} name={} email={} id={}", picture, name, email, id);
+
+                        } else if(oAuth2AuthenticationToken.getAuthorizedClientRegistrationId().equals("github")) {
+                            OAuth2User oAuth2User = oAuth2AuthenticationToken.getPrincipal();
+                            if(!(oAuth2User instanceof DefaultOAuth2User)) {
+                                throw new RuntimeException("Don't know what to do");
+                            }
+
+                            DefaultOAuth2User defaultOAuth2User = (DefaultOAuth2User)oAuth2User;
+
+                            String id = defaultOAuth2User.getName();
+                            String picture = (String) defaultOAuth2User.getAttributes().get("avatar_url");
+                            String name = (String) defaultOAuth2User.getAttributes().get("name");
+
+                            log.info("Github: id={} picture={} name={}", id, picture, name);
+
+                        } else if(oAuth2AuthenticationToken.getAuthorizedClientRegistrationId().equals("facebook")) {
+                            OAuth2User oAuth2User = oAuth2AuthenticationToken.getPrincipal();
+                            if(!(oAuth2User instanceof DefaultOAuth2User)) {
+                                throw new RuntimeException("Don't know what to do");
+                            }
+
+                            DefaultOAuth2User defaultOAuth2User = (DefaultOAuth2User)oAuth2User;
+
+                            String id = defaultOAuth2User.getName();
+                            String name = (String) defaultOAuth2User.getAttributes().get("name");
+
+                            log.info("Facebook: id={} name={}", id, name);
+
+                        } else {
+                            throw new RuntimeException("Don't know what to do");
+                        }
                     })
                     .failureHandler((request, response, exception) -> {
                         log.info("failureHandler", exception);
