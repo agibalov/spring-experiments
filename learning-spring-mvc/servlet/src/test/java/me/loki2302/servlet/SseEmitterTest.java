@@ -97,7 +97,7 @@ public class SseEmitterTest {
         private Exchanger<Object> exchanger;
 
         @GetMapping
-        public ResponseEntity<SseEmitter> responseBodyEmitterHandler() {
+        public ResponseEntity<SseEmitter> sseEmitterHandler() {
             SseEmitter sseEmitter = new SseEmitter();
 
             executorService.submit(() -> {
