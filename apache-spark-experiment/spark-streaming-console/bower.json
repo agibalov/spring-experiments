@@ -1,0 +1,20 @@
+{
+  "name": "spark-streaming-console",
+  "version": "0.0.0",
+  "homepage": "https://github.com/loki2302/apache-spark-experiment",
+  "authors": [
+    "loki2302 <loki2302@loki2302.me>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "~1.4.0",
+    "bootstrap": "~3.3.4"
+  }
+}

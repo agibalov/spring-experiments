@@ -1,0 +1,30 @@
+sparkmaster:
+  image: loki2302/sparkmaster
+  hostname: sparkmaster
+  ports:
+    - "8080:8080"
+    - "7077:7077"
+
+sparkworker1:
+  image: loki2302/sparkworker
+  hostname: sparkworker1
+  environment:
+    SPARK_MASTER: "sparkmaster:7077"
+    WEBUI_PORT: 8081
+    CORES: 1
+  links:
+    - sparkmaster
+  ports:
+    - "8081:8081"
+
+sparkworker2:
+  image: loki2302/sparkworker
+  hostname: sparkworker2
+  environment:
+    SPARK_MASTER: "sparkmaster:7077"
+    WEBUI_PORT: 8082
+    CORES: 1
+  links:
+    - sparkmaster
+  ports:
+    - "8082:8082"
