@@ -1,0 +1,4 @@
+spring:
+  application:
+    name: ${app.name}
+    instance_id: ${app.instance}
