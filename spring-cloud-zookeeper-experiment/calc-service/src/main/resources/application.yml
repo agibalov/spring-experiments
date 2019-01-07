@@ -1,0 +1,6 @@
+spring.application.name: CalcService
+spring.cloud.zookeeper.dependencies:
+  AddService:
+    loadBalancerType: ROUND_ROBIN
+  SubService:
+    loadBalancerType: ROUND_ROBIN
