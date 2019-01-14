@@ -16,7 +16,7 @@ group 'io.agibalov'
 version '1.0-SNAPSHOT'
 
 wrapper {
-    gradleVersion = '4.10.2'
+    gradleVersion = '5.1.1'
 }
 
 sourceCompatibility = 1.8
@@ -29,8 +29,10 @@ dependencies {
     testCompile 'junit:junit'
     testCompile 'org.springframework.boot:spring-boot-starter-test'
     testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
 
     compile 'org.springframework.boot:spring-boot-starter'
     compile 'com.github.ulisesbocchio:jasypt-spring-boot-starter:2.1.0'
     compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
 }
