@@ -2,6 +2,8 @@
 
 Illustrates integration between [Jasypt and Spring Boot](https://github.com/ulisesbocchio/jasypt-spring-boot).
 
+## Basic scenarios
+
 Run `./gradlew clean bootRun` and see it fails:
 
 ```
@@ -22,14 +24,18 @@ Caused by: org.jasypt.exceptions.EncryptionOperationNotPossibleException: null
 Run `JASYPT_ENCRYPTOR_PASSWORD=password ./gradlew clean bootRun` and see it DOESN'T fail:
 
 ```
-2019-01-13 22:07:41.482  INFO 18346 --- [           main] io.agibalov.App                          : username is aagibalov
+2019-01-13 22:07:41.482  INFO 18346 --- [           main] io.agibalov.App                          : username is andreya
 2019-01-13 22:07:41.482  INFO 18346 --- [           main] io.agibalov.App                          : password is qwerty
 ```
+
+## Keeping all the passwords in the repository
+
+*Scenario: the team wants to store all the sensitive data in the repository and at the same time it wants to make sure that if someone gets access to the code, they won't be able to access the sensitive data. All team members put the master password to `~/.the-app/secrets.yaml` on their machines and Spring Boot looks up that password before it can decypher the sensitive data.*
 
 Save the password to `~/.the-app/secrets.yaml` by running `./save-password.sh` and then run `./gradlew clean bootRun`:
 
 ```
-2019-01-13 22:28:25.438  INFO 22204 --- [           main] io.agibalov.App                          : username is aagibalov
+2019-01-13 22:28:25.438  INFO 22204 --- [           main] io.agibalov.App                          : username is andreya
 2019-01-13 22:28:25.438  INFO 22204 --- [           main] io.agibalov.App                          : password is qwerty
 ```
 
