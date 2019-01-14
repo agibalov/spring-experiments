@@ -1,14 +1,44 @@
 # jasypt-spring-boot-experiment
 
-Illustrates integration between Jasypt and Spring Boot.
+Illustrates integration between [Jasypt and Spring Boot](https://github.com/ulisesbocchio/jasypt-spring-boot).
 
-1. Download [Jasypt command line utility](http://www.jasypt.org/index.html)
-2. Encrypt your password with master password: `./encrypt input="preved" password="s3cr3t"`. The output will contain an encrypted version of "preved": "7ZFDMCgFdeQY9PlaiJgFyQ==" (not guaranteed to be exactly this text).
-3. Update `application.properties`: `password=ENC(7ZFDMCgFdeQY9PlaiJgFyQ==)`
-4. Build the app using `./gradlew bootRepackage`
-5. Run the app using `java -jar jasypt-spring-boot-experiment-1.0-SNAPSHOT.jar --jasypt.encryptor.password=s3cr3t`
-6. Run the app with any other encryptor password and see it fails
+Run `./gradlew clean bootRun` and see it fails:
 
-Note that `jasypt.encryptor.password` is 100% Spring Boot-compliant, so there's a million ways to supply it to the app.
+```
+Caused by: java.lang.IllegalStateException: Required Encryption configuration property missing: jasypt.encryptor.password
+        at com.ulisesbocchio.jasyptspringboot.encryptor.DefaultLazyEncryptor.getRequiredProperty(DefaultLazyEncryptor.java:69) ~[jasypt-spring-boot-2.1.0.jar:na]
+        at com.ulisesbocchio.jasyptspringboot.encryptor.DefaultLazyEncryptor.createDefault(DefaultLazyEncryptor.java:44) ~[jasypt-spring-boot-2.1.0.jar:na]
+        at com.ulisesbocchio.jasyptspringboot.encryptor.DefaultLazyEncryptor.lambda$null$2(DefaultLazyEncryptor.java:33) ~[jasypt-spring-boot-2.1.0.jar:na]
+```
 
-Also see: https://github.com/ulisesbocchio/jasypt-spring-boot
+Run `JASYPT_ENCRYPTOR_PASSWORD=123 ./gradlew clean bootRun` and see it fails:
+
+```
+Caused by: org.jasypt.exceptions.EncryptionOperationNotPossibleException: null
+        at org.jasypt.encryption.pbe.StandardPBEByteEncryptor.decrypt(StandardPBEByteEncryptor.java:1055) ~[jasypt-1.9.2.jar:na]
+        at org.jasypt.encryption.pbe.StandardPBEStringEncryptor.decrypt(StandardPBEStringEncryptor.java:725) ~[jasypt-1.9.2.jar:na]
+```
+
+Run `JASYPT_ENCRYPTOR_PASSWORD=password ./gradlew clean bootRun` and see it DOESN'T fail:
+
+```
+2019-01-13 22:07:41.482  INFO 18346 --- [           main] io.agibalov.App                          : username is aagibalov
+2019-01-13 22:07:41.482  INFO 18346 --- [           main] io.agibalov.App                          : password is qwerty
+```
+
+Save the password to `~/.the-app/secrets.yaml` by running `./save-password.sh` and then run `./gradlew clean bootRun`:
+
+```
+2019-01-13 22:28:25.438  INFO 22204 --- [           main] io.agibalov.App                          : username is aagibalov
+2019-01-13 22:28:25.438  INFO 22204 --- [           main] io.agibalov.App                          : password is qwerty
+```
+
+Delete the password from `~/.the-app/secrets.yaml` by running `./delete-password.sh` and then run `./gradlew clean bootRun`:
+
+```
+Caused by: java.lang.IllegalStateException: Required Encryption configuration property missing: jasypt.encryptor.password
+        at com.ulisesbocchio.jasyptspringboot.encryptor.DefaultLazyEncryptor.getRequiredProperty(DefaultLazyEncryptor.java:69) ~[jasypt-spring-boot-2.1.0.jar:na]
+        at com.ulisesbocchio.jasyptspringboot.encryptor.DefaultLazyEncryptor.createDefault(DefaultLazyEncryptor.java:44) ~[jasypt-spring-boot-2.1.0.jar:na]
+```
+
+All the same options apply to `./gradlew clean test` as well.

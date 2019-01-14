@@ -1,0 +1,8 @@
+login: andreya
+
+# nCFUYl2kMtIiWoxsTBclzg== stands for qwerty (master password: password)
+password: ENC(nCFUYl2kMtIiWoxsTBclzg==)
+
+app:
+  username: the app username
+  password: ENC(nCFUYl2kMtIiWoxsTBclzg==)
