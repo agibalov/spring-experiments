@@ -6,6 +6,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.resource.OAuth2AccessDeniedException;
+import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsResourceDetails;
 import org.springframework.security.oauth2.client.token.grant.password.ResourceOwnerPasswordResourceDetails;
 import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -57,6 +58,22 @@ public class SpringOAuth2RestTemplateTest {
         } catch (Throwable t) {
             fail();
         }
+    }
+
+    @Test
+    public void canUseClientCredentialsResourceDetails() {
+        ClientCredentialsResourceDetails resourceDetails = new ClientCredentialsResourceDetails();
+        resourceDetails.setAccessTokenUri("http://localhost:8080/oauth/token");
+        resourceDetails.setClientId("MyClientId1");
+        resourceDetails.setClientSecret("MyClientId1Secret");
+        resourceDetails.setGrantType("client_credentials");
+        resourceDetails.setScope(Arrays.asList("read"));
+
+        OAuth2RestTemplate oAuth2RestTemplate = new OAuth2RestTemplate(resourceDetails);
+        Map<String, String> responseBody = oAuth2RestTemplate.getForObject("http://localhost:8080/", Map.class);
+        assertEquals(
+                "PRINCIPAL is client 'MyClientId1' ([ROLE_CLIENT])",
+                responseBody.get("message"));
     }
 
     @Import(App.class)

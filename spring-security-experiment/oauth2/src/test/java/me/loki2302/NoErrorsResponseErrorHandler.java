@@ -7,11 +7,11 @@ import java.io.IOException;
 
 class NoErrorsResponseErrorHandler implements ResponseErrorHandler {
     @Override
-    public boolean hasError(ClientHttpResponse response) throws IOException {
+    public boolean hasError(ClientHttpResponse response) {
         return false;
     }
 
     @Override
-    public void handleError(ClientHttpResponse response) throws IOException {
+    public void handleError(ClientHttpResponse response) {
     }
 }
