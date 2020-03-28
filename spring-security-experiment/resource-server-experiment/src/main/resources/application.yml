@@ -1,0 +1,3 @@
+logging.level.org.springframework.security: DEBUG
+
+app.secret: QW5kcmV5IGlzIHRoZSBiZXN0ISEhIEFuZHJleSBpcyB0aGUgYmVzdCEhIQ==

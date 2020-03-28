@@ -4,7 +4,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'org.springframework.boot:spring-boot-gradle-plugin:2.0.1.RELEASE'
+        classpath 'org.springframework.boot:spring-boot-gradle-plugin:2.2.6.RELEASE'
     }
 }
 
@@ -21,13 +21,25 @@ subprojects {
         mavenCentral()
     }
 
+    dependencyManagement {
+        dependencies {
+            dependency 'org.apache.httpcomponents:httpclient:4.5.11'
+        }
+    }
+
     dependencies {
         testCompile 'junit:junit'
         testCompile 'org.springframework.boot:spring-boot-starter-test'
+
+        compileOnly 'org.projectlombok:lombok'
+        annotationProcessor 'org.projectlombok:lombok'
+
+        testCompileOnly 'org.projectlombok:lombok'
+        testAnnotationProcessor 'org.projectlombok:lombok'
     }
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.0.2'
+    gradleVersion = '4.10.2'
     distributionUrl = "https://services.gradle.org/distributions/gradle-$gradleVersion-all.zip"
 }

@@ -1,0 +1,8 @@
+dependencies {
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-security'
+    compile 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+
+    testCompile 'org.apache.httpcomponents:httpclient'
+    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
+}

@@ -1,2 +1,3 @@
-spring-security-experiment
-==========================
+# spring-security-experiment
+
+Various Spring Security experiments.

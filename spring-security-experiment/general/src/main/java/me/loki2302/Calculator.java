@@ -37,7 +37,7 @@ public class Calculator {
 
     @PostFilter("filterObject % 3 != 0")
     public List<Integer> doublify(List<Integer> values) {
-        List<Integer> result = new ArrayList<Integer>();
+        List<Integer> result = new ArrayList<>();
         for(int x : values) {
             result.add(x * 2);
         }
