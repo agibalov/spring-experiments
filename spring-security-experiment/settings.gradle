@@ -4,3 +4,5 @@ include 'basic-authentication'
 include 'web-stateless'
 include 'oauth2'
 include 'resource-server-experiment'
+include 'oauth1-experiment'
+
